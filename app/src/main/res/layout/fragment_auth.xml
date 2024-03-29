@@ -139,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/enter_password"
                     android:inputType="textPassword"
-                    tools:text="" />
+                    tools:text="test@test.test" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button

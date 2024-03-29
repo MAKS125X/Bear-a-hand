@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentAuthBinding
+import com.example.simbirsoftmobile.presentation.screens.content.ContentFragment
+import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -50,6 +53,13 @@ class AuthFragment : Fragment() {
         binding.apply {
             authButton.isEnabled =
                 emailET.text.toString().length >= 6 && passwordET.text.toString().length >= 6
+            authButton.setOnClickListener {
+                parentFragmentManager.beginTransaction().replace(
+                    R.id.fragmentHolder,
+                    ContentFragment.newInstance(),
+                    ContentFragment.TAG,
+                ).commit()
+            }
         }
 
         initClickableTextViews()
