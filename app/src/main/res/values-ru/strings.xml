@@ -37,4 +37,14 @@
     <string name="charitable_assistance">Благотворительная помощь</string>
     <string name="empty_category_list_error">Произошла ошибка получения категорий</string>
     <string name="error_occurred_while_receiving_data">Произошла ошибка при получении данных</string>
+    <string name="forget_password"><u>Забыли пароль?</u></string>
+    <string name="registration"><u>Регистрация</u></string>
+    <string name="authorization">Авторизация</string>
+    <string name="login_via_socials">Для участия в мероприятиях войдите в приложение через социальные сети</string>
+    <string name="login_through_app">Или авторизуйтесь через приложение</string>
+    <string name="email">E-mail</string>
+    <string name="enter_email">Введите e-mail</string>
+    <string name="password">Пароль</string>
+    <string name="enter_password">Введите пароль</string>
+    <string name="login">Войти</string>
 </resources>

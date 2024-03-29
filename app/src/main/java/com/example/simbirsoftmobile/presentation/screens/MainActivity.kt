@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.ActivityMainBinding
+import com.example.simbirsoftmobile.presentation.screens.auth.AuthFragment
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.help.HelpFragment
 import com.example.simbirsoftmobile.presentation.screens.news.NewsFragment
@@ -24,8 +25,15 @@ class MainActivity : AppCompatActivity() {
         initBottomNavigation()
 
         if (savedInstanceState == null) {
-            binding.bottomNavigationView.selectedItemId = R.id.help
+//            binding.bottomNavigationView.selectedItemId = R.id.help
+
+            supportFragmentManager.beginTransaction().replace(
+                binding.fragmentHolder.id,
+                AuthFragment.newInstance(),
+                AuthFragment.TAG,
+            ).commit()
         }
+
     }
 
     private fun initBottomNavigation() {

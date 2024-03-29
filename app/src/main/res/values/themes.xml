@@ -9,6 +9,7 @@
         <item name="colorTertiary">@color/turtle_green</item>
         <item name="colorOnTertiary">@color/white</item>
         <item name="android:colorBackground">@color/white</item>
+        <item name="colorPrimaryInverse">@color/cool_grey</item>
         <item name="colorOnBackground">@color/black87</item>
         <item name="colorOnSurface">@color/black54</item>
         <item name="colorSurface">@color/light_grey_2</item>
