@@ -47,4 +47,6 @@
     <string name="password">Пароль</string>
     <string name="enter_password">Введите пароль</string>
     <string name="login">Войти</string>
+    <string name="event">Событие</string>
+    <string name="search_result_events_size">Результаты поиска: %1$s мероприятий</string>
 </resources>

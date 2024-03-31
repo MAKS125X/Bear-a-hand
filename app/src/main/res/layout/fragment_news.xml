@@ -25,9 +25,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/profile"
-            android:theme="@style/ToolbarTitle"
-            tools:text="Новости" />
+            android:text="@string/news"
+            android:theme="@style/ToolbarTitle" />
     </androidx.appcompat.widget.Toolbar>
 
 

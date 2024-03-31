@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.databinding.ItemSearchResultBinding
-import com.example.simbirsoftmobile.presentation.models.SearchResultUI
+import com.example.simbirsoftmobile.presentation.screens.search.models.SearchResultUI
 
 class SearchResultAdapter :
     ListAdapter<SearchResultUI, SearchResultAdapter.ViewHolder>(DiffCallback) {

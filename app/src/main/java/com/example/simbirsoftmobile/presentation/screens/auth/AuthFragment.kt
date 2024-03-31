@@ -7,10 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentAuthBinding
-import com.example.simbirsoftmobile.presentation.screens.content.ContentFragment
-import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -34,8 +33,10 @@ class AuthFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(EMAIL_KEY, binding.emailET.text.toString())
-        outState.putString(PASSWORD_KEY, binding.passwordET.text.toString())
+        if (isAdded && isVisible) {
+            outState.putString(EMAIL_KEY, binding.emailET.text.toString())
+            outState.putString(PASSWORD_KEY, binding.passwordET.text.toString())
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,11 +55,7 @@ class AuthFragment : Fragment() {
             authButton.isEnabled =
                 emailET.text.toString().length >= 6 && passwordET.text.toString().length >= 6
             authButton.setOnClickListener {
-                parentFragmentManager.beginTransaction().replace(
-                    R.id.fragmentHolder,
-                    ContentFragment.newInstance(),
-                    ContentFragment.TAG,
-                ).commit()
+                findNavController().navigate(R.id.action_authFragment_to_contentFragment)
             }
         }
 
@@ -102,6 +99,11 @@ class AuthFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         disposable.dispose()
@@ -112,7 +114,6 @@ class AuthFragment : Fragment() {
 
         const val EMAIL_KEY = "authEmailKey"
         const val PASSWORD_KEY = "authPasswordKey"
-
 
         @JvmStatic
         fun newInstance() = AuthFragment()

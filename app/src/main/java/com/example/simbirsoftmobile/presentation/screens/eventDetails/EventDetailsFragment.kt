@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
 import com.example.simbirsoftmobile.presentation.models.event.Event
@@ -30,6 +32,7 @@ class EventDetailsFragment : Fragment() {
 
     private var eventId: Int? = null
     private var uiState: UiState<Event> = UiState.Idle
+    private val args: EventDetailsFragmentArgs by navArgs()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -41,9 +44,8 @@ class EventDetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            eventId = it.getInt(EVENT_ID_KEY)
-        }
+
+        eventId = args.eventId
     }
 
     override fun onCreateView(
@@ -153,7 +155,7 @@ class EventDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().popBackStack()
         }
 
         if (savedInstanceState != null) {
@@ -259,8 +261,8 @@ class EventDetailsFragment : Fragment() {
 
     companion object {
         const val TAG = "EventDetailsFragment"
-        private const val EVENT_ID_KEY = "EventId"
-        const val EVENT_MODEL_KEY = "EventModel"
+        const val EVENT_ID_KEY = "eventId"
+        private const val EVENT_MODEL_KEY = "EventModel"
 
         @JvmStatic
         fun newInstance(eventId: Int) =

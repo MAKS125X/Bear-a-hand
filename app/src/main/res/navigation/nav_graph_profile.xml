@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profile_menu"
+    app:startDestination="@id/profileFragment">
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.simbirsoftmobile.presentation.screens.profile.ProfileFragment"
+        android:label="layout_base_fragment_profile"
+        tools:layout="@layout/layout_base_fragment_profile" />
+</navigation>

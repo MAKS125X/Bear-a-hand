@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.simbirsoftmobile.presentation.models.event.Event
 import com.example.simbirsoftmobile.presentation.models.event.EventsDeserializer
 import com.google.gson.GsonBuilder
+import io.reactivex.rxjava3.core.Single
 
 object EventRepository {
     private val eventGson by lazy {
@@ -34,6 +35,17 @@ object EventRepository {
         return events.filter { event ->
             event.categoryList.any { requiredCategories.contains(it) }
         }
+    }
+
+    fun searchEvent(
+        searchString: String,
+        context: Context,
+    ): Single<List<Event>> {
+        val events = getAllEvents(context)
+
+        return Single.just(events.filter { event ->
+            event.title.contains(searchString, true)
+        })
     }
 
     fun getEventById(

@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentNewsBinding
 import com.example.simbirsoftmobile.presentation.models.event.Event
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
-import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.repository.CategoryRepository
 import com.example.simbirsoftmobile.repository.EventRepository
@@ -38,6 +39,8 @@ class NewsFragment : Fragment() {
         val currentState = newsUiState
         if (currentState is UiState.Success) {
             outState.putParcelableArrayList(LIST_KEY, ArrayList(currentState.data))
+        } else {
+            newsUiState = UiState.Idle
         }
     }
 
@@ -64,9 +67,12 @@ class NewsFragment : Fragment() {
         } else {
             if (savedInstanceState != null) {
                 val currentList = getNewsListFromBundle(savedInstanceState)
-
-                newsUiState = UiState.Success(currentList)
-                updateUiState()
+                if (currentList.isEmpty()) {
+                    getNewsListFromFile()
+                } else {
+                    newsUiState = UiState.Success(currentList)
+                    updateUiState()
+                }
             } else {
                 getNewsListFromFile()
             }
@@ -156,22 +162,17 @@ class NewsFragment : Fragment() {
     }
 
     private fun moveToEventDetailsFragment(eventId: Int) {
-        parentFragmentManager.beginTransaction().replace(
-            R.id.fragmentHolder,
-            EventDetailsFragment.newInstance(eventId),
-            EventDetailsFragment.TAG,
-        ).addToBackStack(EventDetailsFragment.TAG).commit()
+        findNavController().navigate(
+            R.id.action_newsFragment_to_eventDetailsFragment,
+            bundleOf(EventDetailsFragment.EVENT_ID_KEY to eventId)
+        )
     }
 
     private fun initToolbar() {
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.open_filter -> {
-                    parentFragmentManager.beginTransaction().replace(
-                        R.id.fragmentHolder,
-                        FilterFragment.newInstance(),
-                        FilterFragment.TAG,
-                    ).addToBackStack(FilterFragment.TAG).commit()
+                    findNavController().navigate(R.id.action_newsFragment_to_filterFragment)
                     newsUiState = UiState.Idle
                 }
             }
@@ -183,6 +184,7 @@ class NewsFragment : Fragment() {
         super.onDestroyView()
 
         adapter = null
+        _binding = null
         downloadTask?.cancel(true)
     }
 

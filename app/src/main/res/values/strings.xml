@@ -49,4 +49,6 @@
     <string name="password">Password</string>
     <string name="enter_password">Enter password</string>
     <string name="login">Login</string>
+    <string name="event">Event</string>
+    <string name="search_result_events_size">Search results: %1$s events</string>
 </resources>
