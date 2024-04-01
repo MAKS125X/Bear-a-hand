@@ -52,6 +52,9 @@ class HelpFragment : Fragment() {
         }
 
     private fun updateUiState() {
+        if (!isAdded || !isVisible) {
+            return
+        }
         with(binding) {
             when (val currentState = categoriesUiState) {
                 is UiState.Error -> {

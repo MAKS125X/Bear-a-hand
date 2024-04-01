@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentNewsBinding
 import com.example.simbirsoftmobile.presentation.models.event.Event
@@ -124,7 +125,7 @@ class NewsFragment : Fragment() {
                         errorTV.visibility = View.VISIBLE
                         errorTV.text = currentState.message
                     }
-                    recyclerView.post { recyclerView.visibility = View.GONE }
+                    newsRecyclerView.post { newsRecyclerView.visibility = View.GONE }
                 }
 
                 UiState.Idle -> {}
@@ -137,7 +138,7 @@ class NewsFragment : Fragment() {
                 is UiState.Success -> {
                     progressIndicator.post { progressIndicator.visibility = View.GONE }
                     if (currentState.data.isEmpty()) {
-                        recyclerView.post { recyclerView.visibility = View.GONE }
+                        newsRecyclerView.post { newsRecyclerView.visibility = View.GONE }
                         errorTV.post {
                             errorTV.visibility = View.VISIBLE
                             binding.errorTV.text =
@@ -145,8 +146,8 @@ class NewsFragment : Fragment() {
                         }
                     } else {
                         errorTV.post { errorTV.visibility = View.GONE }
-                        recyclerView.post {
-                            recyclerView.visibility = View.VISIBLE
+                        newsRecyclerView.post {
+                            newsRecyclerView.visibility = View.VISIBLE
                             adapter?.submitList(currentState.data)
                         }
                     }
@@ -157,8 +158,8 @@ class NewsFragment : Fragment() {
 
     private fun initAdapter() {
         adapter = NewsAdapter(this::moveToEventDetailsFragment, requireContext())
-
-        binding.recyclerView.adapter = adapter
+        adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        binding.newsRecyclerView.adapter = adapter
     }
 
     private fun moveToEventDetailsFragment(eventId: Int) {

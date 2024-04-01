@@ -9,11 +9,10 @@
         android:id="@+id/newsFragment"
         android:name="com.example.simbirsoftmobile.presentation.screens.news.NewsFragment"
         android:label="fragment_news"
-        tools:layout="@layout/fragment_news" >
+        tools:layout="@layout/fragment_news">
         <action
             android:id="@+id/action_newsFragment_to_eventDetailsFragment"
-            app:destination="@id/eventDetailsFragment" >
-        </action>
+            app:destination="@id/eventDetailsFragment" />
         <action
             android:id="@+id/action_newsFragment_to_filterFragment"
             app:destination="@id/filterFragment" />
@@ -22,11 +21,11 @@
         android:id="@+id/eventDetailsFragment"
         android:name="com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment"
         android:label="fragment_event_details"
-        tools:layout="@layout/fragment_event_details" >
+        tools:layout="@layout/fragment_event_details">
         <argument
             android:name="eventId"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/filterFragment"
