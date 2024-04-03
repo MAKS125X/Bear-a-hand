@@ -4,13 +4,14 @@ import android.content.Context
 import com.example.simbirsoftmobile.presentation.models.category.Category
 import com.example.simbirsoftmobile.presentation.screens.utils.TypedListener
 import com.example.simbirsoftmobile.repository.CategoryRepository
+import io.reactivex.rxjava3.core.Observable
 import java.lang.ref.WeakReference
 
 class Downloader(
     context: Context,
-    callback: TypedListener<List<Category>>,
+    callback: TypedListener<Observable<List<Category>>>,
 ) {
-    private val callbackReference: WeakReference<TypedListener<List<Category>>> =
+    private val callbackReference: WeakReference<TypedListener<Observable<List<Category>>>> =
         WeakReference(callback)
     private val contextReference: WeakReference<Context> = WeakReference(context)
 
@@ -19,13 +20,9 @@ class Downloader(
         if (ref != null) {
             val categories =
                 CategoryRepository.getCategories(ref)
-            if (categories.isEmpty()) {
-                callbackReference.get()
-                    ?.invoke(listOf())
-            } else {
-                callbackReference.get()
-                    ?.invoke(categories)
-            }
+
+            callbackReference.get()
+                ?.invoke(categories)
         }
     }
 

@@ -1,20 +1,18 @@
 package com.example.simbirsoftmobile.presentation.screens.help
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentHelpBinding
 import com.example.simbirsoftmobile.presentation.models.category.Category
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.repository.CategoryRepository
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class HelpFragment : Fragment() {
     private var _binding: FragmentHelpBinding? = null
@@ -24,90 +22,45 @@ class HelpFragment : Fragment() {
     var adapter: CategoryAdapter? = null
     private var categoriesUiState: UiState<List<Category>> = UiState.Idle
 
-    private val dataBroadcastReceiver =
-        object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val currentCategoryList = getArrayListFromIntent(intent)
-
-                if (currentCategoryList.isEmpty()) {
-                    categoriesUiState = UiState.Error(getString(R.string.empty_category_list_error))
-                    updateUiState()
-                } else {
-                    categoriesUiState = UiState.Success(currentCategoryList)
-                    updateUiState()
-                }
-            }
-        }
-
-    private fun getArrayListFromIntent(intent: Intent) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableArrayListExtra(
-                DownloadCategoriesService.LIST_KEY,
-                Category::class.java
-            )
-                ?: arrayListOf()
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableArrayListExtra(DownloadCategoriesService.LIST_KEY) ?: arrayListOf()
-        }
+    private val compositeDisposable = CompositeDisposable()
 
     private fun updateUiState() {
-        if (!isAdded || !isVisible) {
-            return
-        }
-        with(binding) {
-            when (val currentState = categoriesUiState) {
-                is UiState.Error -> {
-                    progressIndicator.post {
-                        progressIndicator.visibility = View.GONE
-                    }
-                    titleTextView.post {
-                        titleTextView.visibility = View.VISIBLE
-                        titleTextView.text = currentState.message
-                    }
-                    recyclerView.post {
-                        recyclerView.visibility = View.GONE
-                    }
+
+        when (val currentState = categoriesUiState) {
+            is UiState.Error -> {
+                with(binding) {
+                    progressIndicator.visibility = View.GONE
+                    titleTextView.visibility = View.VISIBLE
+                    titleTextView.text = currentState.message
+                    recyclerView.visibility = View.GONE
                 }
+            }
 
-                UiState.Loading -> {
-                    progressIndicator.post {
-                        progressIndicator.visibility = View.VISIBLE
-                    }
-                    titleTextView.post {
-                        titleTextView.visibility = View.GONE
-                    }
-                    recyclerView.post {
-                        recyclerView.visibility = View.GONE
-                    }
+            UiState.Loading -> {
+                with(binding) {
+                    progressIndicator.visibility = View.VISIBLE
+                    titleTextView.visibility = View.GONE
+                    recyclerView.visibility = View.GONE
                 }
+            }
 
-                is UiState.Success -> {
-                    progressIndicator.post {
-                        progressIndicator.visibility = View.GONE
-                    }
-                    titleTextView.post {
-                        titleTextView.visibility = View.VISIBLE
-                        titleTextView.text = getString(R.string.select_help_category)
-                    }
+            is UiState.Success -> {
+                with(binding) {
+                    progressIndicator.visibility = View.GONE
+                    titleTextView.visibility = View.VISIBLE
+                    titleTextView.text = getString(R.string.select_help_category)
 
-                    recyclerView.post {
-                        recyclerView.visibility = View.VISIBLE
-                    }
+                    recyclerView.visibility = View.VISIBLE
                     adapter?.submitList(currentState.data)
                     adapter?.notifyDataSetChanged()
                 }
+            }
 
-                UiState.Idle -> {
-                    progressIndicator.post {
-                        progressIndicator.visibility = View.GONE
-                    }
-                    titleTextView.post {
-                        titleTextView.visibility = View.GONE
-                    }
-                    recyclerView.post {
-                        recyclerView.visibility = View.GONE
-                    }
+            UiState.Idle -> {
+                with(binding) {
+                    progressIndicator.visibility = View.GONE
+                    titleTextView.visibility = View.GONE
+                    recyclerView.visibility = View.GONE
                 }
             }
         }
@@ -137,10 +90,9 @@ class HelpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initAdapter()
-        registerReceiver()
 
         if (savedInstanceState != null) {
-            val currentCategoryList = getNewsListFromBundle(savedInstanceState)
+            val currentCategoryList = getCategoriesListFromBundle(savedInstanceState)
             if (currentCategoryList.isEmpty()) {
                 categoriesUiState = UiState.Error(getString(R.string.empty_category_list_error))
                 updateUiState()
@@ -152,23 +104,18 @@ class HelpFragment : Fragment() {
             categoriesUiState = UiState.Loading
             updateUiState()
 
-            requireContext().startService(
-                Intent(
-                    requireContext(),
-                    DownloadCategoriesService::class.java
-                )
-            )
+            val disposable = CategoryRepository
+                .getCategories(requireContext())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    categoriesUiState = UiState.Success(it)
+                    updateUiState()
+                }
+            compositeDisposable.add(disposable)
         }
     }
 
-    private fun registerReceiver() {
-        val intentFilter = IntentFilter(DownloadCategoriesService.DOWNLOAD_ACTION)
-
-        val localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
-        localBroadcastManager.registerReceiver(dataBroadcastReceiver, intentFilter)
-    }
-
-    private fun getNewsListFromBundle(savedInstanceState: Bundle): List<Category> =
+    private fun getCategoriesListFromBundle(savedInstanceState: Bundle): List<Category> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             savedInstanceState
                 .getParcelableArrayList(CATEGORY_LIST_KEY, Category::class.java)?.toList()
@@ -182,7 +129,6 @@ class HelpFragment : Fragment() {
 
     private fun initAdapter() {
         adapter = CategoryAdapter(requireContext())
-
         binding.recyclerView.adapter = adapter
     }
 
@@ -194,15 +140,7 @@ class HelpFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        LocalBroadcastManager.getInstance(requireContext())
-            .unregisterReceiver(dataBroadcastReceiver)
-        requireContext().stopService(
-            Intent(
-                requireContext(),
-                DownloadCategoriesService::class.java,
-            )
-        )
+        compositeDisposable.dispose()
     }
 
     companion object {

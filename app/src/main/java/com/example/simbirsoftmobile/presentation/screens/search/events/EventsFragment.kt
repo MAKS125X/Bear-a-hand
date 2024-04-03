@@ -92,10 +92,15 @@ class EventsFragment : ViewPagerFragment() {
             UiState.Idle -> {}
             UiState.Loading -> {}
             is UiState.Success -> {
-                binding.emptyResultLayout.visibility = View.GONE
-                binding.queryResultLayout.visibility = View.VISIBLE
-                binding.searchResultSizeTV.text =
-                    getString(R.string.search_result_events_size, currentState.data.size.toString())
+                with(binding) {
+                    emptyResultLayout.visibility = View.GONE
+                    queryResultLayout.visibility = View.VISIBLE
+                    searchResultSizeTV.text =
+                        getString(
+                            R.string.search_result_events_size,
+                            currentState.data.size.toString()
+                        )
+                }
                 adapter.submitList(currentState.data)
             }
         }
@@ -107,7 +112,6 @@ class EventsFragment : ViewPagerFragment() {
 
     private fun initAdapter() {
         binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         divider.isLastItemDecorated = false
         binding.recyclerView.addItemDecoration(divider)

@@ -1,14 +1,13 @@
-package com.example.simbirsoftmobile.presentation.screens.help
+package com.example.simbirsoftmobile.presentation.screens.help.thread
 
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.simbirsoftmobile.presentation.models.category.Category
-import com.example.simbirsoftmobile.presentation.screens.help.thread.Downloader
 
 class DownloadCategoriesService : Service() {
-    private val downloader: Downloader = Downloader(this) { sendResultToActivity(it) }
+    private val downloader: Downloader = Downloader(this) { }
 
     override fun onBind(intent: Intent): IBinder? = null
 

@@ -8,9 +8,14 @@ import com.example.simbirsoftmobile.databinding.ItemCategorySettingBinding
 import com.example.simbirsoftmobile.presentation.models.category.CategorySetting
 
 class CategorySettingAdapter(
-    private val settings: List<CategorySetting>,
+    private var settings: List<CategorySetting> = listOf(),
     val context: Context,
 ) : RecyclerView.Adapter<CategorySettingAdapter.ViewHolder>() {
+
+    fun submitList(list: List<CategorySetting>) {
+        settings = list
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

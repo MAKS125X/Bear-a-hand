@@ -5,20 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentNewsBinding
 import com.example.simbirsoftmobile.presentation.models.event.Event
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
+import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.repository.CategoryRepository
 import com.example.simbirsoftmobile.repository.EventRepository
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class NewsFragment : Fragment() {
     private var _binding: FragmentNewsBinding? = null
@@ -27,9 +25,8 @@ class NewsFragment : Fragment() {
 
     private var adapter: NewsAdapter? = null
 
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
-    private var downloadTask: Future<*>? = null
     private var newsUiState: UiState<List<Event>> = UiState.Idle
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -63,63 +60,80 @@ class NewsFragment : Fragment() {
         initAdapter()
         initToolbar()
 
+
+
         if (newsUiState is UiState.Success) {
             updateUiState()
         } else {
             if (savedInstanceState != null) {
                 val currentList = getNewsListFromBundle(savedInstanceState)
                 if (currentList.isEmpty()) {
-                    getNewsListFromFile()
+                    observeCategories()
                 } else {
                     newsUiState = UiState.Success(currentList)
                     updateUiState()
                 }
             } else {
-                getNewsListFromFile()
+                observeCategories()
             }
         }
     }
 
     private fun getNewsListFromBundle(savedInstanceState: Bundle): List<Event> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState.getParcelableArrayList(LIST_KEY, Event::class.java)?.toList()
+            savedInstanceState
+                .getParcelableArrayList(LIST_KEY, Event::class.java)
+                ?.toList()
                 ?: listOf()
         } else {
             @Suppress("DEPRECATION")
             savedInstanceState.getParcelableArrayList<Event>(LIST_KEY)?.toList() ?: listOf()
         }
 
-    private fun getNewsListFromFile() {
+    private fun observeCategories() {
         newsUiState = UiState.Loading
         updateUiState()
 
-        val loadList = Runnable {
-            val requiredCategories =
-                CategoryRepository.getSelectedCategoriesId(requireContext())
+        val disposable =
+            CategoryRepository.getSelectedCategoriesId(requireContext())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (it.isEmpty()) {
+                        newsUiState =
+                            UiState.Error(getString(R.string.nothing_was_found_based_on_filters))
+                        updateUiState()
+                    } else {
+                        getNewsListFromFile(it)
+                    }
+                }
 
-            if (requiredCategories.isEmpty()) {
-                newsUiState =
-                    UiState.Error(getString(R.string.nothing_was_found_based_on_filters))
-                updateUiState()
-            } else {
-                val events =
-                    EventRepository.getAllEventsByCategories(
-                        requiredCategories,
-                        requireContext(),
-                    )
+        compositeDisposable.add(disposable)
 
-                newsUiState = UiState.Success(events)
-                updateUiState()
+    }
+
+    private fun getNewsListFromFile(ids: List<Int>) {
+        val disposable = EventRepository
+            .getAllEventsByCategories(ids, requireContext())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it.isEmpty()) {
+                    newsUiState =
+                        UiState.Error(getString(R.string.nothing_was_found_based_on_filters))
+                    updateUiState()
+                } else {
+                    newsUiState = UiState.Success(it)
+                    updateUiState()
+                }
             }
-        }
 
-        downloadTask = executor.submit(loadList)
+        compositeDisposable.add(disposable)
     }
 
     private fun updateUiState() {
-        with(binding) {
-            when (val currentState = newsUiState) {
-                is UiState.Error -> {
+
+        when (val currentState = newsUiState) {
+            is UiState.Error -> {
+                with(binding) {
                     progressIndicator.post { progressIndicator.visibility = View.GONE }
                     errorTV.post {
                         errorTV.visibility = View.VISIBLE
@@ -127,15 +141,19 @@ class NewsFragment : Fragment() {
                     }
                     newsRecyclerView.post { newsRecyclerView.visibility = View.GONE }
                 }
+            }
 
-                UiState.Idle -> {}
+            UiState.Idle -> {}
 
-                UiState.Loading -> {
+            UiState.Loading -> {
+                with(binding) {
                     progressIndicator.post { progressIndicator.visibility = View.VISIBLE }
                     errorTV.post { errorTV.visibility = View.GONE }
                 }
+            }
 
-                is UiState.Success -> {
+            is UiState.Success -> {
+                with(binding) {
                     progressIndicator.post { progressIndicator.visibility = View.GONE }
                     if (currentState.data.isEmpty()) {
                         newsRecyclerView.post { newsRecyclerView.visibility = View.GONE }
@@ -149,6 +167,7 @@ class NewsFragment : Fragment() {
                         newsRecyclerView.post {
                             newsRecyclerView.visibility = View.VISIBLE
                             adapter?.submitList(currentState.data)
+                            adapter?.notifyDataSetChanged()
                         }
                     }
                 }
@@ -156,25 +175,32 @@ class NewsFragment : Fragment() {
         }
     }
 
+
     private fun initAdapter() {
         adapter = NewsAdapter(this::moveToEventDetailsFragment, requireContext())
-        adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        adapter?.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         binding.newsRecyclerView.adapter = adapter
     }
 
     private fun moveToEventDetailsFragment(eventId: Int) {
-        findNavController().navigate(
-            R.id.action_newsFragment_to_eventDetailsFragment,
-            bundleOf(EventDetailsFragment.EVENT_ID_KEY to eventId)
-        )
+        parentFragmentManager.beginTransaction().replace(
+            R.id.contentHolder,
+            EventDetailsFragment.newInstance(eventId),
+            EventDetailsFragment.TAG,
+        ).addToBackStack(EventDetailsFragment.TAG).commit()
     }
 
     private fun initToolbar() {
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.open_filter -> {
-                    findNavController().navigate(R.id.action_newsFragment_to_filterFragment)
                     newsUiState = UiState.Idle
+                    parentFragmentManager.beginTransaction().replace(
+                        R.id.contentHolder,
+                        FilterFragment.newInstance(),
+                        FilterFragment.TAG,
+                    ).addToBackStack(FilterFragment.TAG).commit()
                 }
             }
             true
@@ -183,10 +209,15 @@ class NewsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-
         adapter = null
         _binding = null
-        downloadTask?.cancel(true)
+
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
     }
 
     companion object {
