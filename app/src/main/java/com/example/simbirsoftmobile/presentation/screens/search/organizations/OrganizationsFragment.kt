@@ -103,7 +103,7 @@ class OrganizationsFragment : ViewPagerFragment() {
     }
 
     private fun getListOfEventsByQuery(query: String) {
-        if (context != null) {
+        if (context != null && query.isNotEmpty()) {
             publishSubject.onNext(query)
         }
     }

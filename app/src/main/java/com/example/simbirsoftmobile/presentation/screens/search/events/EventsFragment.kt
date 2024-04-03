@@ -118,7 +118,7 @@ class EventsFragment : ViewPagerFragment() {
     }
 
     override fun onSearchQueryChanged(query: String) {
-        if (context != null) {
+        if (context != null && query.isNotEmpty()) {
             getListOfEventsByQuery(query)
         }
     }

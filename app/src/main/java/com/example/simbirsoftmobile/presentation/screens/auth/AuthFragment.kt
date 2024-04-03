@@ -46,22 +46,27 @@ class AuthFragment : Fragment() {
         if (savedInstanceState != null) {
             val email = savedInstanceState.getString(EMAIL_KEY, "")
             val password = savedInstanceState.getString(PASSWORD_KEY, "")
-            binding.apply {
+            with(binding) {
                 emailET.setText(email)
                 passwordET.setText(password)
             }
         }
 
-        binding.apply {
-            authButton.isEnabled =
-                emailET.text.toString().length >= 6 && passwordET.text.toString().length >= 6
-            authButton.setOnClickListener {
-                parentFragmentManager.beginTransaction().replace(
-                    R.id.fragmentContainerView,
-                    ContentFragment.newInstance(),
-                    ContentFragment.TAG,
-                ).commit()
+        with(binding) {
+            val email = emailET.text
+            val password = passwordET.text
+            if (email != null && password != null) {
+                authButton.isEnabled =
+                    email.length >= 6 && password.length >= 6
             }
+        }
+
+        binding.authButton.setOnClickListener {
+            parentFragmentManager.beginTransaction().replace(
+                R.id.fragmentContainerView,
+                ContentFragment.newInstance(),
+                ContentFragment.TAG,
+            ).commit()
         }
 
         initClickableTextViews()

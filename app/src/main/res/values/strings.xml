@@ -51,4 +51,5 @@
     <string name="login">Login</string>
     <string name="event">Event</string>
     <string name="search_result_events_size">Search results: %1$s events</string>
+    <string name="try_search">Write the event name or keywords in the search bar.</string>
 </resources>

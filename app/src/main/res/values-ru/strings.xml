@@ -17,7 +17,7 @@
     <string name="take_picture">Сделать снимок</string>
     <string name="delete_picture">Удалить</string>
     <string name="select_help_category">Выберите категорию помощи:</string>
-    <string name="filter">Фильтровать</string>
+    <string name="filter">Фильтр</string>
     <string name="adults">Взрослые</string>
     <string name="children">Дети</string>
     <string name="animals">Животные</string>
@@ -49,4 +49,5 @@
     <string name="login">Войти</string>
     <string name="event">Событие</string>
     <string name="search_result_events_size">Результаты поиска: %1$s мероприятий</string>
+    <string name="try_search">Напишите в строке поиска название \nмероприятия или ключевые слова.</string>
 </resources>

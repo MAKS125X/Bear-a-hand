@@ -31,7 +31,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Напишите в строке поиска название \nмероприятия или ключевые слова."
+            android:text="@string/try_search"
             android:textAlignment="center"
             android:textColor="?attr/colorOnSurface" />
     </LinearLayout>
@@ -62,7 +62,6 @@
                 android:id="@+id/searchResultSizeTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Результаты поиска: 109 мероприятий"
                 android:textColor="?attr/colorOnSurface" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
