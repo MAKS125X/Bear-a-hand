@@ -28,12 +28,6 @@ class FilterFragment : Fragment() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        adapter = CategorySettingAdapter(context = context)
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         saveCategoriesInstanceState(outState)
@@ -46,6 +40,12 @@ class FilterFragment : Fragment() {
         } else {
             uiState = UiState.Idle
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        adapter = CategorySettingAdapter(context = context)
     }
 
     private fun getNewsListFromBundle(savedInstanceState: Bundle): List<CategorySetting> =

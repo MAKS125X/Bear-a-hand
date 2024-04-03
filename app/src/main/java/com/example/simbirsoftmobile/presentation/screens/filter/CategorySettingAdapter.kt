@@ -11,7 +11,6 @@ class CategorySettingAdapter(
     private var settings: List<CategorySetting> = listOf(),
     val context: Context,
 ) : RecyclerView.Adapter<CategorySettingAdapter.ViewHolder>() {
-
     fun submitList(list: List<CategorySetting>) {
         settings = list
     }

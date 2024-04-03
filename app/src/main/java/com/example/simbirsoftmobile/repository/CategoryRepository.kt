@@ -35,10 +35,12 @@ object CategoryRepository {
 
     fun getCategories(context: Context): Observable<List<Category>> {
         return Observable
-            .just(context.assets
-                .open("categories.json")
-                .bufferedReader()
-                .use { it.readText() })
+            .just(
+                context.assets
+                    .open("categories.json")
+                    .bufferedReader()
+                    .use { it.readText() }
+            )
             .subscribeOn(Schedulers.io())
             .delay(1000, TimeUnit.MILLISECONDS)
             .map {

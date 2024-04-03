@@ -7,6 +7,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class SearchResultUI(
     val name: String,
-): Parcelable
+) : Parcelable
 
 fun Event.toSearchResultUi(): SearchResultUI = SearchResultUI(this.title)

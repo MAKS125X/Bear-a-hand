@@ -15,12 +15,18 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class AuthFragment : Fragment() {
-
     private var _binding: FragmentAuthBinding? = null
     private val binding: FragmentAuthBinding
         get() = _binding!!
 
     private val disposable = CompositeDisposable()
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString(EMAIL_KEY, binding.emailET.text.toString())
+        outState.putString(PASSWORD_KEY, binding.passwordET.text.toString())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,15 +37,10 @@ class AuthFragment : Fragment() {
         return binding.root
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (isAdded && isVisible) {
-            outState.putString(EMAIL_KEY, binding.emailET.text.toString())
-            outState.putString(PASSWORD_KEY, binding.passwordET.text.toString())
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         if (savedInstanceState != null) {

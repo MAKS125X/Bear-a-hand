@@ -62,16 +62,17 @@ class OrganizationsFragment : ViewPagerFragment() {
             updateUiState()
         }
 
-        val disposable = publishSubject.switchMapSingle { query ->
-            EventRepository.searchEvent(query, requireContext())
-        }
-            .subscribeOn(Schedulers.io())
-            .map { it.map { it.toSearchResultUi() } }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                uiState = UiState.Success(it)
-                updateUiState()
+        val disposable =
+            publishSubject.switchMapSingle { query ->
+                EventRepository.searchEvent(query, requireContext())
             }
+                .subscribeOn(Schedulers.io())
+                .map { query -> query.map { it.toSearchResultUi() } }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    uiState = UiState.Success(it)
+                    updateUiState()
+                }
         compositeDisposable.add(disposable)
     }
 
@@ -102,7 +103,9 @@ class OrganizationsFragment : ViewPagerFragment() {
     }
 
     private fun getListOfEventsByQuery(query: String) {
-        publishSubject.onNext(query)
+        if (context != null) {
+            publishSubject.onNext(query)
+        }
     }
 
     private fun initAdapter() {
@@ -130,7 +133,7 @@ class OrganizationsFragment : ViewPagerFragment() {
     }
 
     companion object {
-        const val TAG = "EventsFragment"
+        const val TAG = "OrganizationsFragment"
         const val LIST_KEY = "OrganizationsListKey"
 
         @JvmStatic

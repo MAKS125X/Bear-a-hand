@@ -26,14 +26,18 @@ class ContentFragment : Fragment() {
     private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentContentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         initBottomNavigation()
@@ -115,7 +119,6 @@ class ContentFragment : Fragment() {
         const val TAG = "ContentFragment"
 
         @JvmStatic
-        fun newInstance() =
-            ContentFragment()
+        fun newInstance() = ContentFragment()
     }
 }

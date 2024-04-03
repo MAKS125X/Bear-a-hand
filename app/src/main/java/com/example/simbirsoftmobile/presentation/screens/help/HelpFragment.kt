@@ -24,8 +24,15 @@ class HelpFragment : Fragment() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private fun updateUiState() {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val currentUiState = categoriesUiState
+        if (currentUiState is UiState.Success) {
+            outState.putParcelableArrayList(CATEGORY_LIST_KEY, ArrayList(currentUiState.data))
+        }
+    }
 
+    private fun updateUiState() {
         when (val currentState = categoriesUiState) {
             is UiState.Error -> {
                 with(binding) {
@@ -63,14 +70,6 @@ class HelpFragment : Fragment() {
                     recyclerView.visibility = View.GONE
                 }
             }
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        val currentUiState = categoriesUiState
-        if (currentUiState is UiState.Success) {
-            outState.putParcelableArrayList(CATEGORY_LIST_KEY, ArrayList(currentUiState.data))
         }
     }
 

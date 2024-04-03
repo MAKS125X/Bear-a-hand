@@ -98,7 +98,7 @@ class EventsFragment : ViewPagerFragment() {
                     searchResultSizeTV.text =
                         getString(
                             R.string.search_result_events_size,
-                            currentState.data.size.toString()
+                            currentState.data.size.toString(),
                         )
                 }
                 adapter.submitList(currentState.data)

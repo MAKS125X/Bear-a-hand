@@ -6,4 +6,4 @@ fun interface SearchQueryListener {
     fun onSearchQueryChanged(query: String)
 }
 
-abstract class ViewPagerFragment: Fragment(), SearchQueryListener
+abstract class ViewPagerFragment : Fragment(), SearchQueryListener

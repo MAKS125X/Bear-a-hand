@@ -60,8 +60,6 @@ class NewsFragment : Fragment() {
         initAdapter()
         initToolbar()
 
-
-
         if (newsUiState is UiState.Success) {
             updateUiState()
         } else {
@@ -108,7 +106,6 @@ class NewsFragment : Fragment() {
                 }
 
         compositeDisposable.add(disposable)
-
     }
 
     private fun getNewsListFromFile(ids: List<Int>) {
@@ -130,7 +127,6 @@ class NewsFragment : Fragment() {
     }
 
     private fun updateUiState() {
-
         when (val currentState = newsUiState) {
             is UiState.Error -> {
                 with(binding) {
@@ -175,7 +171,6 @@ class NewsFragment : Fragment() {
         }
     }
 
-
     private fun initAdapter() {
         adapter = NewsAdapter(this::moveToEventDetailsFragment, requireContext())
         adapter?.stateRestorationPolicy =
@@ -211,8 +206,6 @@ class NewsFragment : Fragment() {
         super.onDestroyView()
         adapter = null
         _binding = null
-
-
     }
 
     override fun onDestroy() {

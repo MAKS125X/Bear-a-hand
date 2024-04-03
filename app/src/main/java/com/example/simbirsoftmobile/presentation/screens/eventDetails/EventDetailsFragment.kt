@@ -30,6 +30,7 @@ class EventDetailsFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+
         val currentState = uiState
         if (currentState is UiState.Success) {
             outState.putParcelable(EVENT_MODEL_KEY, currentState.data)

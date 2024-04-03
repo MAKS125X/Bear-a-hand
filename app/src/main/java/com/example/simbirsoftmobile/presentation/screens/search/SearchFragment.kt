@@ -21,7 +21,7 @@ class SearchFragment : Fragment() {
     private val binding: FragmentSearchBinding
         get() = _binding!!
 
-    private val disposeBag = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     private var pagerItems: List<PagerItem>? = null
 
@@ -32,13 +32,13 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private val callback = object : ViewPager2.OnPageChangeCallback() {
+    private val callback = object :
+        ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
+
             pagerItems?.let { list ->
-                list[position]
-                    .fragment
-                    .onSearchQueryChanged(binding.searchView.query.toString())
+                list[position].fragment.onSearchQueryChanged(binding.searchView.query.toString())
             }
         }
     }
@@ -78,9 +78,9 @@ class SearchFragment : Fragment() {
                 tab.text = list[position].title
             }.attach()
 
-            val searchObserver = initSearchObserver()
+            binding.fragmentViewPager.registerOnPageChangeCallback(callback)
 
-            val dispose = searchObserver
+            val dispose = initSearchObserver()
                 .filter { str -> str.isNotEmpty() }
                 .distinctUntilChanged()
                 .debounce(500, TimeUnit.MILLISECONDS)
@@ -90,27 +90,27 @@ class SearchFragment : Fragment() {
                         .onSearchQueryChanged(query)
                 }
 
-            disposeBag.add(dispose)
+            compositeDisposable.add(dispose)
         }
     }
 
-    private fun initSearchObserver() = Observable.create<String> { emitter ->
-        binding.searchView.setOnQueryTextListener(
-            object :
-                SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    return true
-                }
-
-                override fun onQueryTextChange(p0: String?): Boolean {
-                    if (p0 != null) {
-                        emitter.onNext(p0)
+    private fun initSearchObserver() =
+        Observable.create<String> { emitter ->
+            binding.searchView.setOnQueryTextListener(
+                object :
+                    SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        query?.let { emitter.onNext(it) }
+                        return true
                     }
-                    return true
-                }
-            },
-        )
-    }
+
+                    override fun onQueryTextChange(p0: String?): Boolean {
+                        p0?.let { emitter.onNext(it) }
+                        return true
+                    }
+                },
+            )
+        }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -120,7 +120,7 @@ class SearchFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        disposeBag.dispose()
+        compositeDisposable.dispose()
     }
 
     companion object {
