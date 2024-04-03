@@ -1,8 +1,8 @@
 package com.example.simbirsoftmobile.presentation.screens.utils
 
 sealed class UiState<out T> {
-    object Loading : UiState<Nothing>()
-    class Error(val message: String) : UiState<Nothing>()
-    class Success<T>(val data: T) : UiState<T>()
-    object Idle : UiState<Nothing>()
+    data object Loading : UiState<Nothing>()
+    data class Error(val message: String) : UiState<Nothing>()
+    data class Success<T>(val data: T) : UiState<T>()
+    data object Idle : UiState<Nothing>()
 }
