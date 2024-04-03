@@ -20,6 +20,7 @@ fun getRemainingDateInfo(
     context: Context,
 ): String {
     val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
     if (today > end) {
         return if (start == end) {
             val formatter = DateTimeFormatterBuilder()

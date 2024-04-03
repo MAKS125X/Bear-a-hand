@@ -3,25 +3,41 @@ package com.example.simbirsoftmobile.presentation.screens.eventDetails
 import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
 import com.example.simbirsoftmobile.presentation.models.event.Event
+import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getRemainingDateInfo
 import com.example.simbirsoftmobile.repository.EventRepository
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 class EventDetailsFragment : Fragment() {
     private var _binding: FragmentEventDetailsBinding? = null
     private val binding: FragmentEventDetailsBinding
         get() = _binding!!
 
+    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private var downloadTask: Future<*>? = null
+
     private var eventId: Int? = null
+    private var uiState: UiState<Event> = UiState.Idle
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val currentState = uiState
+        if (currentState is UiState.Success) {
+            outState.putParcelable(EVENT_MODEL_KEY, currentState.data)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,50 +55,131 @@ class EventDetailsFragment : Fragment() {
         return binding.root
     }
 
+    private fun updateUiState() {
+        with(binding) {
+            when (val currentState = uiState) {
+                is UiState.Error -> {
+                    progressIndicator.post {
+                        progressIndicator.visibility = View.GONE
+                    }
+                    eventDetailsLayout.post {
+                        eventDetailsLayout.visibility = View.GONE
+                    }
+                    errorTV.post {
+                        errorTV.visibility = View.VISIBLE
+                        errorTV.text = currentState.message
+                    }
+                }
+
+                UiState.Idle -> {}
+
+                UiState.Loading -> {
+                    progressIndicator.post {
+                        progressIndicator.visibility = View.VISIBLE
+                    }
+                    eventDetailsLayout.post {
+                        eventDetailsLayout.visibility = View.GONE
+                    }
+                    errorTV.post {
+                        errorTV.visibility = View.GONE
+                    }
+                }
+
+                is UiState.Success -> {
+                    errorTV.post {
+                        errorTV.visibility = View.GONE
+                    }
+                    progressIndicator.post {
+                        progressIndicator.visibility = View.GONE
+                    }
+                    eventDetailsLayout.post {
+                        eventDetailsLayout.visibility = View.VISIBLE
+
+                        titleTV.text = currentState.data.title
+                        organizerNameTV.text = currentState.data.organizerName
+                        addressTV.text = currentState.data.address
+
+                        remainDateTV.text =
+                            getRemainingDateInfo(
+                                currentState.data.dateStart,
+                                currentState.data.dateEnd,
+                                requireContext(),
+                            )
+
+                        initEmailSection(currentState.data.email)
+                        initPhoneNumbers(currentState.data.phoneNumbers)
+                        initImage(currentState.data.imageUrl)
+
+                        descriptionTV.text = currentState.data.description
+                        initOrganizerUrlText(currentState.data.siteUrl)
+
+                        toolbar.setOnMenuItemClickListener {
+                            when (it.itemId) {
+                                R.id.share_event -> {
+                                    val shareIntent =
+                                        Intent().apply {
+                                            action = Intent.ACTION_SEND
+                                            putExtra(Intent.EXTRA_TEXT, currentState.data.title)
+                                            type = "text/plain"
+                                        }
+                                    startActivity(
+                                        Intent.createChooser(
+                                            shareIntent,
+                                            "Поделиться событием",
+                                        )
+                                    )
+                                }
+                            }
+                            true
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getEventFromBundle(savedInstanceState: Bundle): Event? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            savedInstanceState.getParcelable(EVENT_MODEL_KEY, Event::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            savedInstanceState.getParcelable<Event>(EVENT_MODEL_KEY)
+        }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        val event = eventId?.let { getEventById(it) }
-        if (event == null) {
-            Toast.makeText(requireContext(), "Event with id: $eventId is null", Toast.LENGTH_LONG)
-                .show()
+
+        binding.toolbar.setNavigationOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
+        if (savedInstanceState != null) {
+            val currentEvent = getEventFromBundle(savedInstanceState)
+            if (currentEvent != null) {
+                uiState = UiState.Success(currentEvent)
+                updateUiState()
+            }
         } else {
-            with(binding) {
-                titleTV.text = event.title
-                organizerNameTV.text = event.organizerName
-                addressTV.text = event.address
+            uiState = UiState.Loading
 
-                remainDateTV.text =
-                    getRemainingDateInfo(event.dateStart, event.dateEnd, requireContext())
+            updateUiState()
+            val loadList = Runnable {
+                val event = eventId?.let { getEventById(it) }
 
-                initEmailSection(event.email)
-                initPhoneNumbers(event.phoneNumbers)
-                initImage(event.imageUrl)
-
-                descriptionTV.text = event.description
-                initOrganizerUrlText(event.siteUrl)
-
-                toolbar.setNavigationOnClickListener {
-                    parentFragmentManager.popBackStack()
-                }
-
-                toolbar.setOnMenuItemClickListener {
-                    when (it.itemId) {
-                        R.id.share_event -> {
-                            val shareIntent =
-                                Intent().apply {
-                                    action = Intent.ACTION_SEND
-                                    putExtra(Intent.EXTRA_TEXT, event.title)
-                                    type = "text/plain"
-                                }
-                            startActivity(Intent.createChooser(shareIntent, "Поделиться событием"))
-                        }
-                    }
-                    true
+                if (event == null) {
+                    uiState =
+                        UiState.Error(getString(R.string.error_occurred_while_receiving_data))
+                    updateUiState()
+                } else {
+                    uiState = UiState.Success(event)
+                    updateUiState()
                 }
             }
+
+            downloadTask = executor.submit(loadList)
         }
     }
 
@@ -156,11 +253,14 @@ class EventDetailsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
+        downloadTask?.cancel(true)
     }
 
     companion object {
         const val TAG = "EventDetailsFragment"
         private const val EVENT_ID_KEY = "EventId"
+        const val EVENT_MODEL_KEY = "EventModel"
 
         @JvmStatic
         fun newInstance(eventId: Int) =

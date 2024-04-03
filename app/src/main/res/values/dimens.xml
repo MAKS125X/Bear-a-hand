@@ -3,6 +3,8 @@
     <dimen name="toolbar_text_size">21sp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
 
+    <dimen name="progressIndicatorSize">48dp</dimen>
+
     <dimen name="screen_h1_text_size">24sp</dimen>
     <dimen name="screen_h1_margin_vertical">16dp</dimen>
 
@@ -60,7 +62,7 @@
     <dimen name="event_description_text_size">14sp</dimen>
     <dimen name="event_details_toolbar_margin_bottom">16dp</dimen>
     <dimen name="event_details_padding">20dp</dimen>
-    <dimen name="event_details_elements_margin_bottom">10dp</dimen>
+    <dimen name="event_details_elements_margin_vertical">10dp</dimen>
     <dimen name="event_details_sections_margin_bottom">20dp</dimen>
     <dimen name="event_details_icon_size">24dp</dimen>
     <dimen name="event_details_additional_text_size">12sp</dimen>
@@ -78,9 +80,4 @@
     <dimen name="event_item_spacer">8dp</dimen>
     <dimen name="events_recycler_padding">8dp</dimen>
     <dimen name="events_text_margin_top">8dp</dimen>
-
-
-
-
-
 </resources>

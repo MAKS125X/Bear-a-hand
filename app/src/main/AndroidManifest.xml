@@ -26,6 +26,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SimbirSoftMobile"
         tools:targetApi="31">
+
+        <service
+            android:name=".presentation.screens.help.DownloadCategoriesService"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity
             android:name=".presentation.screens.SplashScreenActivity"
             android:exported="true"
@@ -33,9 +39,11 @@
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".presentation.screens.MainActivity"
             android:exported="true">
@@ -43,7 +51,6 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-
 
         <meta-data
             android:name="preloaded_fonts"
@@ -59,4 +66,5 @@
                 android:resource="@xml/file_paths" />
         </provider>
     </application>
+
 </manifest>

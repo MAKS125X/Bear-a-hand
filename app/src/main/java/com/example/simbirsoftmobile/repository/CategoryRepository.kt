@@ -28,7 +28,8 @@ object CategoryRepository {
             .create()
     }
 
-    fun getCategories(context: Context): List<Category> {
+    fun getCategories(context: Context): List<Category> = try {
+        Thread.sleep(3_000)
         val json = context.assets
             .open("categories.json")
             .bufferedReader()
@@ -36,7 +37,11 @@ object CategoryRepository {
                 it.readText()
             }
 
-        return gson.fromJson(json, CategoryDeserializer.objectType)
+        gson.fromJson(json, CategoryDeserializer.objectType)
+    } catch (e: InterruptedException) {
+        Thread.currentThread().interrupt()
+
+        emptyList()
     }
 
     fun saveCategorySettings(
@@ -71,7 +76,7 @@ object CategoryRepository {
 
     fun getSelectedCategoriesId(context: Context): List<Int> {
         val settings = getCategorySettings(context)
-
+        Thread.sleep(2000)
         return settings.filter { it.isSelected }.map { it.category.id }
     }
 }

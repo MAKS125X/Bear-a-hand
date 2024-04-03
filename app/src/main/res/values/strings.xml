@@ -18,14 +18,13 @@
     <string name="temp_images_dir" translatable="false">temp_images</string>
     <string name="temp_image" translatable="false">temp_image.jpg</string>
     <string name="authorities" translatable="false">com.example.fileprovider</string>
-    <string name="select_help_category">Select the help category</string>
+    <string name="select_help_category">Select the help category:</string>
     <string name="filter">Filter</string>
     <string name="adults">Adult</string>
     <string name="children">Children</string>
     <string name="animals">Animals</string>
     <string name="events">Events</string>
     <string name="old">Old</string>
-
     <string name="incorrect_data_format">Incorrect data format</string>
     <string name="unknown_category">Unknown category</string>
     <string name="accept">Accept</string>
@@ -34,9 +33,10 @@
     <string name="nothing_was_found_based_on_filters">Nothing was found based on your filters</string>
     <string name="not_select_any_categories">You have not selected any categories</string>
     <string name="do_you_have_questions">Do you have any questions?</string>
-
     <string name="event_already_ended">The event has already ended</string>
     <string name="will_start_soon">It will start in %1$s days (%2$s – %3$s)</string>
     <string name="days_left">Left %1$s days (%2$s – %3$s)</string>
     <string name="charitable_assistance">Charitable assistance</string>
+    <string name="empty_category_list_error">An error occurred in getting categories</string>
+    <string name="error_occurred_while_receiving_data">An error occurred while receiving the data</string>
 </resources>

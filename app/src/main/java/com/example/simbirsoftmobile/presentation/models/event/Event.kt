@@ -1,7 +1,11 @@
 package com.example.simbirsoftmobile.presentation.models.event
 
+import android.os.Parcelable
 import kotlinx.datetime.LocalDate
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
+@Parcelize
 data class Event(
     val id: Int,
     val title: String,
@@ -13,6 +17,6 @@ data class Event(
     val phoneNumbers: List<String>,
     val email: String,
     val siteUrl: String,
-    val dateStart: LocalDate,
-    val dateEnd: LocalDate,
-)
+    val dateStart: @RawValue LocalDate,
+    val dateEnd: @RawValue LocalDate,
+) : Parcelable

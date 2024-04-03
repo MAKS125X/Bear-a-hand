@@ -40,6 +40,7 @@ object EventRepository {
         id: Int,
         context: Context,
     ): Event {
+        Thread.sleep(2_000)
         val events = getAllEvents(context)
 
         return events.first { it.id == id }

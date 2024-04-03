@@ -8,9 +8,14 @@ import com.example.simbirsoftmobile.databinding.ItemCategoryBinding
 import com.example.simbirsoftmobile.presentation.models.category.Category
 
 class CategoryAdapter(
-    private val categoryArray: List<Category>,
     val context: Context,
 ) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
+    private var categoryArray: List<Category> = listOf()
+
+    fun submitList(list: List<Category>) {
+        categoryArray = list
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,

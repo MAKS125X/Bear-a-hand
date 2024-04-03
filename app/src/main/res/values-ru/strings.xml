@@ -16,14 +16,13 @@
     <string name="pick_photo">Выбрать фото</string>
     <string name="take_picture">Сделать снимок</string>
     <string name="delete_picture">Удалить</string>
-    <string name="select_help_category">Выберите категорию помощи</string>
+    <string name="select_help_category">Выберите категорию помощи:</string>
     <string name="filter">Фильтровать</string>
     <string name="adults">Взрослые</string>
     <string name="children">Дети</string>
     <string name="animals">Животные</string>
     <string name="events">Мероприятия</string>
     <string name="old">Пожилые</string>
-
     <string name="incorrect_data_format">Неверный формат файла</string>
     <string name="unknown_category">Неизвестная категория</string>
     <string name="accept">Подтвердить</string>
@@ -36,4 +35,6 @@
     <string name="will_start_soon">Начнётся через %1$s дней (%2$s – %3$s)</string>
     <string name="days_left">Осталось %1$s дней (%2$s – %3$s)</string>
     <string name="charitable_assistance">Благотворительная помощь</string>
+    <string name="empty_category_list_error">Произошла ошибка получения категорий</string>
+    <string name="error_occurred_while_receiving_data">Произошла ошибка при получении данных</string>
 </resources>
