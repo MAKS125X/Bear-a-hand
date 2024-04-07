@@ -8,6 +8,9 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.rx3.asFlow
 import java.util.concurrent.TimeUnit
 
 object EventRepository {
@@ -54,12 +57,11 @@ object EventRepository {
     fun searchEvent(
         searchString: String,
         context: Context,
-    ): Single<List<Event>> =
-        getAllEvents(context)
+    ): Flow<List<Event>> =
+        getAllEvents(context).asFlow()
             .map {
                 it.filter { event -> event.title.contains(searchString, true) }
             }
-            .single(listOf())
 
     fun getEventById(
         id: Int,

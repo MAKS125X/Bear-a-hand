@@ -6,22 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.example.simbirsoftmobile.databinding.FragmentSearchBinding
 import com.example.simbirsoftmobile.presentation.screens.search.events.EventsFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.PagerItem
 import com.example.simbirsoftmobile.presentation.screens.search.organizations.OrganizationsFragment
 import com.google.android.material.tabs.TabLayoutMediator
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding: FragmentSearchBinding
         get() = _binding!!
-
-    private val compositeDisposable = CompositeDisposable()
 
     private var pagerItems: List<PagerItem>? = null
 
@@ -80,47 +86,47 @@ class SearchFragment : Fragment() {
 
             binding.fragmentViewPager.registerOnPageChangeCallback(callback)
 
-            val dispose = initSearchObserver()
-                .filter { str -> str.isNotEmpty() }
-                .distinctUntilChanged()
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .subscribe { query ->
-                    list[binding.fragmentViewPager.currentItem]
-                        .fragment
-                        .onSearchQueryChanged(query)
-                }
-
-            compositeDisposable.add(dispose)
+            lifecycleScope.launch {
+                initSearchObserver()
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                    .filter { str -> str.isNotEmpty() }
+                    .distinctUntilChanged()
+                    .debounce(500)
+                    .flowOn(Dispatchers.IO)
+                    .collect {
+                        list[binding.fragmentViewPager.currentItem]
+                            .fragment
+                            .onSearchQueryChanged(it)
+                    }
+            }
         }
     }
 
-    private fun initSearchObserver() =
-        Observable.create<String> { emitter ->
-            binding.searchView.setOnQueryTextListener(
-                object :
-                    SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        query?.let { emitter.onNext(it) }
-                        return true
-                    }
+    private fun initSearchObserver(): StateFlow<String> {
+        val stateFlow = MutableStateFlow<String>("")
 
-                    override fun onQueryTextChange(p0: String?): Boolean {
-                        p0?.let { emitter.onNext(it) }
-                        return true
-                    }
-                },
-            )
-        }
+        binding.searchView.setOnQueryTextListener(
+            object :
+                SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    query?.let { stateFlow.value = it }
+                    return true
+                }
+
+                override fun onQueryTextChange(p0: String?): Boolean {
+                    p0?.let { stateFlow.value = it }
+                    return true
+                }
+            },
+        )
+
+        return stateFlow
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding.fragmentViewPager.unregisterOnPageChangeCallback(callback)
         _binding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
     }
 
     companion object {

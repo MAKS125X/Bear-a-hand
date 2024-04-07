@@ -2,23 +2,31 @@ package com.example.simbirsoftmobile.presentation.screens.search.organizations
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentOrganizationsBinding
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
+import com.example.simbirsoftmobile.presentation.screens.search.events.EventsFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.SearchResultUI
 import com.example.simbirsoftmobile.presentation.screens.search.models.ViewPagerFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.toSearchResultUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.repository.EventRepository
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class OrganizationsFragment : ViewPagerFragment() {
     private var _binding: FragmentOrganizationsBinding? = null
@@ -28,8 +36,11 @@ class OrganizationsFragment : ViewPagerFragment() {
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
     private var uiState: UiState<List<SearchResultUI>> = UiState.Idle
 
-    private val compositeDisposable = CompositeDisposable()
-    private val publishSubject: PublishSubject<String> = PublishSubject.create()
+
+    private val currentQuery = MutableSharedFlow<String>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -62,18 +73,22 @@ class OrganizationsFragment : ViewPagerFragment() {
             updateUiState()
         }
 
-        val disposable =
-            publishSubject.switchMapSingle { query ->
-                EventRepository.searchEvent(query, requireContext())
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                currentQuery
+                    .onEach { Log.d(EventsFragment.TAG, "onViewCreated: $it") }
+                    .flatMapLatest { query ->
+                        EventRepository.searchEvent(query, requireContext())
+                    }
+                    .map { list ->
+                        list.map { it.toSearchResultUi() }
+                    }
+                    .collectLatest {
+                        uiState = UiState.Success(it)
+                        updateUiState()
+                    }
             }
-                .subscribeOn(Schedulers.io())
-                .map { query -> query.map { it.toSearchResultUi() } }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    uiState = UiState.Success(it)
-                    updateUiState()
-                }
-        compositeDisposable.add(disposable)
+        }
     }
 
     private fun getEventListFromBundle(savedInstanceState: Bundle): List<SearchResultUI> =
@@ -103,8 +118,15 @@ class OrganizationsFragment : ViewPagerFragment() {
     }
 
     private fun getListOfEventsByQuery(query: String) {
-        if (context != null && query.isNotEmpty()) {
-            publishSubject.onNext(query)
+        currentQuery.tryEmit(query)
+
+        lifecycleScope.launch {
+            EventRepository.searchEvent(query, requireContext())
+                .map { list -> list.map { it.toSearchResultUi() } }
+                .collect { results ->
+                    uiState = UiState.Success(results)
+                    updateUiState()
+                }
         }
     }
 
@@ -125,11 +147,6 @@ class OrganizationsFragment : ViewPagerFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
     }
 
     companion object {
