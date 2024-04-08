@@ -44,7 +44,9 @@ class SearchFragment : Fragment() {
             super.onPageSelected(position)
 
             pagerItems?.let { list ->
-                list[position].fragment.onSearchQueryChanged(binding.searchView.query.toString())
+                if (binding.searchView.query.isNotBlank()) {
+                    list[position].fragment.onSearchQueryChanged(binding.searchView.query.toString())
+                }
             }
         }
     }
@@ -89,9 +91,9 @@ class SearchFragment : Fragment() {
             lifecycleScope.launch {
                 initSearchObserver()
                     .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                    .filter { str -> str.isNotEmpty() }
+                    .filter { str -> str.isNotBlank() }
                     .distinctUntilChanged()
-                    .debounce(500)
+                    .debounce(300)
                     .flowOn(Dispatchers.IO)
                     .collect {
                         list[binding.fragmentViewPager.currentItem]
@@ -104,21 +106,28 @@ class SearchFragment : Fragment() {
 
     private fun initSearchObserver(): StateFlow<String> {
         val stateFlow = MutableStateFlow<String>("")
+        with(binding) {
+            searchView.setOnSearchClickListener {
+                searchView.query?.let { stateFlow.value = it.toString() }
+            }
 
-        binding.searchView.setOnQueryTextListener(
-            object :
-                SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    query?.let { stateFlow.value = it }
-                    return true
-                }
+            searchView.setOnQueryTextListener(
+                object :
+                    SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        query?.let { stateFlow.value = it }
 
-                override fun onQueryTextChange(p0: String?): Boolean {
-                    p0?.let { stateFlow.value = it }
-                    return true
-                }
-            },
-        )
+                        return true
+                    }
+
+                    override fun onQueryTextChange(p0: String?): Boolean {
+                        p0?.let { stateFlow.value = it }
+
+                        return true
+                    }
+                },
+            )
+        }
 
         return stateFlow
     }

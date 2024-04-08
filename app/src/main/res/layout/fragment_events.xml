@@ -7,13 +7,27 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.screens.search.events.EventsFragment">
 
-    <LinearLayout
-        android:id="@+id/emptyResultLayout"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/errorTV"
+        style="@style/ScreenH2TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/search_error_margin_top"
+        android:text="@string/nothing_was_found_based_on_filters"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/infoLayout" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/infoLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
+        android:paddingHorizontal="@dimen/search_info_layout_padding_horizontal"
+        android:paddingVertical="@dimen/search_info_layout_padding_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,52 +37,51 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:paddingHorizontal="60dp"
-            android:paddingVertical="40dp"
             android:scaleType="fitCenter"
             android:src="@drawable/image_search" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Напишите в строке поиска название \nмероприятия или ключевые слова."
+            android:text="@string/try_search_events"
             android:textAlignment="center"
             android:textColor="?attr/colorOnSurface" />
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/queryResultLayout"
+
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:orientation="vertical"
-
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/search_result_text_view_padding"
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressIndicator"
+            style="@style/CircularProgressIndicator"
+            android:layout_gravity="center"
+            android:layout_marginVertical="@dimen/search_progress_margin_vertical"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/searchResultSizeTV"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Результаты поиска: 109 мероприятий"
-                android:textColor="?attr/colorOnSurface" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/searchResultSizeTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/search_result_text_view_padding"
+            android:textColor="?attr/colorOnSurface" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/queryResultLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -94,6 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/SectionDivider" />
+
         </androidx.appcompat.widget.LinearLayoutCompat>
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

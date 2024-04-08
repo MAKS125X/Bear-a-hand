@@ -17,8 +17,6 @@ import kotlinx.coroutines.rx3.asFlow
 import java.util.concurrent.TimeUnit
 
 object EventRepository {
-    private const val TAG = "EventRepository"
-
     private val readEventIds: MutableSet<Int> = mutableSetOf()
 
     private val _notificationFlow: MutableSharedFlow<Int> = MutableSharedFlow(
@@ -64,13 +62,22 @@ object EventRepository {
                 emitUnreadValue()
             }
 
-    fun searchEvent(
+    fun searchEvents(
         searchString: String,
         context: Context,
     ): Flow<List<Event>> =
         getAllEvents(context).asFlow()
             .map {
                 it.filter { event -> event.title.contains(searchString, true) }
+            }
+
+    fun searchOrganizations(
+        searchString: String,
+        context: Context,
+    ): Flow<List<Event>> =
+        getAllEvents(context).asFlow()
+            .map {
+                it.filter { event -> event.organizerName.contains(searchString, true) }.distinct()
             }
 
     fun getEventById(

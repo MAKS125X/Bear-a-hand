@@ -36,7 +36,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchViewLayout"
         app:tabBackground="?attr/colorPrimary"
+        app:tabGravity="fill"
         app:tabIndicatorColor="@color/macaroni_and_cheese"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed"
         app:tabSelectedTextColor="@color/white"
         app:tabTextColor="@color/light_grey_2" />
 

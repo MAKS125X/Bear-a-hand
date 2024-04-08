@@ -4,9 +4,20 @@ import android.os.Parcelable
 import com.example.simbirsoftmobile.presentation.models.event.Event
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
-data class SearchResultUI(
-    val name: String,
-) : Parcelable
+abstract class SearchResultUI(open val name: String)
 
-fun Event.toSearchResultUi(): SearchResultUI = SearchResultUI(this.title)
+@Parcelize
+data class EventSearchResultUI(
+    override val name: String,
+) : Parcelable, SearchResultUI(name)
+
+fun Event.toEventSearchResultUi(): EventSearchResultUI =
+    EventSearchResultUI(this.title)
+
+@Parcelize
+data class OrganizationSearchResultUi(
+    override val name: String,
+) : Parcelable, SearchResultUI(name)
+
+fun Event.toOrganizationSearchResultUi(): OrganizationSearchResultUi =
+    OrganizationSearchResultUi(this.organizerName)

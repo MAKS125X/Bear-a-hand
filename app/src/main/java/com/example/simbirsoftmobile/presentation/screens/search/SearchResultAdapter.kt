@@ -51,14 +51,14 @@ class SearchResultAdapter :
                     oldItem: SearchResultUI,
                     newItem: SearchResultUI,
                 ): Boolean {
-                    return oldItem.name == newItem.name
+                    return oldItem == newItem
                 }
 
                 override fun areContentsTheSame(
                     oldItem: SearchResultUI,
                     newItem: SearchResultUI,
                 ): Boolean {
-                    return oldItem == newItem
+                    return oldItem.name == newItem.name
                 }
             }
     }

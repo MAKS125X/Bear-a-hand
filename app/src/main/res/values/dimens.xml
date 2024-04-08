@@ -50,14 +50,15 @@
 
     <dimen name="search_result_item_image_size">24dp</dimen>
     <dimen name="search_result_item_text_margin_vertical">18dp</dimen>
-
     <dimen name="search_result_text_view_padding">20dp</dimen>
-
     <dimen name="search_result_recycler_padding_start">20dp</dimen>
     <dimen name="search_result_recycler_padding_end">8dp</dimen>
-
     <dimen name="search_view_layout_padding_vertical">4dp</dimen>
     <dimen name="search_view_layout_padding_horizontal">8dp</dimen>
+    <dimen name="search_error_margin_top">40dp</dimen>
+    <dimen name="search_info_layout_padding_vertical">40dp</dimen>
+    <dimen name="search_info_layout_padding_horizontal">60dp</dimen>
+    <dimen name="search_progress_margin_vertical">16dp</dimen>
 
     <dimen name="event_description_text_size">14sp</dimen>
     <dimen name="event_details_toolbar_margin_bottom">16dp</dimen>
