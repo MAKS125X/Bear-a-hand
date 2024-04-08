@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentContentBinding
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
@@ -14,16 +17,13 @@ import com.example.simbirsoftmobile.presentation.screens.news.NewsFragment
 import com.example.simbirsoftmobile.presentation.screens.profile.ProfileFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
 import com.example.simbirsoftmobile.repository.EventRepository
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 
 class ContentFragment : Fragment() {
     private var _binding: FragmentContentBinding? = null
     private val binding: FragmentContentBinding
         get() = _binding!!
-
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,18 +46,24 @@ class ContentFragment : Fragment() {
             binding.bottomNavigationView.selectedItemId = R.id.help_menu
         }
 
-        val disposable = EventRepository
-            .subject
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                if (it <= 0) {
-                    binding.bottomNavigationView.removeBadge(R.id.news_menu)
-                } else {
-                    binding.bottomNavigationView.getOrCreateBadge(R.id.news_menu).number = it
-                }
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            binding.bottomNavigationView.removeBadge(R.id.news_menu)
+        }
+
+        lifecycleScope.launch(exceptionHandler) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                EventRepository.notificationFlow
+                    .collect {
+                        with(binding) {
+                            if (it <= 0) {
+                                bottomNavigationView.removeBadge(R.id.news_menu)
+                            } else {
+                                bottomNavigationView.getOrCreateBadge(R.id.news_menu).number = it
+                            }
+                        }
+                    }
             }
-        compositeDisposable.add(disposable)
+        }
     }
 
     private fun initBottomNavigation() {
@@ -112,7 +118,6 @@ class ContentFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        compositeDisposable.dispose()
     }
 
     companion object {
