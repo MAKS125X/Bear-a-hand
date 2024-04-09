@@ -2,18 +2,21 @@ package com.example.simbirsoftmobile.presentation.screens.search.organizations
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentOrganizationsBinding
+import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
 import com.example.simbirsoftmobile.presentation.screens.search.models.OrganizationSearchResultUi
-import com.example.simbirsoftmobile.presentation.screens.search.models.ViewPagerFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.toOrganizationSearchResultUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.repository.EventRepository
@@ -23,20 +26,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class OrganizationsFragment : ViewPagerFragment() {
+class OrganizationsFragment : Fragment() {
     private var _binding: FragmentOrganizationsBinding? = null
     private val binding: FragmentOrganizationsBinding
         get() = _binding!!
 
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
     private var uiState: UiState<List<OrganizationSearchResultUi>> = UiState.Idle
-
 
     private val currentQuery = MutableSharedFlow<String>(
         replay = 1,
@@ -49,6 +52,19 @@ class OrganizationsFragment : ViewPagerFragment() {
         val currentState = uiState
         if (currentState is UiState.Success) {
             outState.putParcelableArrayList(LIST_KEY, ArrayList(currentState.data))
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setFragmentResultListener(SearchFragment.QUERY_ORGANIZATION_KEY) { _, bundle ->
+            val result = bundle.getString(SearchFragment.RESULT_KEY)
+            if (result != null) {
+                Log.d(TAG, "onCreate: |$result|")
+
+                currentQuery.tryEmit(result)
+            }
         }
     }
 
@@ -78,39 +94,31 @@ class OrganizationsFragment : ViewPagerFragment() {
             updateUiState()
         }
 
-
         val exceptionHandler = CoroutineExceptionHandler { _, _ ->
             uiState = UiState.Error(getString(R.string.dat_acquisition_error_occurred))
             updateUiState()
         }
 
         lifecycleScope.launch(exceptionHandler) {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                currentQuery
-                    .onEach {
-                        uiState = UiState.Loading
-                        updateUiState()
-                    }
-                    .flowOn(Dispatchers.Main)
-                    .flatMapLatest { query ->
-                        EventRepository.searchOrganizations(query, requireContext())
-                    }
-                    .flowOn(Dispatchers.IO)
-                    .map { list ->
-                        list.map { it.toOrganizationSearchResultUi() }
-                    }
-                    .collectLatest {
-                        if (it.isNotEmpty()) {
-                            uiState = UiState.Success(it)
-                        }
-                        uiState = if (it.isNotEmpty()) {
-                            UiState.Success(it)
-                        } else {
-                            UiState.Error("По данному запросу ничего не найдено")
-                        }
-                        updateUiState()
-                    }
-            }
+            currentQuery
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .filter { it.isNotBlank() }
+                .onEach {
+                    uiState = UiState.Loading
+                    updateUiState()
+                }
+                .flowOn(Dispatchers.Main)
+                .flatMapLatest { query ->
+                    EventRepository.searchOrganizations(query, requireContext())
+                }
+                .flowOn(Dispatchers.IO)
+                .map { list ->
+                    list.map { it.toOrganizationSearchResultUi() }
+                }
+                .collectLatest {
+                    uiState = UiState.Success(it)
+                    updateUiState()
+                }
         }
     }
 
@@ -118,7 +126,7 @@ class OrganizationsFragment : ViewPagerFragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             savedInstanceState.getParcelableArrayList(
                 LIST_KEY,
-                OrganizationSearchResultUi::class.java
+                OrganizationSearchResultUi::class.java,
             )
                 ?.toList()
                 ?: listOf()
@@ -176,14 +184,9 @@ class OrganizationsFragment : ViewPagerFragment() {
 
     private fun initAdapter() {
         binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         divider.isLastItemDecorated = false
         binding.recyclerView.addItemDecoration(divider)
-    }
-
-    override fun onSearchQueryChanged(query: String) {
-        currentQuery.tryEmit(query)
     }
 
     override fun onDestroyView() {

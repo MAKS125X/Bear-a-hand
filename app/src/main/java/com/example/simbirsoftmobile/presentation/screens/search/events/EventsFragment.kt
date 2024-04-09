@@ -2,18 +2,21 @@ package com.example.simbirsoftmobile.presentation.screens.search.events
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventsBinding
+import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
 import com.example.simbirsoftmobile.presentation.screens.search.models.EventSearchResultUI
-import com.example.simbirsoftmobile.presentation.screens.search.models.ViewPagerFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.toEventSearchResultUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.repository.EventRepository
@@ -22,14 +25,13 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class EventsFragment : ViewPagerFragment() {
+class EventsFragment : Fragment() {
     private var _binding: FragmentEventsBinding? = null
     private val binding: FragmentEventsBinding
         get() = _binding!!
@@ -51,12 +53,25 @@ class EventsFragment : ViewPagerFragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setFragmentResultListener(SearchFragment.QUERY_EVENT_KEY) { _, bundle ->
+            val result = bundle.getString(SearchFragment.RESULT_KEY)
+            if (result != null) {
+                Log.d(TAG, "onCreate: |$result|")
+                currentQuery.tryEmit(result)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentEventsBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -69,7 +84,6 @@ class EventsFragment : ViewPagerFragment() {
 
         if (savedInstanceState != null) {
             val currentList = getEventListFromBundle(savedInstanceState)
-
             uiState = UiState.Success(currentList)
             updateUiState()
         } else {
@@ -83,25 +97,24 @@ class EventsFragment : ViewPagerFragment() {
         }
 
         lifecycleScope.launch(exceptionHandler) {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                currentQuery
-                    .onEach {
-                        uiState = UiState.Loading
-                        updateUiState()
-                    }
-                    .flowOn(Dispatchers.Main)
-                    .flatMapLatest { query ->
-                        EventRepository.searchEvents(query, requireContext())
-                    }
-                    .flowOn(Dispatchers.IO)
-                    .map { list ->
-                        list.map { it.toEventSearchResultUi() }
-                    }
-                    .collectLatest {
-                        uiState = UiState.Success(it)
-                        updateUiState()
-                    }
-            }
+            currentQuery
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    uiState = UiState.Loading
+                    updateUiState()
+                }
+                .flowOn(Dispatchers.Main)
+                .flatMapLatest { query ->
+                    EventRepository.searchEvents(query, requireContext())
+                }
+                .flowOn(Dispatchers.IO)
+                .map { list ->
+                    list.map { it.toEventSearchResultUi() }
+                }
+                .collect {
+                    uiState = UiState.Success(it)
+                    updateUiState()
+                }
         }
     }
 
@@ -166,10 +179,6 @@ class EventsFragment : ViewPagerFragment() {
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         divider.isLastItemDecorated = false
         binding.recyclerView.addItemDecoration(divider)
-    }
-
-    override fun onSearchQueryChanged(query: String) {
-            currentQuery.tryEmit(query)
     }
 
     override fun onDestroyView() {

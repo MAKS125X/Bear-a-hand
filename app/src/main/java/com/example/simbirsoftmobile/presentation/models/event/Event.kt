@@ -64,7 +64,7 @@ data class Event(
                 parcel.readString()!!,
                 parcel.readString()!!,
                 LocalDate.fromEpochDays(parcel.readInt()),
-                LocalDate.fromEpochDays(parcel.readInt())
+                LocalDate.fromEpochDays(parcel.readInt()),
             )
         }
     }
