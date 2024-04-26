@@ -1,7 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.filter
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentFilterBinding
 import com.example.simbirsoftmobile.presentation.models.category.CategorySetting
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
 import com.example.simbirsoftmobile.repository.CategoryRepository
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -47,18 +47,6 @@ class FilterFragment : Fragment() {
 
         adapter = CategorySettingAdapter(context = context)
     }
-
-    private fun getNewsListFromBundle(savedInstanceState: Bundle): List<CategorySetting> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState
-                .getParcelableArrayList(CATEGORIES_KEY, CategorySetting::class.java)
-                ?.toList()
-                ?: listOf()
-        } else {
-            @Suppress("DEPRECATION")
-            savedInstanceState.getParcelableArrayList<CategorySetting>(CATEGORIES_KEY)?.toList()
-                ?: listOf()
-        }
 
     private fun updateState() {
         when (val currentState = uiState) {
@@ -109,20 +97,20 @@ class FilterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
 
-        if (uiState is UiState.Success) {
-            updateState()
-        } else {
-            if (savedInstanceState != null) {
-                val currentList = getNewsListFromBundle(savedInstanceState)
+        when {
+            uiState is UiState.Success -> updateState()
+            savedInstanceState != null -> {
+                val currentList =
+                    getParcelableListFromBundleByKey<CategorySetting>(savedInstanceState, CATEGORIES_KEY)
                 if (currentList.isEmpty()) {
                     observeCategories()
                 } else {
                     uiState = UiState.Success(currentList)
                     updateState()
                 }
-            } else {
-                observeCategories()
             }
+
+            else -> observeCategories()
         }
 
         binding.toolbar.setNavigationOnClickListener {
@@ -147,12 +135,13 @@ class FilterFragment : Fragment() {
     }
 
     private fun observeCategories() {
-        uiState = UiState.Loading
-        updateState()
-
         val disposable = CategoryRepository
             .getCategorySettings(requireContext())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                uiState = UiState.Loading
+                updateState()
+            }
             .subscribe {
                 uiState = UiState.Success(it)
                 updateState()

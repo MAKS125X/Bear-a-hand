@@ -3,7 +3,6 @@ package com.example.simbirsoftmobile.presentation.screens.eventDetails
 import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +14,7 @@ import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
 import com.example.simbirsoftmobile.presentation.models.event.Event
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getRemainingDateInfo
+import com.example.simbirsoftmobile.presentation.screens.utils.getSingleParcelableFromBundleByKey
 import com.example.simbirsoftmobile.repository.EventRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -118,14 +118,6 @@ class EventDetailsFragment : Fragment() {
         }
     }
 
-    private fun getEventFromBundle(savedInstanceState: Bundle): Event? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState.getParcelable(EVENT_MODEL_KEY, Event::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            savedInstanceState.getParcelable<Event>(EVENT_MODEL_KEY)
-        }
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -137,7 +129,8 @@ class EventDetailsFragment : Fragment() {
         }
 
         if (savedInstanceState != null) {
-            val currentEvent = getEventFromBundle(savedInstanceState)
+            val currentEvent =
+                getSingleParcelableFromBundleByKey<Event>(savedInstanceState, EVENT_MODEL_KEY)
             if (currentEvent != null) {
                 uiState = UiState.Success(currentEvent)
                 updateUiState()

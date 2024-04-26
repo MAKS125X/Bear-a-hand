@@ -40,13 +40,12 @@ object EventRepository {
         _notificationFlow.tryEmit(unreadCount)
     }
 
-    private fun getAllEvents(context: Context): Observable<List<Event>> {
-        return Observable
+    private fun getAllEvents(context: Context): Observable<List<Event>> =
+        Observable
             .just(context.assets.open("events.json").bufferedReader().use { it.readText() })
             .subscribeOn(Schedulers.io())
             .delay(2000, TimeUnit.MILLISECONDS)
             .map { eventGson.fromJson(it, EventsDeserializer.objectType) }
-    }
 
     fun getAllEventsByCategories(
         requiredCategories: List<Int>,
