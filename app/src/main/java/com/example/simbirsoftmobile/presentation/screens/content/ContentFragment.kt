@@ -19,6 +19,7 @@ import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
 import com.example.simbirsoftmobile.repository.EventRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class ContentFragment : Fragment() {
     private var _binding: FragmentContentBinding? = null
@@ -46,8 +47,10 @@ class ContentFragment : Fragment() {
             binding.bottomNavigationView.selectedItemId = R.id.help_menu
         }
 
-        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-            binding.bottomNavigationView.removeBadge(R.id.news_menu)
+        val exceptionHandler = CoroutineExceptionHandler { _, e ->
+            if (e !is IOException) {
+                binding.bottomNavigationView.removeBadge(R.id.news_menu)
+            }
         }
 
         lifecycleScope.launch(exceptionHandler) {
