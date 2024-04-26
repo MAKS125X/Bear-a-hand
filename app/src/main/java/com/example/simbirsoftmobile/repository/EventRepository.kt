@@ -4,8 +4,19 @@ import android.content.Context
 import com.example.simbirsoftmobile.presentation.models.event.Event
 import com.example.simbirsoftmobile.presentation.models.event.EventsDeserializer
 import com.google.gson.GsonBuilder
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
 
 object EventRepository {
+    private val readEventIds: MutableSet<Int> = mutableSetOf()
+    val subject = BehaviorSubject.create<Int>()
+    private var currentEventList: MutableList<Event> = mutableListOf()
+
+    const val TAG = "EventRepository"
+
     private val eventGson by lazy {
         GsonBuilder().registerTypeAdapter(
             EventsDeserializer.objectType,
@@ -13,36 +24,51 @@ object EventRepository {
         ).create()
     }
 
-    fun getAllEvents(context: Context): List<Event> {
-        val json =
-            context.assets
-                .open("events.json")
-                .bufferedReader()
-                .use {
-                    it.readText()
-                }
-
-        return eventGson.fromJson(json, EventsDeserializer.objectType)
+    private fun emitUnreadValue() {
+        val unreadCount = currentEventList.count { !readEventIds.contains(it.id) }
+        subject.onNext(unreadCount)
     }
+
+    private fun getAllEvents(context: Context): Observable<List<Event>> =
+        Observable
+            .just(context.assets.open("events.json").bufferedReader().use { it.readText() })
+            .subscribeOn(Schedulers.io())
+            .delay(2000, TimeUnit.MILLISECONDS)
+            .map { eventGson.fromJson(it, EventsDeserializer.objectType) }
 
     fun getAllEventsByCategories(
         requiredCategories: List<Int>,
         context: Context,
-    ): List<Event> {
-        val events = getAllEvents(context)
+    ): Observable<List<Event>> =
+        getAllEvents(context)
+            .map { list ->
+                list.filter { event ->
+                    event.categoryList.any { requiredCategories.contains(it) }
+                }
+            }.doOnNext {
+                currentEventList = it.toMutableList()
+                emitUnreadValue()
+            }
 
-        return events.filter { event ->
-            event.categoryList.any { requiredCategories.contains(it) }
-        }
-    }
+    fun searchEvent(
+        searchString: String,
+        context: Context,
+    ): Single<List<Event>> =
+        getAllEvents(context)
+            .map {
+                it.filter { event -> event.title.contains(searchString, true) }
+            }
+            .single(listOf())
 
     fun getEventById(
         id: Int,
         context: Context,
-    ): Event {
-        Thread.sleep(2_000)
-        val events = getAllEvents(context)
-
-        return events.first { it.id == id }
-    }
+    ): Single<Event> =
+        getAllEvents(context)
+            .map { list -> list.first { it.id == id } }
+            .doOnNext {
+                readEventIds.add(id)
+                emitUnreadValue()
+            }
+            .singleOrError()
 }

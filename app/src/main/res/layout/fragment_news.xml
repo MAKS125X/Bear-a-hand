@@ -25,14 +25,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/profile"
-            android:theme="@style/ToolbarTitle"
-            tools:text="Новости" />
+            android:text="@string/news"
+            android:theme="@style/ToolbarTitle" />
     </androidx.appcompat.widget.Toolbar>
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/newsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:paddingHorizontal="@dimen/events_recycler_padding"

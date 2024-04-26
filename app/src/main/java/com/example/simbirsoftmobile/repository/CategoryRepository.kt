@@ -9,10 +9,15 @@ import com.example.simbirsoftmobile.presentation.models.category.CategorySetting
 import com.example.simbirsoftmobile.presentation.models.category.CategorySettingSerializer
 import com.example.simbirsoftmobile.presentation.models.category.toSettingsModel
 import com.google.gson.GsonBuilder
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 object CategoryRepository {
     private const val CATEGORY_SETTINGS_KEY = "CATEGORY_SETTINGS"
     private const val SHARED_PREF_NAME = "MY_SHARED_PREF"
+
+    const val TAG = "CategoryRepository"
 
     private val gson by lazy {
         GsonBuilder()
@@ -28,28 +33,25 @@ object CategoryRepository {
             .create()
     }
 
-    fun getCategories(context: Context): List<Category> = try {
-        Thread.sleep(3_000)
-        val json = context.assets
-            .open("categories.json")
-            .bufferedReader()
-            .use {
-                it.readText()
+    fun getCategories(context: Context): Observable<List<Category>> =
+        Observable
+            .just(
+                context.assets
+                    .open("categories.json")
+                    .bufferedReader()
+                    .use { it.readText() }
+            )
+            .subscribeOn(Schedulers.io())
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .map {
+                gson.fromJson<List<Category>>(it, CategoryDeserializer.objectType)
             }
-
-        gson.fromJson(json, CategoryDeserializer.objectType)
-    } catch (e: InterruptedException) {
-        Thread.currentThread().interrupt()
-
-        emptyList()
-    }
 
     fun saveCategorySettings(
         context: Context,
         settings: List<CategorySetting>,
     ) {
-        val jsonList =
-            gson.toJson(settings, CategorySettingSerializer.objectType)
+        val jsonList = gson.toJson(settings, CategorySettingSerializer.objectType)
         val pref: SharedPreferences =
             context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = pref.edit()
@@ -58,25 +60,36 @@ object CategoryRepository {
         editor.apply()
     }
 
-    fun getCategorySettings(context: Context): List<CategorySetting> {
-        val pref: SharedPreferences =
-            context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+    fun getCategorySettings(context: Context): Observable<List<CategorySetting>> =
+        Observable
+            .create {
+                val pref: SharedPreferences =
+                    context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+                it.onNext(pref.getString(CATEGORY_SETTINGS_KEY, "").orEmpty())
+            }
+            .delay(2000, TimeUnit.MILLISECONDS)
+            .map {
+                gson.fromJson<List<CategorySetting>>(
+                    it,
+                    CategorySettingDeserializer.objectType,
+                ) ?: emptyList()
+            }
+            .flatMap { settingsList ->
+                if (settingsList.isEmpty()) {
+                    getCategories(context)
+                        .map { categoriesList ->
+                            categoriesList.map { it.toSettingsModel() }
+                        }
+                } else {
+                    Observable.just(settingsList)
+                }
+            }
 
-        val jsonList = pref.getString(CATEGORY_SETTINGS_KEY, "")
 
-        if (jsonList.isNullOrEmpty()) {
-            return getCategories(context).map { it.toSettingsModel() }
-        }
-
-        return gson.fromJson(
-            jsonList,
-            CategorySettingDeserializer.objectType,
-        )
-    }
-
-    fun getSelectedCategoriesId(context: Context): List<Int> {
-        val settings = getCategorySettings(context)
-        Thread.sleep(2000)
-        return settings.filter { it.isSelected }.map { it.category.id }
-    }
+    fun getSelectedCategoriesId(context: Context): Observable<List<Int>> =
+        getCategorySettings(context)
+            .map {
+                it.filter { category -> category.isSelected }
+                    .map { category -> category.category.id }
+            }
 }

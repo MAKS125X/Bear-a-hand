@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.screens.auth.AuthFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back"
+        app:popupTheme="@style/Base.Theme.SimbirSoftMobile"
+        app:titleTextColor="?attr/colorOnPrimary">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/toolbarTitleTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/authorization"
+            android:theme="@style/ToolbarTitle"
+            tools:text="Авторизация" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/auth_padding_horizontal"
+            android:paddingVertical="@dimen/auth_padding_vertical">
+
+            <TextView
+                android:id="@+id/authWithSocialTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/auth_title_margin_horizontal"
+                android:layout_marginTop="@dimen/auth_elements_margin_top"
+                android:text="@string/login_via_socials"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/auth_icon_layout_margin_horizontal"
+                android:layout_marginTop="@dimen/auth_elements_margin_top"
+                android:weightSum="3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/authWithSocialTV">
+
+                <ImageView
+                    android:layout_width="@dimen/auth_icon_size"
+                    android:layout_height="@dimen/auth_icon_size"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_vk" />
+
+                <ImageView
+                    android:layout_width="@dimen/auth_icon_size"
+                    android:layout_height="@dimen/auth_icon_size"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_fb" />
+
+                <ImageView
+                    android:layout_width="@dimen/auth_icon_size"
+                    android:layout_height="@dimen/auth_icon_size"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_ok" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/authWithEmailTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/auth_title_margin_horizontal"
+                android:layout_marginTop="@dimen/auth_section_margin_top"
+                android:text="@string/login_through_app"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/auth_elements_margin_top"
+                android:hint="@string/email"
+                app:expandedHintEnabled="false"
+                app:helperText=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/authWithEmailTV">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/emailET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_email" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/auth_elements_margin_top"
+                android:hint="@string/password"
+                app:endIconMode="password_toggle"
+                app:expandedHintEnabled="false"
+                app:helperText=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/emailLayout"
+                app:passwordToggleDrawable="@drawable/selector_password_icon"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_password"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/authButton"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/auth_elements_margin_top"
+                android:text="@string/login"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/passwordLayout" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/auth_elements_margin_top"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/authButton">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/forgetPasswordTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:text="@string/forget_password"
+                    android:textColor="?attr/colorPrimary" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/registrationTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="@string/registration"
+                    android:textColor="?attr/colorPrimary" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

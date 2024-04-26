@@ -10,23 +10,75 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentFilterBinding
 import com.example.simbirsoftmobile.presentation.models.category.CategorySetting
+import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
 import com.example.simbirsoftmobile.repository.CategoryRepository
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class FilterFragment : Fragment() {
     private var _binding: FragmentFilterBinding? = null
     private val binding: FragmentFilterBinding
         get() = _binding!!
 
-    private var settingsList: List<CategorySetting>? = null
+    private var uiState: UiState<List<CategorySetting>> = UiState.Idle
 
     private var adapter: CategorySettingAdapter? = null
 
+    private val compositeDisposable = CompositeDisposable()
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        saveCategoriesInstanceState(outState)
+    }
+
+    private fun saveCategoriesInstanceState(outState: Bundle) {
+        val currentState = uiState
+        if (currentState is UiState.Success) {
+            outState.putParcelableArrayList(CATEGORIES_KEY, ArrayList(currentState.data))
+        } else {
+            uiState = UiState.Idle
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        settingsList = CategoryRepository.getCategorySettings(context)
 
-        adapter = CategorySettingAdapter(settingsList ?: listOf(), context)
+        adapter = CategorySettingAdapter(context = context)
+    }
+
+    private fun updateState() {
+        when (val currentState = uiState) {
+            is UiState.Error -> {
+                with(binding) {
+                    recyclerView.visibility = View.GONE
+                    progressIndicator.visibility = View.GONE
+                    errorTV.visibility = View.VISIBLE
+                    errorTV.text = currentState.message
+                }
+            }
+
+            UiState.Idle -> {}
+
+            UiState.Loading -> {
+                with(binding) {
+                    recyclerView.visibility = View.GONE
+                    progressIndicator.visibility = View.VISIBLE
+                    errorTV.visibility = View.GONE
+                }
+            }
+
+            is UiState.Success -> {
+                with(binding) {
+                    recyclerView.visibility = View.VISIBLE
+                    progressIndicator.visibility = View.GONE
+                    errorTV.visibility = View.GONE
+                    adapter?.submitList(currentState.data)
+                    adapter?.notifyDataSetChanged()
+                }
+            }
+        }
     }
 
     override fun onCreateView(
@@ -44,24 +96,58 @@ class FilterFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
+
+        when {
+            uiState is UiState.Success -> updateState()
+            savedInstanceState != null -> {
+                val currentList =
+                    getParcelableListFromBundleByKey<CategorySetting>(savedInstanceState, CATEGORIES_KEY)
+                if (currentList.isEmpty()) {
+                    observeCategories()
+                } else {
+                    uiState = UiState.Success(currentList)
+                    updateState()
+                }
+            }
+
+            else -> observeCategories()
+        }
+
         binding.toolbar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.accept_filter -> {
-                    settingsList?.let { list ->
+                    val currentState = uiState
+                    if (currentState is UiState.Success) {
                         CategoryRepository.saveCategorySettings(
                             requireContext(),
-                            list,
+                            currentState.data,
                         )
                     }
+                    parentFragmentManager.popBackStack()
                 }
             }
 
-            parentFragmentManager.popBackStack()
             true
         }
+    }
+
+    private fun observeCategories() {
+        val disposable = CategoryRepository
+            .getCategorySettings(requireContext())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                uiState = UiState.Loading
+                updateState()
+            }
+            .subscribe {
+                uiState = UiState.Success(it)
+                updateState()
+            }
+
+        compositeDisposable.add(disposable)
     }
 
     private fun initAdapter() {
@@ -72,8 +158,14 @@ class FilterFragment : Fragment() {
         binding.recyclerView.addItemDecoration(divider)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
+    }
+
     companion object {
         const val TAG = "FilterFragment"
+        const val CATEGORIES_KEY = "CategoriesList"
 
         @JvmStatic
         fun newInstance() = FilterFragment()

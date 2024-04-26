@@ -3,7 +3,6 @@ package com.example.simbirsoftmobile.presentation.screens.eventDetails
 import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,24 +14,23 @@ import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
 import com.example.simbirsoftmobile.presentation.models.event.Event
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getRemainingDateInfo
+import com.example.simbirsoftmobile.presentation.screens.utils.getSingleParcelableFromBundleByKey
 import com.example.simbirsoftmobile.repository.EventRepository
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class EventDetailsFragment : Fragment() {
     private var _binding: FragmentEventDetailsBinding? = null
     private val binding: FragmentEventDetailsBinding
         get() = _binding!!
 
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
-    private var downloadTask: Future<*>? = null
-
+    private val compositeDisposable = CompositeDisposable()
     private var eventId: Int? = null
     private var uiState: UiState<Event> = UiState.Idle
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+
         val currentState = uiState
         if (currentState is UiState.Success) {
             outState.putParcelable(EVENT_MODEL_KEY, currentState.data)
@@ -59,92 +57,66 @@ class EventDetailsFragment : Fragment() {
         with(binding) {
             when (val currentState = uiState) {
                 is UiState.Error -> {
-                    progressIndicator.post {
-                        progressIndicator.visibility = View.GONE
-                    }
-                    eventDetailsLayout.post {
-                        eventDetailsLayout.visibility = View.GONE
-                    }
-                    errorTV.post {
-                        errorTV.visibility = View.VISIBLE
-                        errorTV.text = currentState.message
-                    }
+                    progressIndicator.visibility = View.GONE
+                    eventDetailsLayout.visibility = View.GONE
+                    errorTV.visibility = View.VISIBLE
+                    errorTV.text = currentState.message
                 }
 
                 UiState.Idle -> {}
 
                 UiState.Loading -> {
-                    progressIndicator.post {
-                        progressIndicator.visibility = View.VISIBLE
-                    }
-                    eventDetailsLayout.post {
-                        eventDetailsLayout.visibility = View.GONE
-                    }
-                    errorTV.post {
-                        errorTV.visibility = View.GONE
-                    }
+                    progressIndicator.visibility = View.VISIBLE
+                    eventDetailsLayout.visibility = View.GONE
+                    errorTV.visibility = View.GONE
                 }
 
                 is UiState.Success -> {
-                    errorTV.post {
-                        errorTV.visibility = View.GONE
-                    }
-                    progressIndicator.post {
-                        progressIndicator.visibility = View.GONE
-                    }
-                    eventDetailsLayout.post {
-                        eventDetailsLayout.visibility = View.VISIBLE
+                    errorTV.visibility = View.GONE
+                    progressIndicator.visibility = View.GONE
+                    eventDetailsLayout.visibility = View.VISIBLE
 
-                        titleTV.text = currentState.data.title
-                        organizerNameTV.text = currentState.data.organizerName
-                        addressTV.text = currentState.data.address
+                    titleTV.text = currentState.data.title
+                    organizerNameTV.text = currentState.data.organizerName
+                    addressTV.text = currentState.data.address
 
-                        remainDateTV.text =
-                            getRemainingDateInfo(
-                                currentState.data.dateStart,
-                                currentState.data.dateEnd,
-                                requireContext(),
-                            )
+                    remainDateTV.text =
+                        getRemainingDateInfo(
+                            currentState.data.dateStart,
+                            currentState.data.dateEnd,
+                            requireContext(),
+                        )
 
-                        initEmailSection(currentState.data.email)
-                        initPhoneNumbers(currentState.data.phoneNumbers)
-                        initImage(currentState.data.imageUrl)
+                    initEmailSection(currentState.data.email)
+                    initPhoneNumbers(currentState.data.phoneNumbers)
+                    initImage(currentState.data.imageUrl)
 
-                        descriptionTV.text = currentState.data.description
-                        initOrganizerUrlText(currentState.data.siteUrl)
+                    descriptionTV.text = currentState.data.description
+                    initOrganizerUrlText(currentState.data.siteUrl)
 
-                        toolbar.setOnMenuItemClickListener {
-                            when (it.itemId) {
-                                R.id.share_event -> {
-                                    val shareIntent =
-                                        Intent().apply {
-                                            action = Intent.ACTION_SEND
-                                            putExtra(Intent.EXTRA_TEXT, currentState.data.title)
-                                            type = "text/plain"
-                                        }
-                                    startActivity(
-                                        Intent.createChooser(
-                                            shareIntent,
-                                            "Поделиться событием",
-                                        )
+                    toolbar.setOnMenuItemClickListener {
+                        when (it.itemId) {
+                            R.id.share_event -> {
+                                val shareIntent =
+                                    Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(Intent.EXTRA_TEXT, currentState.data.title)
+                                        type = "text/plain"
+                                    }
+                                startActivity(
+                                    Intent.createChooser(
+                                        shareIntent,
+                                        "Поделиться событием",
                                     )
-                                }
+                                )
                             }
-                            true
                         }
+                        true
                     }
                 }
             }
         }
     }
-
-    private fun getEventFromBundle(savedInstanceState: Bundle): Event? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState.getParcelable(EVENT_MODEL_KEY, Event::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            savedInstanceState.getParcelable<Event>(EVENT_MODEL_KEY)
-        }
 
     override fun onViewCreated(
         view: View,
@@ -157,7 +129,8 @@ class EventDetailsFragment : Fragment() {
         }
 
         if (savedInstanceState != null) {
-            val currentEvent = getEventFromBundle(savedInstanceState)
+            val currentEvent =
+                getSingleParcelableFromBundleByKey<Event>(savedInstanceState, EVENT_MODEL_KEY)
             if (currentEvent != null) {
                 uiState = UiState.Success(currentEvent)
                 updateUiState()
@@ -166,25 +139,25 @@ class EventDetailsFragment : Fragment() {
             uiState = UiState.Loading
 
             updateUiState()
-            val loadList = Runnable {
-                val event = eventId?.let { getEventById(it) }
-
-                if (event == null) {
-                    uiState =
-                        UiState.Error(getString(R.string.error_occurred_while_receiving_data))
-                    updateUiState()
-                } else {
-                    uiState = UiState.Success(event)
-                    updateUiState()
-                }
+            val currentId = eventId
+            if (currentId != null) {
+                getEventById(currentId)
+            } else {
+                UiState.Error(getString(R.string.error_occurred_while_receiving_data))
+                updateUiState()
             }
-
-            downloadTask = executor.submit(loadList)
         }
     }
 
-    private fun getEventById(id: Int): Event? {
-        return eventId?.let { EventRepository.getEventById(id, requireContext()) }
+    private fun getEventById(id: Int) {
+        val dispose = EventRepository
+            .getEventById(id, requireContext())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { event ->
+                uiState = UiState.Success(event)
+                updateUiState()
+            }
+        compositeDisposable.add(dispose)
     }
 
     private fun initEmailSection(email: String) {
@@ -221,27 +194,31 @@ class EventDetailsFragment : Fragment() {
     }
 
     private fun initImage(imageResource: Int) {
-        try {
-            val drawable = ContextCompat.getDrawable(requireContext(), imageResource)
-            if (drawable != null) {
-                binding.previewIV.visibility = View.VISIBLE
-                binding.previewIV.setImageDrawable(drawable)
-            } else {
-                binding.previewIV.visibility = View.GONE
+        with(binding) {
+            try {
+                val drawable = ContextCompat.getDrawable(requireContext(), imageResource)
+                if (drawable != null) {
+                    previewIV.visibility = View.VISIBLE
+                    previewIV.setImageDrawable(drawable)
+                } else {
+                    previewIV.visibility = View.GONE
+                }
+            } catch (e: Resources.NotFoundException) {
+                previewIV.visibility = View.GONE
             }
-        } catch (e: Resources.NotFoundException) {
-            binding.previewIV.visibility = View.GONE
         }
     }
 
     private fun initOrganizerUrlText(siteUrl: String) {
-        if (siteUrl.isNotBlank()) {
-            binding.organizerUrlTV.visibility = View.VISIBLE
-            binding.organizerUrlTV.setOnClickListener {
-                openLink(siteUrl)
+        with(binding) {
+            if (siteUrl.isNotBlank()) {
+                organizerUrlTV.visibility = View.VISIBLE
+                organizerUrlTV.setOnClickListener {
+                    openLink(siteUrl)
+                }
+            } else {
+                organizerUrlTV.visibility = View.GONE
             }
-        } else {
-            binding.organizerUrlTV.visibility = View.GONE
         }
     }
 
@@ -253,14 +230,13 @@ class EventDetailsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-
-        downloadTask?.cancel(true)
+        compositeDisposable.dispose()
     }
 
     companion object {
         const val TAG = "EventDetailsFragment"
-        private const val EVENT_ID_KEY = "EventId"
-        const val EVENT_MODEL_KEY = "EventModel"
+        const val EVENT_ID_KEY = "eventId"
+        private const val EVENT_MODEL_KEY = "EventModel"
 
         @JvmStatic
         fun newInstance(eventId: Int) =

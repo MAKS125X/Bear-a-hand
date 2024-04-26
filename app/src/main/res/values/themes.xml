@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.SimbirSoftMobile" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Base.Theme.SimbirSoftMobile" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/green_leaf</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -9,6 +9,7 @@
         <item name="colorTertiary">@color/turtle_green</item>
         <item name="colorOnTertiary">@color/white</item>
         <item name="android:colorBackground">@color/white</item>
+        <item name="colorPrimaryInverse">@color/cool_grey</item>
         <item name="colorOnBackground">@color/black87</item>
         <item name="colorOnSurface">@color/black54</item>
         <item name="colorSurface">@color/light_grey_2</item>

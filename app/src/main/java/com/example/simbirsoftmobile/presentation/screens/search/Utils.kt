@@ -1,6 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.search
 
-import com.example.simbirsoftmobile.presentation.models.SearchResultUI
+import com.example.simbirsoftmobile.presentation.screens.search.models.SearchResultUI
 import kotlin.random.Random
 
 val validChars: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')

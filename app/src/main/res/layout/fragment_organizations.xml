@@ -5,60 +5,95 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
-    tools:context=".presentation.screens.search.EventsFragment">
+    tools:context=".presentation.screens.search.organizations.OrganizationsFragment">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/linearLayout"
+    <LinearLayout
+        android:id="@+id/emptyResultLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/search_result_text_view_padding"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/keyWordsTV"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ключевые слова: мастер-класс, помощь"
-            android:textColor="?attr/colorOnSurface" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/searchResultSizeTV"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Результаты поиска: 109 мероприятий"
-            android:textColor="?attr/colorOnSurface" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.divider.MaterialDivider
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/SectionDivider" />
+            android:adjustViewBounds="true"
+            android:paddingHorizontal="60dp"
+            android:paddingVertical="40dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/image_search" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/try_search"
+            android:textAlignment="center"
+            android:textColor="?attr/colorOnSurface" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/queryResultLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:attr/colorBackground"
-            android:paddingStart="@dimen/search_result_recycler_padding_start"
-            android:paddingEnd="@dimen/search_result_recycler_padding_end"
-            tools:itemCount="6"
-            tools:listitem="@layout/item_search_result" />
+            android:orientation="vertical"
+            android:padding="@dimen/search_result_text_view_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.divider.MaterialDivider
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/searchResultSizeTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSurface" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/SectionDivider" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/SectionDivider" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/colorBackground"
+                android:paddingStart="@dimen/search_result_recycler_padding_start"
+                android:paddingEnd="@dimen/search_result_recycler_padding_end"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="6"
+                tools:listitem="@layout/item_search_result" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/SectionDivider" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
