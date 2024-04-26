@@ -33,8 +33,8 @@ object CategoryRepository {
             .create()
     }
 
-    fun getCategories(context: Context): Observable<List<Category>> {
-        return Observable
+    fun getCategories(context: Context): Observable<List<Category>> =
+        Observable
             .just(
                 context.assets
                     .open("categories.json")
@@ -46,7 +46,6 @@ object CategoryRepository {
             .map {
                 gson.fromJson<List<Category>>(it, CategoryDeserializer.objectType)
             }
-    }
 
     fun saveCategorySettings(
         context: Context,
@@ -61,17 +60,19 @@ object CategoryRepository {
         editor.apply()
     }
 
-    fun getCategorySettings(context: Context): Observable<List<CategorySetting>> {
-        val pref: SharedPreferences =
-            context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
-        return Observable
-            .just(pref.getString(CATEGORY_SETTINGS_KEY, "") ?: "")
+    fun getCategorySettings(context: Context): Observable<List<CategorySetting>> =
+        Observable
+            .create {
+                val pref: SharedPreferences =
+                    context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+                it.onNext(pref.getString(CATEGORY_SETTINGS_KEY, "").orEmpty())
+            }
             .delay(2000, TimeUnit.MILLISECONDS)
             .map {
                 gson.fromJson<List<CategorySetting>>(
                     it,
                     CategorySettingDeserializer.objectType,
-                ) ?: mutableListOf()
+                ) ?: emptyList()
             }
             .flatMap { settingsList ->
                 if (settingsList.isEmpty()) {
@@ -83,13 +84,12 @@ object CategoryRepository {
                     Observable.just(settingsList)
                 }
             }
-    }
 
-    fun getSelectedCategoriesId(context: Context): Observable<List<Int>> {
-        return getCategorySettings(context)
+
+    fun getSelectedCategoriesId(context: Context): Observable<List<Int>> =
+        getCategorySettings(context)
             .map {
                 it.filter { category -> category.isSelected }
                     .map { category -> category.category.id }
             }
-    }
 }

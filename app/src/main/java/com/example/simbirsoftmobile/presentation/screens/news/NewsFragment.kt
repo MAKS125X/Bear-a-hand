@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.presentation.screens.news
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import com.example.simbirsoftmobile.presentation.models.event.Event
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
 import com.example.simbirsoftmobile.repository.CategoryRepository
 import com.example.simbirsoftmobile.repository.EventRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -64,7 +64,7 @@ class NewsFragment : Fragment() {
             updateUiState()
         } else {
             if (savedInstanceState != null) {
-                val currentList = getNewsListFromBundle(savedInstanceState)
+                val currentList = getParcelableListFromBundleByKey<Event>(savedInstanceState, LIST_KEY)
                 if (currentList.isEmpty()) {
                     observeCategories()
                 } else {
@@ -76,17 +76,6 @@ class NewsFragment : Fragment() {
             }
         }
     }
-
-    private fun getNewsListFromBundle(savedInstanceState: Bundle): List<Event> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState
-                .getParcelableArrayList(LIST_KEY, Event::class.java)
-                ?.toList()
-                ?: listOf()
-        } else {
-            @Suppress("DEPRECATION")
-            savedInstanceState.getParcelableArrayList<Event>(LIST_KEY)?.toList() ?: listOf()
-        }
 
     private fun observeCategories() {
         newsUiState = UiState.Loading

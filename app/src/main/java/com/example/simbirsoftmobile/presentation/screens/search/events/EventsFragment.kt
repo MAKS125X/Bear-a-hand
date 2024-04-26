@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.presentation.screens.search.events
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import com.example.simbirsoftmobile.presentation.screens.search.models.SearchRes
 import com.example.simbirsoftmobile.presentation.screens.search.models.ViewPagerFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.toSearchResultUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
 import com.example.simbirsoftmobile.repository.EventRepository
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -56,7 +56,7 @@ class EventsFragment : ViewPagerFragment() {
         initAdapter()
 
         if (savedInstanceState != null) {
-            val currentList = getEventListFromBundle(savedInstanceState)
+            val currentList = getParcelableListFromBundleByKey<SearchResultUI>(savedInstanceState, LIST_KEY)
 
             uiState = UiState.Success(currentList)
             updateUiState()
@@ -75,23 +75,10 @@ class EventsFragment : ViewPagerFragment() {
         compositeDisposable.add(disposable)
     }
 
-    private fun getEventListFromBundle(savedInstanceState: Bundle): List<SearchResultUI> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState.getParcelableArrayList(LIST_KEY, SearchResultUI::class.java)
-                ?.toList()
-                ?: listOf()
-        } else {
-            @Suppress("DEPRECATION")
-            savedInstanceState.getParcelableArrayList<SearchResultUI>(LIST_KEY)?.toList()
-                ?: listOf()
-        }
-
     private fun updateUiState() {
-        when (val currentState = uiState) {
-            is UiState.Error -> {}
-            UiState.Idle -> {}
-            UiState.Loading -> {}
-            is UiState.Success -> {
+        val currentState = uiState
+        when {
+            currentState is UiState.Success -> {
                 with(binding) {
                     emptyResultLayout.visibility = View.GONE
                     queryResultLayout.visibility = View.VISIBLE

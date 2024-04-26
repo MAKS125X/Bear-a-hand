@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.presentation.screens.help
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +9,7 @@ import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentHelpBinding
 import com.example.simbirsoftmobile.presentation.models.category.Category
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
 import com.example.simbirsoftmobile.repository.CategoryRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -91,7 +91,8 @@ class HelpFragment : Fragment() {
         initAdapter()
 
         if (savedInstanceState != null) {
-            val currentCategoryList = getCategoriesListFromBundle(savedInstanceState)
+            val currentCategoryList =
+                getParcelableListFromBundleByKey<Category>(savedInstanceState, CATEGORY_LIST_KEY)
             if (currentCategoryList.isEmpty()) {
                 categoriesUiState = UiState.Error(getString(R.string.empty_category_list_error))
                 updateUiState()
@@ -113,18 +114,6 @@ class HelpFragment : Fragment() {
             compositeDisposable.add(disposable)
         }
     }
-
-    private fun getCategoriesListFromBundle(savedInstanceState: Bundle): List<Category> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState
-                .getParcelableArrayList(CATEGORY_LIST_KEY, Category::class.java)?.toList()
-                ?: listOf()
-        } else {
-            @Suppress("DEPRECATION")
-            savedInstanceState
-                .getParcelableArrayList<Category>(CATEGORY_LIST_KEY)?.toList()
-                ?: listOf()
-        }
 
     private fun initAdapter() {
         adapter = CategoryAdapter(requireContext())
