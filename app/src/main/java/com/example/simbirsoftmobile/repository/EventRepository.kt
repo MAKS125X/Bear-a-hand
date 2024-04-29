@@ -7,15 +7,26 @@ import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
-import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.rx3.asFlow
 import java.util.concurrent.TimeUnit
 
 object EventRepository {
     private val readEventIds: MutableSet<Int> = mutableSetOf()
-    val subject = BehaviorSubject.create<Int>()
-    private var currentEventList: MutableList<Event> = mutableListOf()
 
-    const val TAG = "EventRepository"
+    private val _notificationFlow: MutableSharedFlow<Int> = MutableSharedFlow(
+        replay = 1,
+        extraBufferCapacity = 0,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val notificationFlow: SharedFlow<Int> = _notificationFlow.asSharedFlow()
+
+    private var currentEventList: MutableList<Event> = mutableListOf()
 
     private val eventGson by lazy {
         GsonBuilder().registerTypeAdapter(
@@ -26,7 +37,7 @@ object EventRepository {
 
     private fun emitUnreadValue() {
         val unreadCount = currentEventList.count { !readEventIds.contains(it.id) }
-        subject.onNext(unreadCount)
+        _notificationFlow.tryEmit(unreadCount)
     }
 
     private fun getAllEvents(context: Context): Observable<List<Event>> =
@@ -50,15 +61,23 @@ object EventRepository {
                 emitUnreadValue()
             }
 
-    fun searchEvent(
+    fun searchEvents(
         searchString: String,
         context: Context,
-    ): Single<List<Event>> =
-        getAllEvents(context)
+    ): Flow<List<Event>> =
+        getAllEvents(context).asFlow()
             .map {
                 it.filter { event -> event.title.contains(searchString, true) }
             }
-            .single(listOf())
+
+    fun searchOrganizations(
+        searchString: String,
+        context: Context,
+    ): Flow<List<Event>> =
+        getAllEvents(context).asFlow()
+            .map {
+                it.filter { event -> event.organizerName.contains(searchString, true) }.distinct()
+            }
 
     fun getEventById(
         id: Int,

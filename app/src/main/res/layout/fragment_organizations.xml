@@ -7,13 +7,27 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.screens.search.organizations.OrganizationsFragment">
 
-    <LinearLayout
-        android:id="@+id/emptyResultLayout"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/errorTV"
+        style="@style/ScreenH2TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/nothing_was_found_based_on_filters"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/infoLayout" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/infoLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
+        android:paddingHorizontal="@dimen/search_info_layout_padding_horizontal"
+        android:paddingVertical="@dimen/search_info_layout_padding_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,58 +37,58 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:paddingHorizontal="60dp"
-            android:paddingVertical="40dp"
             android:scaleType="fitCenter"
             android:src="@drawable/image_search" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/try_search"
+            android:text="@string/try_search_organization"
             android:textAlignment="center"
             android:textColor="?attr/colorOnSurface" />
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <LinearLayout
-        android:id="@+id/queryResultLayout"
+
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:visibility="gone"
-
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/search_result_text_view_padding"
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressIndicator"
+            style="@style/CircularProgressIndicator"
+            android:layout_gravity="center"
+            android:layout_marginVertical="@dimen/search_progress_margin_vertical"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/searchResultSizeTV"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurface" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/searchResultSizeTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/search_result_text_view_padding"
+            android:textColor="?attr/colorOnSurface" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/queryResultLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
             <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/SectionDivider" />
@@ -87,13 +101,15 @@
                 android:paddingStart="@dimen/search_result_recycler_padding_start"
                 android:paddingEnd="@dimen/search_result_recycler_padding_end"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="6"
+                tools:itemCount="0"
                 tools:listitem="@layout/item_search_result" />
 
             <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/SectionDivider" />
+
         </androidx.appcompat.widget.LinearLayoutCompat>
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

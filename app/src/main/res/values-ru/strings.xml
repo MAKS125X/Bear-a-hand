@@ -49,5 +49,8 @@
     <string name="login">Войти</string>
     <string name="event">Событие</string>
     <string name="search_result_events_size">Результаты поиска: %1$s мероприятий</string>
-    <string name="try_search">Напишите в строке поиска название \nмероприятия или ключевые слова.</string>
+    <string name="search_result_organizations_size">Результаты поиска: %1$s организаций</string>
+    <string name="try_search_events">Напишите в строке поиска название \nмероприятия или ключевые слова.</string>
+    <string name="try_search_organization">Напишите в строке поиска название \nорганизации или ключевые слова.</string>
+    <string name="dat_acquisition_error_occurred">Произошла ошибка получения данных</string>
 </resources>
