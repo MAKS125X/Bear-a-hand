@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentNewsBinding
@@ -18,8 +21,9 @@ import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetai
 import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class NewsFragment : Fragment() {
     private var _binding: FragmentNewsBinding? = null
@@ -29,7 +33,6 @@ class NewsFragment : Fragment() {
     private var adapter: NewsAdapter? = null
 
     private var newsUiState: UiState<List<EventShortUi>> = UiState.Idle
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -95,38 +98,44 @@ class NewsFragment : Fragment() {
                     .filter { it.isSelected }
                     .map { it.id }
 
-                val disposable = GetEventsBySettingsUseCase()
-                    .invoke(*requiredCategoryIds.toTypedArray())
-                    .doOnSubscribe {
-                        newsUiState = UiState.Loading
-                        updateUiState()
-                    }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        newsUiState = when (it) {
-                            is Either.Left -> {
-                                UiState.Error(
-                                    when (it.value) {
-                                        is NetworkError.Api -> getString(R.string.error_occurred_while_receiving_data)
-                                        is NetworkError.InvalidParameters -> getString(R.string.empty_category_list_error)
-                                        NetworkError.Timeout -> getString(R.string.timeout_error)
-                                        is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                                    }
-                                )
-                            }
+                val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+                    newsUiState = UiState.Error(getString(R.string.unexpected_error))
+                    updateUiState()
+                }
 
-                            is Either.Right -> {
-                                if (it.value.isEmpty()) {
-                                    UiState.Error(getString(R.string.nothing_was_found_based_on_filters))
-                                } else {
-                                    UiState.Success(it.value.map { item -> item.mapToShorUi() })
+                lifecycleScope.launch(exceptionHandler) {
+                    GetEventsBySettingsUseCase()
+                        .invoke(*requiredCategoryIds.toTypedArray())
+                        .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                        .onEach {
+                            newsUiState = UiState.Loading
+                            updateUiState()
+                        }
+                        .collect {
+                            newsUiState = when (it) {
+                                is Either.Left -> {
+                                    UiState.Error(
+                                        when (it.value) {
+                                            is NetworkError.Api -> it.value.error
+                                                ?: getString(R.string.error_occurred_while_receiving_data)
+
+                                            is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+                                            NetworkError.Timeout -> getString(R.string.timeout_error)
+                                            is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                            is NetworkError.Connection -> getString(R.string.connection_error)
+                                        }
+                                    )
+                                }
+
+                                is Either.Right -> {
+                                    UiState.Success(
+                                        it.value.map { item -> item.mapToShorUi() }
+                                    )
                                 }
                             }
+                            updateUiState()
                         }
-                        updateUiState()
-                    }
-
-                compositeDisposable.add(disposable)
+                }
             }
         }
     }
@@ -211,11 +220,6 @@ class NewsFragment : Fragment() {
         super.onDestroyView()
         adapter = null
         _binding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
     }
 
     companion object {

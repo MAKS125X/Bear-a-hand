@@ -57,4 +57,5 @@
     <string name="data_acquisition_error_occurred">Data acquisition error occurred</string>
     <string name="unexpected_error">An unexpected error occurred</string>
     <string name="timeout_error">The response time has expired</string>
+    <string name="connection_error">Network connection error</string>
 </resources>

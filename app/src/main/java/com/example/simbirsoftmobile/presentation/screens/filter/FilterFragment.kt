@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentFilterBinding
@@ -18,8 +21,9 @@ import com.example.simbirsoftmobile.presentation.models.settingTest.toUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class FilterFragment : Fragment() {
     private var _binding: FragmentFilterBinding? = null
@@ -29,8 +33,6 @@ class FilterFragment : Fragment() {
     private var uiState: UiState<List<CategorySettingUi>> = UiState.Idle
 
     private var adapter: CategorySettingAdapter? = null
-
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -142,39 +144,45 @@ class FilterFragment : Fragment() {
     }
 
     private fun observeCategories() {
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            uiState = UiState.Error(getString(R.string.unexpected_error))
+            updateState()
+        }
+
         val settings = CategoryPrefsManager.getCategorySettings(requireContext())
 
-        val disposable = GetCategoriesWithSettingsUseCase()
-            .invoke(settings)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                uiState = UiState.Loading
-                updateState()
-            }
-            .subscribe {
-                uiState = when (it) {
-                    is Either.Left -> {
-                        UiState.Error(
-                            when (it.value) {
-                                is NetworkError.Api -> it.value.error
-                                    ?: getString(R.string.unexpected_error)
-
-                                is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-                                NetworkError.Timeout -> getString(R.string.timeout_error)
-                                is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                            }
-                        )
-                    }
-
-                    is Either.Right -> {
-                        UiState.Success(it.value.map { model -> model.toUi() })
-                    }
+        lifecycleScope.launch(exceptionHandler) {
+            GetCategoriesWithSettingsUseCase()
+                .invoke(settings)
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    uiState = UiState.Loading
+                    updateState()
                 }
+                .collect {
+                    uiState = when (it) {
+                        is Either.Left -> {
+                            UiState.Error(
+                                when (it.value) {
+                                    is NetworkError.Api -> it.value.error
+                                        ?: getString(R.string.unexpected_error)
 
-                updateState()
-            }
+                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    NetworkError.Timeout -> getString(R.string.timeout_error)
+                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                    is NetworkError.Connection -> getString(R.string.connection_error)
+                                }
+                            )
+                        }
 
-        compositeDisposable.add(disposable)
+                        is Either.Right -> {
+                            UiState.Success(it.value.map { model -> model.toUi() })
+                        }
+                    }
+
+                    updateState()
+                }
+        }
     }
 
     private fun initAdapter() {
@@ -185,9 +193,9 @@ class FilterFragment : Fragment() {
         binding.recyclerView.addItemDecoration(divider)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

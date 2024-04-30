@@ -117,12 +117,10 @@ class EventsFragment : Fragment() {
                                 when (response.value) {
                                     is NetworkError.Api -> response.value.error
                                         ?: getString(R.string.data_acquisition_error_occurred)
-
                                     is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-
                                     NetworkError.Timeout -> getString(R.string.timeout_error)
-
                                     is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                    is NetworkError.Connection -> getString(R.string.connection_error)
                                 }
                             )
                         }

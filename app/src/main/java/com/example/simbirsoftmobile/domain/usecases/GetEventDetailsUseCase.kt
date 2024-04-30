@@ -4,13 +4,16 @@ import com.example.simbirsoftmobile.di.SimbirSoftApp
 import com.example.simbirsoftmobile.domain.core.Either
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import com.example.simbirsoftmobile.domain.utils.UnreadNewsController
+import kotlinx.coroutines.flow.onEach
 
 class GetEventDetailsUseCase(
     private val repository: EventRepository = SimbirSoftApp.INSTANCE.appContainer.eventRepository,
 ) {
-    operator fun invoke(eventId: String) = repository.getEventById(eventId).doOnNext {
-        if (it is Either.Right) {
-            UnreadNewsController.addReadValue(it.value)
-        }
-    }
+    operator fun invoke(eventId: String) =
+        repository.getEventById(eventId)
+            .onEach {
+                if (it is Either.Right) {
+                    UnreadNewsController.addReadValue(it.value)
+                }
+            }
 }

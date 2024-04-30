@@ -7,13 +7,14 @@ import com.example.simbirsoftmobile.domain.models.CategorySettingModel
 import com.example.simbirsoftmobile.domain.models.toSettingModel
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.example.simbirsoftmobile.presentation.models.settingTest.CategorySettingPrefs
-import io.reactivex.rxjava3.core.Observable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class GetCategoriesWithSettingsUseCase(
     private val repository: CategoryRepository = SimbirSoftApp.INSTANCE.appContainer.categoryRepository,
 ) {
-    operator fun invoke(settings: List<CategorySettingPrefs>): Observable<Either<NetworkError, List<CategorySettingModel>>> {
-        return repository.getCategories().map { response ->
+    operator fun invoke(settings: List<CategorySettingPrefs>): Flow<Either<NetworkError, List<CategorySettingModel>>> =
+        repository.getCategories().map { response ->
             when (response) {
                 is Either.Left -> {
                     response
@@ -31,5 +32,4 @@ class GetCategoriesWithSettingsUseCase(
                 }
             }
         }
-    }
 }

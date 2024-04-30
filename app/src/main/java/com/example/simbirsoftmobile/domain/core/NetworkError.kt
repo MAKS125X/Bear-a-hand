@@ -7,5 +7,7 @@ sealed class NetworkError {
 
     class Api(val error: String?) : NetworkError()
 
+    data object Connection : NetworkError()
+
     data object Timeout : NetworkError()
 }

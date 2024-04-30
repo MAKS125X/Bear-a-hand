@@ -1,18 +1,15 @@
 package com.example.simbirsoftmobile.data.network.repositories
 
-import com.example.simbirsoftmobile.data.network.dtos.event.EventDto
 import com.example.simbirsoftmobile.data.network.dtos.event.EventNetworkDeserializer
 import com.example.simbirsoftmobile.data.network.dtos.event.EventsNetworkDeserializer
-import com.example.simbirsoftmobile.data.network.dtos.event.toModel
-import com.example.simbirsoftmobile.di.SimbirSoftApp
+import com.example.simbirsoftmobile.data.utils.getRequestFlowList
 import com.example.simbirsoftmobile.domain.core.Either
 import com.example.simbirsoftmobile.domain.core.NetworkError
 import com.example.simbirsoftmobile.domain.models.EventModel
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import com.google.gson.GsonBuilder
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class EventRepositoryFile : EventRepository {
     private val gson = GsonBuilder()
@@ -26,33 +23,14 @@ class EventRepositoryFile : EventRepository {
         )
         .create()
 
-    private fun getAllEventsFromFile(): Observable<Either<NetworkError, List<EventModel>>> {
-        return Observable
-            .just(
-                SimbirSoftApp.INSTANCE.assets
-                    .open("events.json")
-                    .bufferedReader()
-                    .use { it.readText() }
-            )
-            .subscribeOn(Schedulers.io())
-            .delay(1, TimeUnit.SECONDS)
-            .map {
-                try {
-                    Either.Right(
-                        gson.fromJson<List<EventDto>>(
-                            it,
-                            EventsNetworkDeserializer.typeToken
-                        ).map { event-> event.toModel() }
-                    )
-                } catch (e: Exception) {
-                    Either.Left(
-                        NetworkError.Api(e.localizedMessage)
-                    )
-                }
-            }
-    }
+    private fun getAllEventsFromFile(): Flow<Either<NetworkError, List<EventModel>>> =
+        getRequestFlowList(
+            "events.json",
+            gson,
+            EventsNetworkDeserializer.typeToken,
+        )
 
-    override fun getEventsByCategory(vararg categoryIds: String): Observable<Either<NetworkError, List<EventModel>>> {
+    override fun getEventsByCategory(vararg categoryIds: String): Flow<Either<NetworkError, List<EventModel>>> {
         return getAllEventsFromFile().map { response ->
             when (response) {
                 is Either.Left -> response
@@ -63,7 +41,7 @@ class EventRepositoryFile : EventRepository {
         }
     }
 
-    override fun getEventById(id: String): Observable<Either<NetworkError, EventModel>> {
+    override fun getEventById(id: String): Flow<Either<NetworkError, EventModel>> {
         return getAllEventsFromFile().map { response ->
             when (response) {
                 is Either.Left -> response
@@ -74,5 +52,6 @@ class EventRepositoryFile : EventRepository {
         }
     }
 
-    override fun getAllEvents(): Observable<Either<NetworkError, List<EventModel>>> = getAllEventsFromFile()
+    override fun getAllEvents(): Flow<Either<NetworkError, List<EventModel>>> =
+        getAllEventsFromFile()
 }

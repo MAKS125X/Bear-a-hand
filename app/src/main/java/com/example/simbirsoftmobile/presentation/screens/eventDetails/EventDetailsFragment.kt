@@ -7,6 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import coil.load
 import coil.request.ImageRequest
@@ -20,15 +23,15 @@ import com.example.simbirsoftmobile.presentation.models.event.mapToLongUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getRemainingDateInfo
 import com.example.simbirsoftmobile.presentation.screens.utils.getSingleParcelableFromBundleByKey
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class EventDetailsFragment : Fragment() {
     private var _binding: FragmentEventDetailsBinding? = null
     private val binding: FragmentEventDetailsBinding
         get() = _binding!!
 
-    private val compositeDisposable = CompositeDisposable()
     private var eventId: String? = null
     private var uiState: UiState<EventLongUi> = UiState.Idle
 
@@ -151,38 +154,43 @@ class EventDetailsFragment : Fragment() {
     }
 
     private fun getEventById(id: String) {
-        val dispose = GetEventDetailsUseCase().invoke(id)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                uiState = UiState.Loading
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            uiState = UiState.Error(getString(R.string.unexpected_error))
+            updateUiState()
+        }
 
-                updateUiState()
-            }
-            .subscribe {
-                uiState = when (it) {
-                    is Either.Left -> {
-                        UiState.Error(
-                            when (it.value) {
-                                is NetworkError.Api -> it.value.error
-                                    ?: getString(R.string.error_occurred_while_receiving_data)
-
-                                is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-                                NetworkError.Timeout -> getString(R.string.timeout_error)
-                                is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                            }
-                        )
-                    }
-
-                    is Either.Right -> {
-                        UiState.Success(
-                            it.value.mapToLongUi()
-                        )
-                    }
+        lifecycleScope.launch(exceptionHandler) {
+            GetEventDetailsUseCase()
+                .invoke(id)
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    uiState = UiState.Loading
+                    updateUiState()
                 }
-                updateUiState()
-            }
+                .collect{
+                    uiState = when (it) {
+                        is Either.Left -> {
+                            UiState.Error(
+                                when (it.value) {
+                                    is NetworkError.Api -> it.value.error
+                                        ?: getString(R.string.error_occurred_while_receiving_data)
+                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    NetworkError.Timeout -> getString(R.string.timeout_error)
+                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                    is NetworkError.Connection -> getString(R.string.connection_error)
+                                }
+                            )
+                        }
 
-        compositeDisposable.add(dispose)
+                        is Either.Right -> {
+                            UiState.Success(
+                                it.value.mapToLongUi()
+                            )
+                        }
+                    }
+                    updateUiState()
+                }
+        }
     }
 
     private fun initEmailSection(email: String) {
@@ -268,7 +276,6 @@ class EventDetailsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        compositeDisposable.dispose()
     }
 
     companion object {
