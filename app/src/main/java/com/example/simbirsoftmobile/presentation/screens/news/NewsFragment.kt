@@ -8,13 +8,16 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentNewsBinding
-import com.example.simbirsoftmobile.presentation.models.event.Event
+import com.example.simbirsoftmobile.domain.core.Either
+import com.example.simbirsoftmobile.domain.core.NetworkError
+import com.example.simbirsoftmobile.domain.usecases.GetEventsBySettingsUseCase
+import com.example.simbirsoftmobile.presentation.models.event.EventShortUi
+import com.example.simbirsoftmobile.presentation.models.event.mapToShorUi
+import com.example.simbirsoftmobile.presentation.models.settingTest.CategoryPrefsManager.getSettingsEither
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
-import com.example.simbirsoftmobile.repository.CategoryRepository
-import com.example.simbirsoftmobile.repository.EventRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
@@ -25,7 +28,7 @@ class NewsFragment : Fragment() {
 
     private var adapter: NewsAdapter? = null
 
-    private var newsUiState: UiState<List<Event>> = UiState.Idle
+    private var newsUiState: UiState<List<EventShortUi>> = UiState.Idle
     private val compositeDisposable = CompositeDisposable()
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -64,55 +67,68 @@ class NewsFragment : Fragment() {
             updateUiState()
         } else {
             if (savedInstanceState != null) {
-                val currentList = getParcelableListFromBundleByKey<Event>(savedInstanceState, LIST_KEY)
+                val currentList =
+                    getParcelableListFromBundleByKey<EventShortUi>(savedInstanceState, LIST_KEY)
                 if (currentList.isEmpty()) {
-                    observeCategories()
+                    getNewsListFromFile()
                 } else {
                     newsUiState = UiState.Success(currentList)
                     updateUiState()
                 }
             } else {
-                observeCategories()
+                getNewsListFromFile()
             }
         }
     }
 
-    private fun observeCategories() {
-        newsUiState = UiState.Loading
-        updateUiState()
-
-        val disposable =
-            CategoryRepository.getSelectedCategoriesId(requireContext())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (it.isEmpty()) {
-                        newsUiState =
-                            UiState.Error(getString(R.string.nothing_was_found_based_on_filters))
-                        updateUiState()
-                    } else {
-                        getNewsListFromFile(it)
-                    }
-                }
-
-        compositeDisposable.add(disposable)
-    }
-
-    private fun getNewsListFromFile(ids: List<Int>) {
-        val disposable = EventRepository
-            .getAllEventsByCategories(ids, requireContext())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                if (it.isEmpty()) {
-                    newsUiState =
-                        UiState.Error(getString(R.string.nothing_was_found_based_on_filters))
-                    updateUiState()
-                } else {
-                    newsUiState = UiState.Success(it)
-                    updateUiState()
-                }
+    private fun getNewsListFromFile() {
+        val settings =
+            getSettingsEither(requireContext())
+        when (settings) {
+            is Either.Left -> {
+                newsUiState = UiState.Error(getString(R.string.empty_category_list_error))
+                updateUiState()
             }
 
-        compositeDisposable.add(disposable)
+            is Either.Right -> {
+                val requiredCategoryIds = settings.value
+                    .filter { it.isSelected }
+                    .map { it.id }
+
+                val disposable = GetEventsBySettingsUseCase()
+                    .invoke(*requiredCategoryIds.toTypedArray())
+                    .doOnSubscribe {
+                        newsUiState = UiState.Loading
+                        updateUiState()
+                    }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        newsUiState = when (it) {
+                            is Either.Left -> {
+                                UiState.Error(
+                                    when (it.value) {
+                                        is NetworkError.Api -> getString(R.string.error_occurred_while_receiving_data)
+                                        is NetworkError.InvalidParameters -> getString(R.string.empty_category_list_error)
+                                        NetworkError.Timeout -> getString(R.string.timeout_error)
+                                        is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                    }
+                                )
+                            }
+
+                            is Either.Right -> {
+                                if (it.value.isEmpty()) {
+                                    UiState.Error(getString(R.string.nothing_was_found_based_on_filters))
+                                } else {
+                                    UiState.Success(it.value.map { item -> item.mapToShorUi() })
+                                }
+                            }
+                        }
+                        updateUiState()
+                    }
+
+                compositeDisposable.add(disposable)
+            }
+        }
     }
 
     private fun updateUiState() {
@@ -167,7 +183,7 @@ class NewsFragment : Fragment() {
         binding.newsRecyclerView.adapter = adapter
     }
 
-    private fun moveToEventDetailsFragment(eventId: Int) {
+    private fun moveToEventDetailsFragment(eventId: String) {
         parentFragmentManager.beginTransaction().replace(
             R.id.contentHolder,
             EventDetailsFragment.newInstance(eventId),

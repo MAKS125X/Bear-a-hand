@@ -6,7 +6,7 @@ import android.os.Parcelable
 
 inline fun <reified T : Parcelable> getParcelableListFromBundleByKey(
     savedInstanceState: Bundle,
-    key: String
+    key: String,
 ): List<T> =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         savedInstanceState
@@ -19,10 +19,9 @@ inline fun <reified T : Parcelable> getParcelableListFromBundleByKey(
             ?: listOf()
     }
 
-
 inline fun <reified T : Parcelable> getSingleParcelableFromBundleByKey(
     savedInstanceState: Bundle,
-    key: String
+    key: String,
 ): T? =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         savedInstanceState.getParcelable(key, T::class.java)

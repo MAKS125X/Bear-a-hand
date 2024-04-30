@@ -35,7 +35,7 @@
     <string name="will_start_soon">Начнётся через %1$s дней (%2$s – %3$s)</string>
     <string name="days_left">Осталось %1$s дней (%2$s – %3$s)</string>
     <string name="charitable_assistance">Благотворительная помощь</string>
-    <string name="empty_category_list_error">Произошла ошибка получения категорий</string>
+    <string name="empty_category_list_error">Произошла ошибка получения категорий. Настройте интересующие вас категории.</string>
     <string name="error_occurred_while_receiving_data">Произошла ошибка при получении данных</string>
     <string name="forget_password"><u>Забыли пароль?</u></string>
     <string name="registration"><u>Регистрация</u></string>
@@ -52,5 +52,8 @@
     <string name="search_result_organizations_size">Результаты поиска: %1$s организаций</string>
     <string name="try_search_events">Напишите в строке поиска название \nмероприятия или ключевые слова.</string>
     <string name="try_search_organization">Напишите в строке поиска название \nорганизации или ключевые слова.</string>
-    <string name="dat_acquisition_error_occurred">Произошла ошибка получения данных</string>
+    <string name="data_acquisition_error_occurred">Произошла ошибка получения данных</string>
+    <string name="unexpected_error">Произошла непредвиденная ошибка</string>
+    <string name="timeout_error">Время ожидания ответа истекло</string>
+
 </resources>

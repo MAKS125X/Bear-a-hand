@@ -16,6 +16,7 @@ import com.example.simbirsoftmobile.presentation.screens.search.models.PagerItem
 import com.example.simbirsoftmobile.presentation.screens.search.organizations.OrganizationsFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
@@ -34,7 +35,7 @@ class SearchFragment : Fragment() {
     private fun sendFragmentApiQuery(query: String) {
         childFragmentManager.setFragmentResult(
             if (binding.fragmentViewPager.currentItem == 0) QUERY_EVENT_KEY else QUERY_ORGANIZATION_KEY,
-            bundleOf(RESULT_KEY to query)
+            bundleOf(RESULT_KEY to query),
         )
     }
 
@@ -63,6 +64,7 @@ class SearchFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(FlowPreview::class)
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,

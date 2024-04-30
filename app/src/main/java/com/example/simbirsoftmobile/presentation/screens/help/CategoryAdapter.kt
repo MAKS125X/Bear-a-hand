@@ -1,18 +1,17 @@
 package com.example.simbirsoftmobile.presentation.screens.help
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.ItemCategoryBinding
-import com.example.simbirsoftmobile.presentation.models.category.Category
+import com.example.simbirsoftmobile.presentation.models.category.CategoryLongUi
 
-class CategoryAdapter(
-    val context: Context,
-) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
-    private var categoryArray: List<Category> = listOf()
+class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
+    private var categoryArray: List<CategoryLongUi> = listOf()
 
-    fun submitList(list: List<Category>) {
+    fun submitList(list: List<CategoryLongUi>) {
         categoryArray = list
     }
 
@@ -26,7 +25,6 @@ class CategoryAdapter(
                 parent,
                 false,
             ),
-            context,
         )
 
     override fun getItemCount(): Int = categoryArray.size
@@ -40,20 +38,21 @@ class CategoryAdapter(
 
     class ViewHolder(
         private val binding: ItemCategoryBinding,
-        val context: Context,
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(model: Category) {
+        fun bind(model: CategoryLongUi) {
             with(binding) {
-                setupUI(model, context)
+                setupUI(model)
             }
         }
 
-        private fun ItemCategoryBinding.setupUI(
-            model: Category,
-            context: Context,
-        ) {
-            categoryNameIV.setImageResource(model.imageResId)
-            categoryNameTV.text = context.resources.getString(model.stringResId)
+        private fun ItemCategoryBinding.setupUI(model: CategoryLongUi) {
+            categoryNameIV.setImageResource(R.drawable.category_unknown)
+            categoryNameIV.load(model.imageUrl) {
+                placeholder(R.drawable.loading_animation)
+                this.crossfade(100)
+                error(R.drawable.category_unknown)
+            }
+            categoryNameTV.text = model.name
         }
     }
 }

@@ -66,7 +66,6 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core:2.22.0")
 
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 
     implementation("androidx.fragment:fragment-ktx:1.6.2")
@@ -84,4 +83,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:$coroutines")
+
+    val retrofit = "2.9.0"
+    implementation("com.squareup.retrofit2:retrofit:$retrofit")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofit")
+    implementation("com.squareup.retrofit2:adapter-rxjava3:$retrofit")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    val coil = "2.6.0"
+    implementation("io.coil-kt:coil:$coil")
 }

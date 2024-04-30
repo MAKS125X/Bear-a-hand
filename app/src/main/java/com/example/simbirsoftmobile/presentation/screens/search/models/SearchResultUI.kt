@@ -1,23 +1,33 @@
 package com.example.simbirsoftmobile.presentation.screens.search.models
 
 import android.os.Parcelable
-import com.example.simbirsoftmobile.presentation.models.event.Event
+import com.example.simbirsoftmobile.domain.models.EventModel
 import kotlinx.parcelize.Parcelize
 
-abstract class SearchResultUI(open val name: String) : Parcelable
+abstract class SearchResultUI(open val id: String, open val name: String) : Parcelable
 
 @Parcelize
-data class EventSearchResultUI(
+data class EventSearchUi(
+    override val id: String,
     override val name: String,
-) : SearchResultUI(name)
+) : Parcelable, SearchResultUI(id, name)
 
-fun Event.toEventSearchResultUi(): EventSearchResultUI =
-    EventSearchResultUI(this.title)
+fun EventModel.toEventSearchUi(): EventSearchUi {
+    return EventSearchUi(
+        id,
+        name,
+    )
+}
 
 @Parcelize
-data class OrganizationSearchResultUi(
+data class OrganizationSearchUi(
+    override val id: String,
     override val name: String,
-) : SearchResultUI(name)
+) : Parcelable, SearchResultUI(id, name)
 
-fun Event.toOrganizationSearchResultUi(): OrganizationSearchResultUi =
-    OrganizationSearchResultUi(this.organizerName)
+fun EventModel.toOrganizationSearchUi(): OrganizationSearchUi {
+    return OrganizationSearchUi(
+        id,
+        organization,
+    )
+}

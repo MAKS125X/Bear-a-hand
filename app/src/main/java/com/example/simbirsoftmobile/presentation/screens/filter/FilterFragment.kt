@@ -9,10 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentFilterBinding
-import com.example.simbirsoftmobile.presentation.models.category.CategorySetting
+import com.example.simbirsoftmobile.domain.core.Either
+import com.example.simbirsoftmobile.domain.core.NetworkError
+import com.example.simbirsoftmobile.domain.usecases.GetCategoriesWithSettingsUseCase
+import com.example.simbirsoftmobile.presentation.models.settingTest.CategoryPrefsManager
+import com.example.simbirsoftmobile.presentation.models.settingTest.CategorySettingUi
+import com.example.simbirsoftmobile.presentation.models.settingTest.toUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
-import com.example.simbirsoftmobile.repository.CategoryRepository
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -22,7 +26,7 @@ class FilterFragment : Fragment() {
     private val binding: FragmentFilterBinding
         get() = _binding!!
 
-    private var uiState: UiState<List<CategorySetting>> = UiState.Idle
+    private var uiState: UiState<List<CategorySettingUi>> = UiState.Idle
 
     private var adapter: CategorySettingAdapter? = null
 
@@ -101,7 +105,10 @@ class FilterFragment : Fragment() {
             uiState is UiState.Success -> updateState()
             savedInstanceState != null -> {
                 val currentList =
-                    getParcelableListFromBundleByKey<CategorySetting>(savedInstanceState, CATEGORIES_KEY)
+                    getParcelableListFromBundleByKey<CategorySettingUi>(
+                        savedInstanceState,
+                        CATEGORIES_KEY,
+                    )
                 if (currentList.isEmpty()) {
                     observeCategories()
                 } else {
@@ -121,9 +128,9 @@ class FilterFragment : Fragment() {
                 R.id.accept_filter -> {
                     val currentState = uiState
                     if (currentState is UiState.Success) {
-                        CategoryRepository.saveCategorySettings(
+                        CategoryPrefsManager.setCategorySettings(
                             requireContext(),
-                            currentState.data,
+                            currentState.data.map { setting -> setting.toPrefs() },
                         )
                     }
                     parentFragmentManager.popBackStack()
@@ -135,15 +142,35 @@ class FilterFragment : Fragment() {
     }
 
     private fun observeCategories() {
-        val disposable = CategoryRepository
-            .getCategorySettings(requireContext())
+        val settings = CategoryPrefsManager.getCategorySettings(requireContext())
+
+        val disposable = GetCategoriesWithSettingsUseCase()
+            .invoke(settings)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 uiState = UiState.Loading
                 updateState()
             }
             .subscribe {
-                uiState = UiState.Success(it)
+                uiState = when (it) {
+                    is Either.Left -> {
+                        UiState.Error(
+                            when (it.value) {
+                                is NetworkError.Api -> it.value.error
+                                    ?: getString(R.string.unexpected_error)
+
+                                is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+                                NetworkError.Timeout -> getString(R.string.timeout_error)
+                                is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                            }
+                        )
+                    }
+
+                    is Either.Right -> {
+                        UiState.Success(it.value.map { model -> model.toUi() })
+                    }
+                }
+
                 updateState()
             }
 
