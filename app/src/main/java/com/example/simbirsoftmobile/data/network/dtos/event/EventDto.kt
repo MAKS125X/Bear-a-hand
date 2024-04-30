@@ -1,0 +1,59 @@
+package com.example.simbirsoftmobile.data.network.dtos.event
+
+import com.example.simbirsoftmobile.data.utils.DataMapper
+import com.example.simbirsoftmobile.domain.models.EventModel
+
+data class EventDto(
+    val id: String,
+    val name: String,
+    val startDate: Long,
+    val endDate: Long,
+    val description: String,
+    val status: Int,
+    val photo: String,
+    val category: String,
+    val createdAt: Long,
+    val phone: String,
+    val address: String,
+    val email: String,
+    val organization: String,
+    val url: String,
+) : DataMapper<EventModel> {
+    override fun mapToDomain(): EventModel {
+        return EventModel(
+            this.id,
+            this.name,
+            startDate,
+            endDate,
+            description,
+            status,
+            photo,
+            category,
+            createdAt,
+            phone,
+            address,
+            email,
+            organization,
+            url
+        )
+    }
+}
+
+fun EventDto.toModel(): EventModel {
+    return EventModel(
+        this.id,
+        this.name,
+        startDate,
+        endDate,
+        description,
+        status,
+        photo,
+        category,
+        createdAt,
+        phone,
+        address,
+        email,
+        organization,
+        url
+    )
+}

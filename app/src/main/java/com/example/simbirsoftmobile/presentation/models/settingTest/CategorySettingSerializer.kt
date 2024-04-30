@@ -1,4 +1,4 @@
-package com.example.simbirsoftmobile.presentation.models.category
+package com.example.simbirsoftmobile.presentation.models.settingTest
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -8,9 +8,9 @@ import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
-class CategorySettingSerializer : JsonSerializer<List<CategorySetting>> {
+class CategorySettingSerializer : JsonSerializer<List<CategorySettingPrefs>> {
     override fun serialize(
-        src: List<CategorySetting>?,
+        src: List<CategorySettingPrefs>?,
         typeOfSrc: Type?,
         context: JsonSerializationContext?,
     ): JsonElement {
@@ -21,7 +21,7 @@ class CategorySettingSerializer : JsonSerializer<List<CategorySetting>> {
             val array = JsonArray()
             for (setting in src) {
                 val categoryJson = JsonObject()
-                categoryJson.addProperty("id", setting.category.id)
+                categoryJson.addProperty("id", setting.id)
                 categoryJson.addProperty("selected", setting.isSelected)
                 array.add(categoryJson)
             }
@@ -32,6 +32,6 @@ class CategorySettingSerializer : JsonSerializer<List<CategorySetting>> {
     }
 
     companion object {
-        val objectType: Type = object : TypeToken<List<CategorySetting>>() {}.type
+        val objectType: Type = object : TypeToken<List<CategorySettingPrefs>>() {}.type
     }
 }

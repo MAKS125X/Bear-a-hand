@@ -9,6 +9,7 @@
         </intent>
     </queries>
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -17,6 +18,7 @@
         android:minSdkVersion="33" />
 
     <application
+        android:name=".di.SimbirSoftApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -26,11 +28,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SimbirSoftMobile"
         tools:targetApi="31">
-
-        <service
-            android:name=".presentation.screens.help.thread.DownloadCategoriesService"
-            android:enabled="true"
-            android:exported="false" />
 
         <activity
             android:name=".presentation.screens.SplashScreenActivity"

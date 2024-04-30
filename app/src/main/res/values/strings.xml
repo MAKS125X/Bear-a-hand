@@ -37,7 +37,7 @@
     <string name="will_start_soon">It will start in %1$s days (%2$s – %3$s)</string>
     <string name="days_left">Left %1$s days (%2$s – %3$s)</string>
     <string name="charitable_assistance">Charitable assistance</string>
-    <string name="empty_category_list_error">An error occurred in getting categories</string>
+    <string name="empty_category_list_error">An error occurred in getting categories. Set up the categories you are interested in.</string>
     <string name="error_occurred_while_receiving_data">An error occurred while receiving the data</string>
     <string name="forget_password"><u>Forget password?</u></string>
     <string name="registration"><u>Registration</u></string>
@@ -54,5 +54,7 @@
     <string name="search_result_organizations_size">Search results: %1$s organizations</string>
     <string name="try_search_events">Write the event name or keywords in the search bar.</string>
     <string name="try_search_organization">Write the organization name or keywords in the search bar.</string>
-    <string name="dat_acquisition_error_occurred">Произошла ошибка получения данных</string>
+    <string name="data_acquisition_error_occurred">Data acquisition error occurred</string>
+    <string name="unexpected_error">An unexpected error occurred</string>
+    <string name="timeout_error">The response time has expired</string>
 </resources>

@@ -2,7 +2,6 @@ package com.example.simbirsoftmobile.presentation.screens.search.organizations
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,22 +13,23 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentOrganizationsBinding
+import com.example.simbirsoftmobile.domain.core.Either
+import com.example.simbirsoftmobile.domain.core.NetworkError
+import com.example.simbirsoftmobile.domain.usecases.SearchOrganizationsUseCase
 import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
-import com.example.simbirsoftmobile.presentation.screens.search.models.OrganizationSearchResultUi
-import com.example.simbirsoftmobile.presentation.screens.search.models.toOrganizationSearchResultUi
+import com.example.simbirsoftmobile.presentation.screens.search.models.OrganizationSearchUi
+import com.example.simbirsoftmobile.presentation.screens.search.models.SearchResultUI
+import com.example.simbirsoftmobile.presentation.screens.search.models.toOrganizationSearchUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
-import com.example.simbirsoftmobile.repository.EventRepository
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
@@ -39,7 +39,7 @@ class OrganizationsFragment : Fragment() {
         get() = _binding!!
 
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
-    private var uiState: UiState<List<OrganizationSearchResultUi>> = UiState.Idle
+    private var uiState: UiState<List<SearchResultUI>> = UiState.Idle
 
     private val currentQuery = MutableSharedFlow<String>(
         replay = 1,
@@ -61,8 +61,6 @@ class OrganizationsFragment : Fragment() {
         setFragmentResultListener(SearchFragment.QUERY_ORGANIZATION_KEY) { _, bundle ->
             val result = bundle.getString(SearchFragment.RESULT_KEY)
             if (result != null) {
-                Log.d(TAG, "onCreate: |$result|")
-
                 currentQuery.tryEmit(result)
             }
         }
@@ -95,7 +93,7 @@ class OrganizationsFragment : Fragment() {
         }
 
         val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-            uiState = UiState.Error(getString(R.string.dat_acquisition_error_occurred))
+            uiState = UiState.Error(getString(R.string.data_acquisition_error_occurred))
             updateUiState()
         }
 
@@ -109,30 +107,49 @@ class OrganizationsFragment : Fragment() {
                 }
                 .flowOn(Dispatchers.Main)
                 .flatMapLatest { query ->
-                    EventRepository.searchOrganizations(query, requireContext())
+                    SearchOrganizationsUseCase().invoke(query)
                 }
                 .flowOn(Dispatchers.IO)
-                .map { list ->
-                    list.map { it.toOrganizationSearchResultUi() }
-                }
-                .collectLatest {
-                    uiState = UiState.Success(it)
+                .collect { response ->
+                    when (response) {
+                        is Either.Left -> {
+                            uiState = UiState.Error(
+                                when (response.value) {
+                                    is NetworkError.Api -> response.value.error
+                                        ?: getString(R.string.data_acquisition_error_occurred)
+
+                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+
+                                    NetworkError.Timeout -> getString(R.string.timeout_error)
+
+                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                }
+                            )
+                        }
+
+                        is Either.Right -> {
+                            uiState = UiState.Success(
+                                response.value.map { it.toOrganizationSearchUi() }
+                            )
+                        }
+                    }
+
                     updateUiState()
                 }
         }
     }
 
-    private fun getOrganizationListFromBundle(savedInstanceState: Bundle): List<OrganizationSearchResultUi> =
+    private fun getOrganizationListFromBundle(savedInstanceState: Bundle): List<OrganizationSearchUi> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             savedInstanceState.getParcelableArrayList(
                 LIST_KEY,
-                OrganizationSearchResultUi::class.java,
+                OrganizationSearchUi::class.java,
             )
                 ?.toList()
                 ?: listOf()
         } else {
             @Suppress("DEPRECATION")
-            savedInstanceState.getParcelableArrayList<OrganizationSearchResultUi>(LIST_KEY)
+            savedInstanceState.getParcelableArrayList<OrganizationSearchUi>(LIST_KEY)
                 ?.toList()
                 ?: listOf()
         }

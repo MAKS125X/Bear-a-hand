@@ -5,8 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.CircleCropTransformation
+import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.ItemFriendBinding
-import com.example.simbirsoftmobile.presentation.models.FriendUI
+import com.example.simbirsoftmobile.presentation.models.friend.FriendUI
 
 class FriendAdapter(
     private val friendList: Array<FriendUI>,
@@ -42,7 +45,11 @@ class FriendAdapter(
 
         private fun ItemFriendBinding.setupUI(model: FriendUI) {
             nameTextView.text = model.name
-            profileIV.setImageResource(model.imageUrl)
+            profileIV.load(model.imageUrl) {
+                placeholder(R.drawable.loading_animation)
+                this.error(R.drawable.friend_error_square)
+                transformations(CircleCropTransformation())
+            }
         }
     }
 

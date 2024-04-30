@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentHelpBinding
-import com.example.simbirsoftmobile.presentation.models.category.Category
+import com.example.simbirsoftmobile.domain.core.Either
+import com.example.simbirsoftmobile.domain.core.NetworkError
+import com.example.simbirsoftmobile.domain.usecases.GetCategoriesUseCase
+import com.example.simbirsoftmobile.presentation.models.category.CategoryLongUi
+import com.example.simbirsoftmobile.presentation.models.category.mapToUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
-import com.example.simbirsoftmobile.repository.CategoryRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
@@ -20,7 +23,7 @@ class HelpFragment : Fragment() {
         get() = _binding!!
 
     var adapter: CategoryAdapter? = null
-    private var categoriesUiState: UiState<List<Category>> = UiState.Idle
+    private var categoriesUiState: UiState<List<CategoryLongUi>> = UiState.Idle
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -92,31 +95,56 @@ class HelpFragment : Fragment() {
 
         if (savedInstanceState != null) {
             val currentCategoryList =
-                getParcelableListFromBundleByKey<Category>(savedInstanceState, CATEGORY_LIST_KEY)
+                getParcelableListFromBundleByKey<CategoryLongUi>(
+                    savedInstanceState,
+                    CATEGORY_LIST_KEY
+                )
             if (currentCategoryList.isEmpty()) {
-                categoriesUiState = UiState.Error(getString(R.string.empty_category_list_error))
+                categoriesUiState =
+                    UiState.Error(getString(R.string.data_acquisition_error_occurred))
                 updateUiState()
             } else {
                 categoriesUiState = UiState.Success(currentCategoryList)
                 updateUiState()
             }
         } else {
-            categoriesUiState = UiState.Loading
-            updateUiState()
-
-            val disposable = CategoryRepository
-                .getCategories(requireContext())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    categoriesUiState = UiState.Success(it)
+            val disposable = GetCategoriesUseCase()
+                .invoke()
+                .doOnSubscribe {
+                    categoriesUiState = UiState.Loading
                     updateUiState()
                 }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    categoriesUiState = when (it) {
+                        is Either.Left -> {
+                            UiState.Error(
+                                when (it.value) {
+                                    is NetworkError.Api -> it.value.error
+                                        ?: getString(R.string.data_acquisition_error_occurred)
+
+                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    NetworkError.Timeout -> getString(R.string.timeout_error)
+                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                }
+                            )
+                        }
+
+                        is Either.Right -> {
+                            UiState.Success(
+                                it.value.map { item -> item.mapToUi() }
+                            )
+                        }
+                    }
+                    updateUiState()
+                }
+
             compositeDisposable.add(disposable)
         }
     }
 
     private fun initAdapter() {
-        adapter = CategoryAdapter(requireContext())
+        adapter = CategoryAdapter()
         binding.recyclerView.adapter = adapter
     }
 

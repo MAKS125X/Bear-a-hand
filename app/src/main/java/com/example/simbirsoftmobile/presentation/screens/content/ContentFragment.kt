@@ -11,12 +11,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentContentBinding
+import com.example.simbirsoftmobile.domain.utils.UnreadNewsController
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.help.HelpFragment
 import com.example.simbirsoftmobile.presentation.screens.news.NewsFragment
 import com.example.simbirsoftmobile.presentation.screens.profile.ProfileFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
-import com.example.simbirsoftmobile.repository.EventRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -55,7 +55,7 @@ class ContentFragment : Fragment() {
 
         lifecycleScope.launch(exceptionHandler) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                EventRepository.notificationFlow
+                UnreadNewsController.notificationFlow
                     .collect {
                         with(binding) {
                             if (it <= 0) {

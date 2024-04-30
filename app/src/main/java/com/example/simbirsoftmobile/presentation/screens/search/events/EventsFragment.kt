@@ -2,7 +2,6 @@ package com.example.simbirsoftmobile.presentation.screens.search.events
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,20 +13,23 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventsBinding
+import com.example.simbirsoftmobile.domain.core.Either
+import com.example.simbirsoftmobile.domain.core.NetworkError
+import com.example.simbirsoftmobile.domain.usecases.SearchEventsUseCase
 import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
-import com.example.simbirsoftmobile.presentation.screens.search.models.EventSearchResultUI
-import com.example.simbirsoftmobile.presentation.screens.search.models.toEventSearchResultUi
+import com.example.simbirsoftmobile.presentation.screens.search.models.EventSearchUi
+import com.example.simbirsoftmobile.presentation.screens.search.models.SearchResultUI
+import com.example.simbirsoftmobile.presentation.screens.search.models.toEventSearchUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
-import com.example.simbirsoftmobile.repository.EventRepository
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
@@ -37,7 +39,7 @@ class EventsFragment : Fragment() {
         get() = _binding!!
 
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
-    private var uiState: UiState<List<EventSearchResultUI>> = UiState.Idle
+    private var uiState: UiState<List<SearchResultUI>> = UiState.Idle
 
     private val currentQuery = MutableSharedFlow<String>(
         replay = 1,
@@ -59,7 +61,6 @@ class EventsFragment : Fragment() {
         setFragmentResultListener(SearchFragment.QUERY_EVENT_KEY) { _, bundle ->
             val result = bundle.getString(SearchFragment.RESULT_KEY)
             if (result != null) {
-                Log.d(TAG, "onCreate: |$result|")
                 currentQuery.tryEmit(result)
             }
         }
@@ -75,6 +76,7 @@ class EventsFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -92,7 +94,7 @@ class EventsFragment : Fragment() {
         }
 
         val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-            uiState = UiState.Error(getString(R.string.dat_acquisition_error_occurred))
+            uiState = UiState.Error(getString(R.string.data_acquisition_error_occurred))
             updateUiState()
         }
 
@@ -105,27 +107,48 @@ class EventsFragment : Fragment() {
                 }
                 .flowOn(Dispatchers.Main)
                 .flatMapLatest { query ->
-                    EventRepository.searchEvents(query, requireContext())
+                    SearchEventsUseCase().invoke(query)
                 }
                 .flowOn(Dispatchers.IO)
-                .map { list ->
-                    list.map { it.toEventSearchResultUi() }
-                }
-                .collect {
-                    uiState = UiState.Success(it)
+                .collect { response ->
+                    when (response) {
+                        is Either.Left -> {
+
+                            uiState = UiState.Error(
+                                when (response.value) {
+                                    is NetworkError.Api -> response.value.error
+                                        ?: getString(R.string.data_acquisition_error_occurred)
+
+                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+
+                                    NetworkError.Timeout -> getString(R.string.timeout_error)
+
+                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                }
+                            )
+                        }
+
+                        is Either.Right -> {
+                            uiState = UiState.Success(
+                                response.value.map { it.toEventSearchUi() }
+                            )
+
+                        }
+                    }
+
                     updateUiState()
                 }
         }
     }
 
-    private fun getEventListFromBundle(savedInstanceState: Bundle): List<EventSearchResultUI> =
+    private fun getEventListFromBundle(savedInstanceState: Bundle): List<EventSearchUi> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState.getParcelableArrayList(LIST_KEY, EventSearchResultUI::class.java)
+            savedInstanceState.getParcelableArrayList(LIST_KEY, EventSearchUi::class.java)
                 ?.toList()
                 ?: listOf()
         } else {
             @Suppress("DEPRECATION")
-            savedInstanceState.getParcelableArrayList<EventSearchResultUI>(LIST_KEY)?.toList()
+            savedInstanceState.getParcelableArrayList<EventSearchUi>(LIST_KEY)?.toList()
                 ?: listOf()
         }
 

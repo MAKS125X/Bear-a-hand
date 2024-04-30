@@ -1,21 +1,25 @@
 package com.example.simbirsoftmobile.presentation.screens.eventDetails
 
 import android.content.Intent
-import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import coil.ImageLoader
+import coil.load
+import coil.request.ImageRequest
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
-import com.example.simbirsoftmobile.presentation.models.event.Event
+import com.example.simbirsoftmobile.domain.core.Either
+import com.example.simbirsoftmobile.domain.core.NetworkError
+import com.example.simbirsoftmobile.domain.usecases.GetEventDetailsUseCase
+import com.example.simbirsoftmobile.presentation.models.event.EventLongUi
+import com.example.simbirsoftmobile.presentation.models.event.mapToLongUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getRemainingDateInfo
 import com.example.simbirsoftmobile.presentation.screens.utils.getSingleParcelableFromBundleByKey
-import com.example.simbirsoftmobile.repository.EventRepository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
@@ -25,8 +29,8 @@ class EventDetailsFragment : Fragment() {
         get() = _binding!!
 
     private val compositeDisposable = CompositeDisposable()
-    private var eventId: Int? = null
-    private var uiState: UiState<Event> = UiState.Idle
+    private var eventId: String? = null
+    private var uiState: UiState<EventLongUi> = UiState.Idle
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -40,7 +44,7 @@ class EventDetailsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            eventId = it.getInt(EVENT_ID_KEY)
+            eventId = it.getString(EVENT_ID_KEY)
         }
     }
 
@@ -76,23 +80,23 @@ class EventDetailsFragment : Fragment() {
                     progressIndicator.visibility = View.GONE
                     eventDetailsLayout.visibility = View.VISIBLE
 
-                    titleTV.text = currentState.data.title
-                    organizerNameTV.text = currentState.data.organizerName
+                    titleTV.text = currentState.data.name
+                    organizerNameTV.text = currentState.data.organization
                     addressTV.text = currentState.data.address
 
                     remainDateTV.text =
                         getRemainingDateInfo(
-                            currentState.data.dateStart,
-                            currentState.data.dateEnd,
+                            currentState.data.startDate,
+                            currentState.data.endDate,
                             requireContext(),
                         )
 
                     initEmailSection(currentState.data.email)
-                    initPhoneNumbers(currentState.data.phoneNumbers)
-                    initImage(currentState.data.imageUrl)
+                    initPhoneNumbers(currentState.data.phone)
+                    initImage(currentState.data.photo)
 
                     descriptionTV.text = currentState.data.description
-                    initOrganizerUrlText(currentState.data.siteUrl)
+                    initOrganizerUrlText(currentState.data.url)
 
                     toolbar.setOnMenuItemClickListener {
                         when (it.itemId) {
@@ -100,7 +104,7 @@ class EventDetailsFragment : Fragment() {
                                 val shareIntent =
                                     Intent().apply {
                                         action = Intent.ACTION_SEND
-                                        putExtra(Intent.EXTRA_TEXT, currentState.data.title)
+                                        putExtra(Intent.EXTRA_TEXT, currentState.data.name)
                                         type = "text/plain"
                                     }
                                 startActivity(
@@ -130,15 +134,12 @@ class EventDetailsFragment : Fragment() {
 
         if (savedInstanceState != null) {
             val currentEvent =
-                getSingleParcelableFromBundleByKey<Event>(savedInstanceState, EVENT_MODEL_KEY)
+                getSingleParcelableFromBundleByKey<EventLongUi>(savedInstanceState, EVENT_MODEL_KEY)
             if (currentEvent != null) {
                 uiState = UiState.Success(currentEvent)
                 updateUiState()
             }
         } else {
-            uiState = UiState.Loading
-
-            updateUiState()
             val currentId = eventId
             if (currentId != null) {
                 getEventById(currentId)
@@ -149,14 +150,40 @@ class EventDetailsFragment : Fragment() {
         }
     }
 
-    private fun getEventById(id: Int) {
-        val dispose = EventRepository
-            .getEventById(id, requireContext())
+    private fun getEventById(id: String) {
+        val dispose = GetEventDetailsUseCase().invoke(id)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { event ->
-                uiState = UiState.Success(event)
+            .doOnSubscribe {
+                uiState = UiState.Loading
+
                 updateUiState()
             }
+            .subscribe {
+                uiState = when (it) {
+                    is Either.Left -> {
+                        UiState.Error(
+                            when (it.value) {
+                                is NetworkError.Api -> it.value.error
+                                    ?: getString(R.string.error_occurred_while_receiving_data)
+
+                                is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
+                                NetworkError.Timeout -> getString(R.string.timeout_error)
+                                is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                            }
+
+                        )
+                    }
+
+                    is Either.Right -> {
+                        UiState.Success(
+                            it.value.mapToLongUi()
+                        )
+                    }
+
+                }
+                updateUiState()
+            }
+
         compositeDisposable.add(dispose)
     }
 
@@ -184,27 +211,40 @@ class EventDetailsFragment : Fragment() {
         }
     }
 
-    private fun initPhoneNumbers(phoneNumbers: List<String>) {
-        if (phoneNumbers.isNotEmpty()) {
+    private fun initPhoneNumbers(phoneNumber: String) {
+        if (phoneNumber.isNotEmpty()) {
             binding.emailLayout.visibility = View.VISIBLE
-            binding.phoneTV.text = phoneNumbers.joinToString("\n")
+            binding.phoneTV.text = phoneNumber
         } else {
             binding.emailLayout.visibility = View.GONE
         }
     }
 
-    private fun initImage(imageResource: Int) {
+    private fun initImage(imageSource: String) {
         with(binding) {
-            try {
-                val drawable = ContextCompat.getDrawable(requireContext(), imageResource)
-                if (drawable != null) {
-                    previewIV.visibility = View.VISIBLE
-                    previewIV.setImageDrawable(drawable)
-                } else {
-                    previewIV.visibility = View.GONE
-                }
-            } catch (e: Resources.NotFoundException) {
-                previewIV.visibility = View.GONE
+            val imageLoader = ImageLoader(previewIV.context)
+            val request: ImageRequest = ImageRequest.Builder(previewIV.context)
+                .data(imageSource)
+                .placeholder(R.drawable.loading_animation)
+                .target(
+                    onStart = { placeholder ->
+                        previewIV.visibility = View.VISIBLE
+                        previewIV.setImageDrawable(placeholder)
+                    },
+                    onSuccess = { drawable ->
+                        previewIV.visibility = View.VISIBLE
+                        previewIV.setImageDrawable(drawable)
+                    },
+                    onError = {
+                        previewIV.visibility = View.GONE
+                    }
+                )
+                .build()
+
+            imageLoader.enqueue(request)
+
+            previewIV.load(imageSource) {
+                placeholder(R.drawable.loading_animation)
             }
         }
     }
@@ -239,10 +279,10 @@ class EventDetailsFragment : Fragment() {
         private const val EVENT_MODEL_KEY = "EventModel"
 
         @JvmStatic
-        fun newInstance(eventId: Int) =
+        fun newInstance(eventId: String) =
             EventDetailsFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(EVENT_ID_KEY, eventId)
+                    putString(EVENT_ID_KEY, eventId)
                 }
             }
     }
