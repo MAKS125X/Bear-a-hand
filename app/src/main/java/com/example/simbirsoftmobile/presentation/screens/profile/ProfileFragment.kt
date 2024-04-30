@@ -161,7 +161,7 @@ class ProfileFragment : Fragment() {
                 ),
                 FriendUI(
                     "Евгений Александров",
-                    "https://get.wallhere.com/photo/face-model-portrait-photography-actor-profile-hair-nose-Person-Colton-Haynes-head-man-male-hairstyle-portrait-photography-photo-shoot-close-up-facial-hair-561682.jpg",
+                    "https://i.ytimg.com/vi/70jYjONsXTU/maxresdefault.jpg",
                 ),
                 FriendUI(
                     "Виктор Кузнецов",

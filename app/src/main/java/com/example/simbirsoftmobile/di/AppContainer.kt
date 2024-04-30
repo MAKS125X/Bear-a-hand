@@ -5,6 +5,8 @@ import com.example.simbirsoftmobile.data.network.api.EventService
 import com.example.simbirsoftmobile.data.network.dtos.category.CategoryNetworkDeserializer
 import com.example.simbirsoftmobile.data.network.dtos.event.EventNetworkDeserializer
 import com.example.simbirsoftmobile.data.network.dtos.event.EventsNetworkDeserializer
+import com.example.simbirsoftmobile.data.network.interceptors.networkMonitor.LiveNetworkMonitor
+import com.example.simbirsoftmobile.data.network.interceptors.networkMonitor.NetworkMonitorInterceptor
 import com.example.simbirsoftmobile.data.network.repositories.CategoryRepositoryNetwork
 import com.example.simbirsoftmobile.data.network.repositories.EventRepositoryNetwork
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
@@ -13,7 +15,6 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class AppContainer {
@@ -46,10 +47,6 @@ class AppContainer {
     }
 
     private fun provideRetrofit(): Retrofit {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
-
         val gson = GsonBuilder()
             .registerTypeAdapter(
                 CategoryNetworkDeserializer.typeToken,
@@ -67,9 +64,18 @@ class AppContainer {
 
         return Retrofit.Builder()
             .baseUrl("https://mock.apidog.com/m1/509685-468980-default/")
-            .client(client)
-            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            .client(provideHttpClient())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
+    }
+
+    private fun provideHttpClient(): OkHttpClient {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        return OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .addInterceptor(NetworkMonitorInterceptor(LiveNetworkMonitor(SimbirSoftApp.INSTANCE)))
+            .build()
+
     }
 }

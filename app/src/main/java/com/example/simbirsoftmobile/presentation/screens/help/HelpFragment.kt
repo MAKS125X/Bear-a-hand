@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentHelpBinding
 import com.example.simbirsoftmobile.domain.core.Either
@@ -14,8 +17,9 @@ import com.example.simbirsoftmobile.presentation.models.category.CategoryLongUi
 import com.example.simbirsoftmobile.presentation.models.category.mapToUi
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class HelpFragment : Fragment() {
     private var _binding: FragmentHelpBinding? = null
@@ -24,8 +28,6 @@ class HelpFragment : Fragment() {
 
     var adapter: CategoryAdapter? = null
     private var categoriesUiState: UiState<List<CategoryLongUi>> = UiState.Idle
-
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -108,24 +110,36 @@ class HelpFragment : Fragment() {
                 updateUiState()
             }
         } else {
-            val disposable = GetCategoriesUseCase()
+            observeCategories()
+        }
+    }
+
+    private fun observeCategories() {
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            categoriesUiState = UiState.Error(getString(R.string.unexpected_error))
+            updateUiState()
+        }
+
+        lifecycleScope.launch(exceptionHandler) {
+            GetCategoriesUseCase()
                 .invoke()
-                .doOnSubscribe {
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach {
                     categoriesUiState = UiState.Loading
                     updateUiState()
                 }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
+                .collect {
                     categoriesUiState = when (it) {
                         is Either.Left -> {
                             UiState.Error(
                                 when (it.value) {
                                     is NetworkError.Api -> it.value.error
-                                        ?: getString(R.string.data_acquisition_error_occurred)
+                                        ?: getString(R.string.error_occurred_while_receiving_data)
 
                                     is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
                                     NetworkError.Timeout -> getString(R.string.timeout_error)
                                     is NetworkError.Unexpected -> getString(R.string.unexpected_error)
+                                    is NetworkError.Connection -> getString(R.string.connection_error)
                                 }
                             )
                         }
@@ -138,8 +152,6 @@ class HelpFragment : Fragment() {
                     }
                     updateUiState()
                 }
-
-            compositeDisposable.add(disposable)
         }
     }
 
@@ -150,13 +162,7 @@ class HelpFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-
         _binding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
     }
 
     companion object {

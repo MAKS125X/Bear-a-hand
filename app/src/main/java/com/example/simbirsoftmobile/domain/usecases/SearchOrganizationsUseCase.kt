@@ -7,14 +7,12 @@ import com.example.simbirsoftmobile.domain.models.EventModel
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.rx3.asFlow
 
 class SearchOrganizationsUseCase(
     private val repository: EventRepository = SimbirSoftApp.INSTANCE.appContainer.eventRepository,
 ) {
     operator fun invoke(query: String): Flow<Either<NetworkError, List<EventModel>>> =
         repository.getAllEvents()
-            .asFlow()
             .map {
                 when (it) {
                     is Either.Left -> it
