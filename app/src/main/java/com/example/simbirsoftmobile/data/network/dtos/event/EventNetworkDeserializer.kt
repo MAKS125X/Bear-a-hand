@@ -45,7 +45,7 @@ class EventNetworkDeserializer : JsonDeserializer<EventDto> {
             address,
             email,
             organizerName,
-            url
+            url,
         )
     }
 

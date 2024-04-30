@@ -18,18 +18,18 @@ interface EventService {
     @Headers("Content-Type:application/json")
     @GET("event/{id}")
     fun getEventById(
-        @Path("id") eventId: String
+        @Path("id") eventId: String,
     ): Observable<List<EventDto>>
 
     @Headers("Content-Type:application/json")
     @POST("events/item")
     fun getEventByRequest(
-        @Body request: EventByIdRequest
+        @Body request: EventByIdRequest,
     ): Observable<EventDto>
 
     @Headers("Content-Type:application/json")
     @POST("events")
     fun getEvents(
-        @Body request: EventsByCategoriesRequest
+        @Body request: EventsByCategoriesRequest,
     ): Observable<List<EventDto>>
 }

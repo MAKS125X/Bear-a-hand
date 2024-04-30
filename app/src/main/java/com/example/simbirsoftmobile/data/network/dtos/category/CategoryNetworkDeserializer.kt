@@ -19,7 +19,6 @@ class CategoryNetworkDeserializer : JsonDeserializer<List<CategoryDto>> {
             json?.asJsonObject ?: throw JsonParseException("Ошибка преобразования json: $json")
 
         for (entry in jsonObject.entrySet()) {
-
             val value = entry.value.asJsonObject
 
             val id = value["id"].asString
@@ -27,9 +26,7 @@ class CategoryNetworkDeserializer : JsonDeserializer<List<CategoryDto>> {
             val nameEn: String = value["name_en"].asString
             val imageUrl: String = value["image"].asString
 
-            categories.add(
-                CategoryDto(id, name, nameEn, imageUrl)
-            )
+            categories.add(CategoryDto(id, name, nameEn, imageUrl))
         }
         return categories
     }

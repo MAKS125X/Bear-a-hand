@@ -113,7 +113,6 @@ class EventsFragment : Fragment() {
                 .collect { response ->
                     when (response) {
                         is Either.Left -> {
-
                             uiState = UiState.Error(
                                 when (response.value) {
                                     is NetworkError.Api -> response.value.error
@@ -132,7 +131,6 @@ class EventsFragment : Fragment() {
                             uiState = UiState.Success(
                                 response.value.map { it.toEventSearchUi() }
                             )
-
                         }
                     }
 

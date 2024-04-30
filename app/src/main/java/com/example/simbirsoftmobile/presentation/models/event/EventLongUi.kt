@@ -37,6 +37,6 @@ fun EventModel.mapToLongUi(): EventLongUi {
         address,
         email,
         organization,
-        url
+        url,
     )
 }

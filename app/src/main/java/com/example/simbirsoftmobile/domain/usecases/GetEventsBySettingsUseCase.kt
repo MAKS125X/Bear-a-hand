@@ -9,7 +9,7 @@ import com.example.simbirsoftmobile.domain.utils.UnreadNewsController
 import io.reactivex.rxjava3.core.Observable
 
 class GetEventsBySettingsUseCase(
-    private val repository: EventRepository = SimbirSoftApp.INSTANCE.appContainer.eventRepository
+    private val repository: EventRepository = SimbirSoftApp.INSTANCE.appContainer.eventRepository,
 ) {
     operator fun invoke(vararg categoryIds: String): Observable<Either<NetworkError, List<EventModel>>> {
         val observable = if (categoryIds.isEmpty()) {

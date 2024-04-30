@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx3.asFlow
 
 class SearchEventsUseCase(
-    private val repository: EventRepository = SimbirSoftApp.INSTANCE.appContainer.eventRepository
+    private val repository: EventRepository = SimbirSoftApp.INSTANCE.appContainer.eventRepository,
 ) {
     operator fun invoke(query: String): Flow<Either<NetworkError, List<EventModel>>> =
         repository.getAllEvents()

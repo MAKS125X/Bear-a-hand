@@ -129,8 +129,6 @@ class NewsFragment : Fragment() {
                 compositeDisposable.add(disposable)
             }
         }
-
-
     }
 
     private fun updateUiState() {

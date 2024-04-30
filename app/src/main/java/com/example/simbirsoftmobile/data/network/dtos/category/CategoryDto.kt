@@ -8,13 +8,13 @@ data class CategoryDto(
     val name: String,
     val nameEn: String,
     val imageUrl: String,
-): DataMapper<CategoryModel>{
+) : DataMapper<CategoryModel> {
     override fun mapToDomain(): CategoryModel {
         return CategoryModel(
             this.id,
             this.name,
             this.nameEn,
-            this.imageUrl
+            this.imageUrl,
         )
     }
 }
@@ -24,6 +24,6 @@ fun CategoryDto.toModel(): CategoryModel {
         this.id,
         this.name,
         this.nameEn,
-        this.imageUrl
+        this.imageUrl,
     )
 }

@@ -7,7 +7,6 @@ import com.example.simbirsoftmobile.presentation.models.core.LocalError
 import com.google.gson.GsonBuilder
 
 object CategoryPrefsManager {
-
     private const val CATEGORY_SETTINGS_KEY = "CATEGORY_SETTINGS"
     private const val SHARED_PREF_NAME = "MY_SHARED_PREF"
 
@@ -15,7 +14,7 @@ object CategoryPrefsManager {
         GsonBuilder()
             .registerTypeAdapter(
                 CategorySettingSerializer.objectType,
-                CategorySettingSerializer()
+                CategorySettingSerializer(),
             )
             .registerTypeAdapter(
                 CategorySettingDeserializer.objectType,
@@ -52,7 +51,10 @@ object CategoryPrefsManager {
         }
     }
 
-    fun setCategorySettings(context: Context, settings: List<CategorySettingPrefs>) {
+    fun setCategorySettings(
+        context: Context,
+        settings: List<CategorySettingPrefs>,
+    ) {
         val jsonList = gson.toJson(settings, CategorySettingSerializer.objectType)
 
         val pref: SharedPreferences =

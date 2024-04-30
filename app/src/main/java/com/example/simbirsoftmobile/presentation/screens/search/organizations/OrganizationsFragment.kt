@@ -25,6 +25,7 @@ import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
@@ -75,6 +76,7 @@ class OrganizationsFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,

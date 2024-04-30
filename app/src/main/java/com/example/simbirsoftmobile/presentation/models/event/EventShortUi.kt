@@ -27,6 +27,6 @@ fun EventModel.mapToShorUi(): EventShortUi {
         status,
         photo,
         category,
-        createdAt
+        createdAt,
     )
 }

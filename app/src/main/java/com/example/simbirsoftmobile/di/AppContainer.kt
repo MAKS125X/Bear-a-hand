@@ -53,15 +53,15 @@ class AppContainer {
         val gson = GsonBuilder()
             .registerTypeAdapter(
                 CategoryNetworkDeserializer.typeToken,
-                CategoryNetworkDeserializer()
+                CategoryNetworkDeserializer(),
             )
             .registerTypeAdapter(
                 EventsNetworkDeserializer.typeToken,
-                EventsNetworkDeserializer()
+                EventsNetworkDeserializer(),
             )
             .registerTypeAdapter(
                 EventNetworkDeserializer.objectType,
-                EventNetworkDeserializer()
+                EventNetworkDeserializer(),
             )
             .create()
 
@@ -69,9 +69,7 @@ class AppContainer {
             .baseUrl("https://mock.apidog.com/m1/509685-468980-default/")
             .client(client)
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-            .addConverterFactory(
-                GsonConverterFactory.create(gson)
-            )
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 }

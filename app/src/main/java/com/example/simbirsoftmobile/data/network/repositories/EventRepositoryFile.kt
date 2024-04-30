@@ -18,11 +18,11 @@ class EventRepositoryFile : EventRepository {
     private val gson = GsonBuilder()
         .registerTypeAdapter(
             EventsNetworkDeserializer.typeToken,
-            EventsNetworkDeserializer()
+            EventsNetworkDeserializer(),
         )
         .registerTypeAdapter(
             EventNetworkDeserializer.objectType,
-            EventNetworkDeserializer()
+            EventNetworkDeserializer(),
         )
         .create()
 
@@ -74,6 +74,5 @@ class EventRepositoryFile : EventRepository {
         }
     }
 
-    override fun getAllEvents(): Observable<Either<NetworkError, List<EventModel>>> =
-        getAllEventsFromFile()
+    override fun getAllEvents(): Observable<Either<NetworkError, List<EventModel>>> = getAllEventsFromFile()
 }

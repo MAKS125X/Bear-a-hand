@@ -17,7 +17,7 @@ class CategoryRepositoryFile : CategoryRepository {
     private val gson = GsonBuilder()
         .registerTypeAdapter(
             CategoryNetworkDeserializer.typeToken,
-            CategoryNetworkDeserializer()
+            CategoryNetworkDeserializer(),
         )
         .create()
 
@@ -36,7 +36,7 @@ class CategoryRepositoryFile : CategoryRepository {
                     Either.Right(
                         gson.fromJson<List<CategoryDto>>(
                             it,
-                            CategoryNetworkDeserializer.typeToken
+                            CategoryNetworkDeserializer.typeToken,
                         ).map { category -> category.toModel() }
                     )
                 } catch (e: Exception) {

@@ -97,7 +97,7 @@ class HelpFragment : Fragment() {
             val currentCategoryList =
                 getParcelableListFromBundleByKey<CategoryLongUi>(
                     savedInstanceState,
-                    CATEGORY_LIST_KEY
+                    CATEGORY_LIST_KEY,
                 )
             if (currentCategoryList.isEmpty()) {
                 categoriesUiState =

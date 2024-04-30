@@ -12,9 +12,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class EventRepositoryNetwork(
-    private val eventService: EventService
+    private val eventService: EventService,
 ) : EventRepository {
-
     override fun getAllEvents(): Observable<Either<NetworkError, List<EventModel>>> {
         return Observable.create { o ->
             eventService

@@ -170,7 +170,6 @@ class EventDetailsFragment : Fragment() {
                                 NetworkError.Timeout -> getString(R.string.timeout_error)
                                 is NetworkError.Unexpected -> getString(R.string.unexpected_error)
                             }
-
                         )
                     }
 
@@ -179,7 +178,6 @@ class EventDetailsFragment : Fragment() {
                             it.value.mapToLongUi()
                         )
                     }
-
                 }
                 updateUiState()
             }

@@ -10,7 +10,7 @@ class CategorySettingDeserializer : JsonDeserializer<List<CategorySettingPrefs>>
     override fun deserialize(
         json: JsonElement?,
         typeOfT: Type?,
-        context: JsonDeserializationContext?
+        context: JsonDeserializationContext?,
     ): List<CategorySettingPrefs> {
         val jsonSettingsArray =
             json?.asJsonObject?.get("settings")?.asJsonArray

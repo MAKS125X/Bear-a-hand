@@ -107,7 +107,7 @@ class FilterFragment : Fragment() {
                 val currentList =
                     getParcelableListFromBundleByKey<CategorySettingUi>(
                         savedInstanceState,
-                        CATEGORIES_KEY
+                        CATEGORIES_KEY,
                     )
                 if (currentList.isEmpty()) {
                     observeCategories()
@@ -193,7 +193,6 @@ class FilterFragment : Fragment() {
     companion object {
         const val TAG = "FilterFragment"
         const val CATEGORIES_KEY = "CategoriesList"
-
 
         @JvmStatic
         fun newInstance() = FilterFragment()

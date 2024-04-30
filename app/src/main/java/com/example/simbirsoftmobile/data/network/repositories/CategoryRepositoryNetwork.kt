@@ -10,10 +10,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class CategoryRepositoryNetwork(
-    private val categoryService: CategoryService
+    private val categoryService: CategoryService,
 ) : CategoryRepository {
-
-
     override fun getCategories(): Observable<Either<NetworkError, List<CategoryModel>>> {
         return Observable.create { o ->
             categoryService

@@ -10,7 +10,7 @@ import com.example.simbirsoftmobile.presentation.models.settingTest.CategorySett
 import io.reactivex.rxjava3.core.Observable
 
 class GetCategoriesWithSettingsUseCase(
-    private val repository: CategoryRepository =  SimbirSoftApp.INSTANCE.appContainer.categoryRepository
+    private val repository: CategoryRepository = SimbirSoftApp.INSTANCE.appContainer.categoryRepository,
 ) {
     operator fun invoke(settings: List<CategorySettingPrefs>): Observable<Either<NetworkError, List<CategorySettingModel>>> {
         return repository.getCategories().map { response ->
@@ -23,8 +23,7 @@ class GetCategoriesWithSettingsUseCase(
                     val categorySetting =
                         response.value.map { category ->
                             category.toSettingModel(
-                                settings
-                                    .find { it.id == category.id }?.isSelected ?: false
+                                settings.find { it.id == category.id }?.isSelected ?: false
                             )
                         }
 

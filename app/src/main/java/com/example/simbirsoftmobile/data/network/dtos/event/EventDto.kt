@@ -34,7 +34,7 @@ data class EventDto(
             address,
             email,
             organization,
-            url
+            url,
         )
     }
 }
@@ -54,6 +54,6 @@ fun EventDto.toModel(): EventModel {
         address,
         email,
         organization,
-        url
+        url,
     )
 }

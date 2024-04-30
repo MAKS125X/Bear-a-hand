@@ -50,10 +50,9 @@ class EventsNetworkDeserializer : JsonDeserializer<List<EventDto>> {
                     address,
                     email,
                     organizerName,
-                    url
+                    url,
                 )
             )
-
         }
 
         return events

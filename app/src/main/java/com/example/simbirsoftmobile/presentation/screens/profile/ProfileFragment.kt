@@ -157,15 +157,15 @@ class ProfileFragment : Fragment() {
             arrayOf(
                 FriendUI(
                     "Дмитрий Валерьевич",
-                    "https://wallpaperforu.com/wp-content/uploads/2023/11/Leonardo-DiCaprio-Hd-Wallpapers-For-Pc.jpg"
+                    "https://wallpaperforu.com/wp-content/uploads/2023/11/Leonardo-DiCaprio-Hd-Wallpapers-For-Pc.jpg",
                 ),
                 FriendUI(
                     "Евгений Александров",
-                    "https://get.wallhere.com/photo/face-model-portrait-photography-actor-profile-hair-nose-Person-Colton-Haynes-head-man-male-hairstyle-portrait-photography-photo-shoot-close-up-facial-hair-561682.jpg"
+                    "https://get.wallhere.com/photo/face-model-portrait-photography-actor-profile-hair-nose-Person-Colton-Haynes-head-man-male-hairstyle-portrait-photography-photo-shoot-close-up-facial-hair-561682.jpg",
                 ),
                 FriendUI(
                     "Виктор Кузнецов",
-                    "https://i.pinimg.com/originals/74/8c/ea/748ceabaaf1c09d7d00ce1813681343c.jpg"
+                    "https://i.pinimg.com/originals/74/8c/ea/748ceabaaf1c09d7d00ce1813681343c.jpg",
                 ),
             )
     }
