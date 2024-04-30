@@ -16,13 +16,14 @@ import java.lang.reflect.Type
 private fun <T> getRequestFlow(
     fileName: String,
     gson: Gson,
-    type: Type
+    type: Type,
 ): Flow<Either<NetworkError, T>> = flow {
     emit(
         SimbirSoftApp.INSTANCE.assets
             .open(fileName)
             .bufferedReader()
-            .use { it.readText() })
+            .use { it.readText() }
+    )
 }
     .onEach { delay(1000L) }
     .map {
@@ -44,7 +45,7 @@ private fun <T> getRequestFlow(
 fun <Model, Dto : DataMapper<Model>> getRequestFlowItem(
     fileName: String,
     gson: Gson,
-    type: Type
+    type: Type,
 ): Flow<Either<NetworkError, Model>> = getRequestFlow<Dto>(fileName, gson, type).map {
     when (it) {
         is Either.Left -> it
@@ -57,7 +58,7 @@ fun <Model, Dto : DataMapper<Model>> getRequestFlowItem(
 fun <Model, Dto : DataMapper<Model>> getRequestFlowList(
     fileName: String,
     gson: Gson,
-    type: Type
+    type: Type,
 ): Flow<Either<NetworkError, List<Model>>> = getRequestFlow<List<Dto>>(fileName, gson, type).map {
     when (it) {
         is Either.Left -> it

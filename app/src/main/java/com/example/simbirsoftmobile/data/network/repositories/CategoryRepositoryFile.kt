@@ -21,7 +21,6 @@ class CategoryRepositoryFile : CategoryRepository {
         getRequestFlowList(
             "categories.json",
             gson,
-            CategoryNetworkDeserializer.typeToken
+            CategoryNetworkDeserializer.typeToken,
         )
 }
-

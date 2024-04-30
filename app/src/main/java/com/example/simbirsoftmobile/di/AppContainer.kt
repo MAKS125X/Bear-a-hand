@@ -76,6 +76,5 @@ class AppContainer {
             .addInterceptor(interceptor)
             .addInterceptor(NetworkMonitorInterceptor(LiveNetworkMonitor(SimbirSoftApp.INSTANCE)))
             .build()
-
     }
 }

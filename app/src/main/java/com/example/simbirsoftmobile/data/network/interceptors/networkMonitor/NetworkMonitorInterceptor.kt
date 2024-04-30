@@ -5,7 +5,7 @@ import okhttp3.Request
 import okhttp3.Response
 
 class NetworkMonitorInterceptor(
-    private val liveNetworkMonitor: NetworkMonitor
+    private val liveNetworkMonitor: NetworkMonitor,
 ) : Interceptor {
     @Throws(ConnectionException::class)
     override fun intercept(chain: Interceptor.Chain): Response {

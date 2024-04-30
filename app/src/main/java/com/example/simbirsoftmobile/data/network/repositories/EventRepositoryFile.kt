@@ -27,9 +27,8 @@ class EventRepositoryFile : EventRepository {
         getRequestFlowList(
             "events.json",
             gson,
-            EventsNetworkDeserializer.typeToken
+            EventsNetworkDeserializer.typeToken,
         )
-
 
     override fun getEventsByCategory(vararg categoryIds: String): Flow<Either<NetworkError, List<EventModel>>> {
         return getAllEventsFromFile().map { response ->

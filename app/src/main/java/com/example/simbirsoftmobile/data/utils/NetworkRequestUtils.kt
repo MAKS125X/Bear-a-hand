@@ -12,7 +12,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import retrofit2.Response
 
 private fun <Dto> getRequestFlowDto(
-    apiCall: suspend () -> Response<Dto>
+    apiCall: suspend () -> Response<Dto>,
 ): Flow<Either<NetworkError, Dto>> = flow {
     withTimeoutOrNull(30000L) {
         try {
@@ -36,7 +36,7 @@ private fun <Dto> getRequestFlowDto(
 }.flowOn(Dispatchers.IO)
 
 fun <Model, Dto : DataMapper<Model>> getRequestFlowItem(
-    apiCall: suspend () -> Response<Dto>
+    apiCall: suspend () -> Response<Dto>,
 ): Flow<Either<NetworkError, Model>> = getRequestFlowDto(apiCall).map {
     when (it) {
         is Either.Left -> it
@@ -47,7 +47,7 @@ fun <Model, Dto : DataMapper<Model>> getRequestFlowItem(
 }
 
 fun <Model, Dto : DataMapper<Model>> getRequestFlowList(
-    apiCall: suspend () -> Response<List<Dto>>
+    apiCall: suspend () -> Response<List<Dto>>,
 ): Flow<Either<NetworkError, List<Model>>> = getRequestFlowDto(apiCall).map {
     when (it) {
         is Either.Left -> it
