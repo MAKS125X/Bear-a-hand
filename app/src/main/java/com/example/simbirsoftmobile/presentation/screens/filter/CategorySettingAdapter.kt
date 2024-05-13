@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.databinding.ItemCategorySettingBinding
-import com.example.simbirsoftmobile.presentation.models.settingTest.CategorySettingUi
+import com.example.simbirsoftmobile.presentation.models.category.CategoryLongUi
 
 class CategorySettingAdapter(
-    private var settings: List<CategorySettingUi> = listOf(),
+    private var settings: List<CategoryLongUi> = listOf(),
     val context: Context,
 ) : RecyclerView.Adapter<CategorySettingAdapter.ViewHolder>() {
-    fun submitList(list: List<CategorySettingUi>) {
+    fun submitList(list: List<CategoryLongUi>) {
         settings = list
     }
 
@@ -39,13 +39,13 @@ class CategorySettingAdapter(
 
     class ViewHolder(private val binding: ItemCategorySettingBinding, val context: Context) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(model: CategorySettingUi) {
+        fun bind(model: CategoryLongUi) {
             with(binding) {
                 setupUI(model)
             }
         }
 
-        private fun ItemCategorySettingBinding.setupUI(model: CategorySettingUi) {
+        private fun ItemCategorySettingBinding.setupUI(model: CategoryLongUi) {
             nameTV.text = model.name
             switchView.isChecked = model.isSelected
             switchView.setOnCheckedChangeListener { _, isChecked ->

@@ -1,9 +1,10 @@
-package com.example.simbirsoftmobile.data.network.repositories
+package com.example.simbirsoftmobile.data.repositories.file
 
 import com.example.simbirsoftmobile.data.network.dtos.category.CategoryNetworkDeserializer
 import com.example.simbirsoftmobile.data.utils.getRequestFlowList
+import com.example.simbirsoftmobile.domain.core.DataError
+import com.example.simbirsoftmobile.domain.core.DataResult
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.core.NetworkError
 import com.example.simbirsoftmobile.domain.models.CategoryModel
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.google.gson.GsonBuilder
@@ -17,10 +18,14 @@ class CategoryRepositoryFile : CategoryRepository {
         )
         .create()
 
-    override fun getCategories(): Flow<Either<NetworkError, List<CategoryModel>>> =
+    override fun getCategories(): Flow<Either<DataError, DataResult<List<CategoryModel>>>> =
         getRequestFlowList(
             "categories.json",
             gson,
             CategoryNetworkDeserializer.typeToken,
         )
+
+    override suspend fun updateCategoriesSettings(vararg categories: CategoryModel) {
+        TODO("Not yet implemented")
+    }
 }

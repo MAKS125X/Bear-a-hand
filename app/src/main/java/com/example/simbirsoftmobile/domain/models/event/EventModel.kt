@@ -1,4 +1,4 @@
-package com.example.simbirsoftmobile.domain.models
+package com.example.simbirsoftmobile.domain.models.event
 
 data class EventModel(
     val id: String,

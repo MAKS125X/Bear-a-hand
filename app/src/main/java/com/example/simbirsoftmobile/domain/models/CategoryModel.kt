@@ -5,4 +5,5 @@ data class CategoryModel(
     val name: String,
     val nameEn: String,
     val imageUrl: String,
+    val isSelected: Boolean,
 )

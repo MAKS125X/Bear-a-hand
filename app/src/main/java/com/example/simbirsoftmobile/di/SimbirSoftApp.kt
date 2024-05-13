@@ -11,7 +11,7 @@ class SimbirSoftApp : Application(), ImageLoaderFactory {
         INSTANCE = this
     }
 
-    val appContainer = AppContainer()
+    val appContainer = AppContainer(this)
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader

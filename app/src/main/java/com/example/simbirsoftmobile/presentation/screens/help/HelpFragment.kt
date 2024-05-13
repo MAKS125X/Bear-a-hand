@@ -10,8 +10,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentHelpBinding
+import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.core.NetworkError
 import com.example.simbirsoftmobile.domain.usecases.GetCategoriesUseCase
 import com.example.simbirsoftmobile.presentation.models.category.CategoryLongUi
 import com.example.simbirsoftmobile.presentation.models.category.mapToUi
@@ -133,13 +133,13 @@ class HelpFragment : Fragment() {
                         is Either.Left -> {
                             UiState.Error(
                                 when (it.value) {
-                                    is NetworkError.Api -> it.value.error
+                                    is DataError.Api -> it.value.error
                                         ?: getString(R.string.error_occurred_while_receiving_data)
-
-                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-                                    NetworkError.Timeout -> getString(R.string.timeout_error)
-                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                                    is NetworkError.Connection -> getString(R.string.connection_error)
+                                    is DataError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    DataError.Timeout -> getString(R.string.timeout_error)
+                                    is DataError.Unexpected -> getString(R.string.unexpected_error)
+                                    is DataError.Connection -> getString(R.string.connection_error)
+                                    is DataError.NetworkBlock -> getString(R.string.unexpected_error)
                                 }
                             )
                         }
