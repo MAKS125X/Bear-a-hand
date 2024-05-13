@@ -1,5 +1,9 @@
 package com.example.simbirsoftmobile.di
 
+import android.content.Context
+import androidx.room.Room
+import com.example.simbirsoftmobile.data.local.AppDatabase
+import com.example.simbirsoftmobile.data.local.TransactionProvider
 import com.example.simbirsoftmobile.data.network.api.CategoryService
 import com.example.simbirsoftmobile.data.network.api.EventService
 import com.example.simbirsoftmobile.data.network.dtos.category.CategoryNetworkDeserializer
@@ -7,8 +11,8 @@ import com.example.simbirsoftmobile.data.network.dtos.event.EventNetworkDeserial
 import com.example.simbirsoftmobile.data.network.dtos.event.EventsNetworkDeserializer
 import com.example.simbirsoftmobile.data.network.interceptors.networkMonitor.LiveNetworkMonitor
 import com.example.simbirsoftmobile.data.network.interceptors.networkMonitor.NetworkMonitorInterceptor
-import com.example.simbirsoftmobile.data.network.repositories.CategoryRepositoryNetwork
-import com.example.simbirsoftmobile.data.network.repositories.EventRepositoryNetwork
+import com.example.simbirsoftmobile.data.repositories.localWithFetch.CategoryRepositoryWithFetch
+import com.example.simbirsoftmobile.data.repositories.localWithFetch.EventRepositoryWithFetch
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import com.google.gson.GsonBuilder
@@ -17,7 +21,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class AppContainer {
+class AppContainer(private val context: Context) {
     val eventRepository by lazy {
         provideEventRepository()
     }
@@ -38,12 +42,31 @@ class AppContainer {
         retrofit.create(EventService::class.java)
     }
 
+    private val db by lazy {
+        provideDatabase()
+    }
+
+    private val transactionProvider by lazy {
+        provideTransactionProvider()
+    }
+
+    private fun provideTransactionProvider(): TransactionProvider {
+        return TransactionProvider(db)
+    }
+
+    private fun provideDatabase() =
+        Room.databaseBuilder(
+            context = context.applicationContext,
+            AppDatabase::class.java,
+            "events.db"
+        ).build()
+
     private fun provideEventRepository(): EventRepository {
-        return EventRepositoryNetwork(eventService)
+        return EventRepositoryWithFetch(eventService, db.events(), transactionProvider)
     }
 
     private fun provideCategoryRepository(): CategoryRepository {
-        return CategoryRepositoryNetwork(categoryService)
+        return CategoryRepositoryWithFetch(categoryService, db.categories(), transactionProvider)
     }
 
     private fun provideRetrofit(): Retrofit {

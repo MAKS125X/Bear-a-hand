@@ -15,8 +15,8 @@ import coil.load
 import coil.request.ImageRequest
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
+import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.core.NetworkError
 import com.example.simbirsoftmobile.domain.usecases.GetEventDetailsUseCase
 import com.example.simbirsoftmobile.presentation.models.event.EventLongUi
 import com.example.simbirsoftmobile.presentation.models.event.mapToLongUi
@@ -172,12 +172,13 @@ class EventDetailsFragment : Fragment() {
                         is Either.Left -> {
                             UiState.Error(
                                 when (it.value) {
-                                    is NetworkError.Api -> it.value.error
+                                    is DataError.Api -> it.value.error
                                         ?: getString(R.string.error_occurred_while_receiving_data)
-                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-                                    NetworkError.Timeout -> getString(R.string.timeout_error)
-                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                                    is NetworkError.Connection -> getString(R.string.connection_error)
+                                    is DataError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    DataError.Timeout -> getString(R.string.timeout_error)
+                                    is DataError.Unexpected -> getString(R.string.unexpected_error)
+                                    is DataError.Connection -> getString(R.string.connection_error)
+                                    DataError.NetworkBlock -> getString(R.string.unexpected_error)
                                 }
                             )
                         }

@@ -5,7 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("kotlin-parcelize")
-    id("androidx.navigation.safeargs.kotlin")
+    kotlin("kapt") version "1.9.22"
 }
 
 android {
@@ -91,4 +91,11 @@ dependencies {
 
     val coil = "2.6.0"
     implementation("io.coil-kt:coil:$coil")
+
+    val room = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$room")
+    annotationProcessor("androidx.room:room-compiler:$room")
+    kapt("androidx.room:room-compiler:$room")
+    implementation("androidx.room:room-ktx:$room")
 }

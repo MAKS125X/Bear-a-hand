@@ -9,15 +9,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentFilterBinding
+import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.core.NetworkError
-import com.example.simbirsoftmobile.domain.usecases.GetCategoriesWithSettingsUseCase
-import com.example.simbirsoftmobile.presentation.models.settingTest.CategoryPrefsManager
-import com.example.simbirsoftmobile.presentation.models.settingTest.CategorySettingUi
-import com.example.simbirsoftmobile.presentation.models.settingTest.toUi
+import com.example.simbirsoftmobile.domain.usecases.GetCategoriesUseCase
+import com.example.simbirsoftmobile.domain.usecases.UpdateCategoriesSettingsUseCase
+import com.example.simbirsoftmobile.presentation.models.category.CategoryLongUi
+import com.example.simbirsoftmobile.presentation.models.category.mapToUi
+import com.example.simbirsoftmobile.presentation.models.utils.mapToDomain
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
 import com.example.simbirsoftmobile.presentation.screens.utils.getParcelableListFromBundleByKey
 import com.google.android.material.divider.MaterialDividerItemDecoration
@@ -30,7 +32,7 @@ class FilterFragment : Fragment() {
     private val binding: FragmentFilterBinding
         get() = _binding!!
 
-    private var uiState: UiState<List<CategorySettingUi>> = UiState.Idle
+    private var uiState: UiState<List<CategoryLongUi>> = UiState.Idle
 
     private var adapter: CategorySettingAdapter? = null
 
@@ -107,7 +109,7 @@ class FilterFragment : Fragment() {
             uiState is UiState.Success -> updateState()
             savedInstanceState != null -> {
                 val currentList =
-                    getParcelableListFromBundleByKey<CategorySettingUi>(
+                    getParcelableListFromBundleByKey<CategoryLongUi>(
                         savedInstanceState,
                         CATEGORIES_KEY,
                     )
@@ -130,10 +132,13 @@ class FilterFragment : Fragment() {
                 R.id.accept_filter -> {
                     val currentState = uiState
                     if (currentState is UiState.Success) {
-                        CategoryPrefsManager.setCategorySettings(
-                            requireContext(),
-                            currentState.data.map { setting -> setting.toPrefs() },
-                        )
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                UpdateCategoriesSettingsUseCase().invoke(
+                                    *currentState.data.mapToDomain().toTypedArray()
+                                )
+                            }
+                        }
                     }
                     parentFragmentManager.popBackStack()
                 }
@@ -149,11 +154,9 @@ class FilterFragment : Fragment() {
             updateState()
         }
 
-        val settings = CategoryPrefsManager.getCategorySettings(requireContext())
-
         lifecycleScope.launch(exceptionHandler) {
-            GetCategoriesWithSettingsUseCase()
-                .invoke(settings)
+            GetCategoriesUseCase()
+                .invoke()
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                 .onEach {
                     uiState = UiState.Loading
@@ -164,19 +167,20 @@ class FilterFragment : Fragment() {
                         is Either.Left -> {
                             UiState.Error(
                                 when (it.value) {
-                                    is NetworkError.Api -> it.value.error
+                                    is DataError.Api -> it.value.error
                                         ?: getString(R.string.unexpected_error)
 
-                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-                                    NetworkError.Timeout -> getString(R.string.timeout_error)
-                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                                    is NetworkError.Connection -> getString(R.string.connection_error)
+                                    is DataError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    DataError.Timeout -> getString(R.string.timeout_error)
+                                    is DataError.Unexpected -> getString(R.string.unexpected_error)
+                                    is DataError.Connection -> getString(R.string.connection_error)
+                                    is DataError.NetworkBlock -> getString(R.string.unexpected_error)
                                 }
                             )
                         }
 
                         is Either.Right -> {
-                            UiState.Success(it.value.map { model -> model.toUi() })
+                            UiState.Success(it.value.map { model -> model.mapToUi() })
                         }
                     }
 

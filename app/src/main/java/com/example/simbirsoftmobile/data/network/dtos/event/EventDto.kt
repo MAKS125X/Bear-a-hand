@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.data.network.dtos.event
 
+import com.example.simbirsoftmobile.data.local.entities.EventEntity
 import com.example.simbirsoftmobile.data.utils.DataMapper
 import com.example.simbirsoftmobile.domain.models.EventModel
 
@@ -39,21 +40,19 @@ data class EventDto(
     }
 }
 
-fun EventDto.toModel(): EventModel {
-    return EventModel(
-        this.id,
-        this.name,
-        startDate,
-        endDate,
-        description,
-        status,
-        photo,
-        category,
-        createdAt,
-        phone,
-        address,
-        email,
-        organization,
-        url,
-    )
-}
+fun EventDto.toEntity() = EventEntity(
+    id,
+    name,
+    startDate,
+    endDate,
+    description,
+    status,
+    photo,
+    category,
+    createdAt,
+    phone,
+    email,
+    address,
+    organization,
+    url
+)

@@ -11,12 +11,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentNewsBinding
+import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.core.NetworkError
 import com.example.simbirsoftmobile.domain.usecases.GetEventsBySettingsUseCase
 import com.example.simbirsoftmobile.presentation.models.event.EventShortUi
 import com.example.simbirsoftmobile.presentation.models.event.mapToShorUi
-import com.example.simbirsoftmobile.presentation.models.settingTest.CategoryPrefsManager.getSettingsEither
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.UiState
@@ -85,58 +84,44 @@ class NewsFragment : Fragment() {
     }
 
     private fun getNewsListFromFile() {
-        val settings =
-            getSettingsEither(requireContext())
-        when (settings) {
-            is Either.Left -> {
-                newsUiState = UiState.Error(getString(R.string.empty_category_list_error))
-                updateUiState()
-            }
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            newsUiState = UiState.Error(getString(R.string.unexpected_error))
+            updateUiState()
+        }
 
-            is Either.Right -> {
-                val requiredCategoryIds = settings.value
-                    .filter { it.isSelected }
-                    .map { it.id }
-
-                val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-                    newsUiState = UiState.Error(getString(R.string.unexpected_error))
+        lifecycleScope.launch(exceptionHandler) {
+            GetEventsBySettingsUseCase()
+                .invoke()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    newsUiState = UiState.Loading
                     updateUiState()
                 }
+                .collect {
+                    newsUiState = when (it) {
+                        is Either.Left -> {
+                            UiState.Error(
+                                when (it.value) {
+                                    is DataError.Api -> it.value.error
+                                        ?: getString(R.string.error_occurred_while_receiving_data)
 
-                lifecycleScope.launch(exceptionHandler) {
-                    GetEventsBySettingsUseCase()
-                        .invoke(*requiredCategoryIds.toTypedArray())
-                        .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                        .onEach {
-                            newsUiState = UiState.Loading
-                            updateUiState()
-                        }
-                        .collect {
-                            newsUiState = when (it) {
-                                is Either.Left -> {
-                                    UiState.Error(
-                                        when (it.value) {
-                                            is NetworkError.Api -> it.value.error
-                                                ?: getString(R.string.error_occurred_while_receiving_data)
-
-                                            is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-                                            NetworkError.Timeout -> getString(R.string.timeout_error)
-                                            is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                                            is NetworkError.Connection -> getString(R.string.connection_error)
-                                        }
-                                    )
+                                    is DataError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    DataError.Timeout -> getString(R.string.timeout_error)
+                                    is DataError.Unexpected -> getString(R.string.unexpected_error)
+                                    is DataError.Connection -> getString(R.string.connection_error)
+                                    is DataError.NetworkBlock -> getString(R.string.unexpected_error)
                                 }
-
-                                is Either.Right -> {
-                                    UiState.Success(
-                                        it.value.map { item -> item.mapToShorUi() }
-                                    )
-                                }
-                            }
-                            updateUiState()
+                            )
                         }
+
+                        is Either.Right -> {
+                            UiState.Success(
+                                it.value.map { item -> item.mapToShorUi() }
+                            )
+                        }
+                    }
+                    updateUiState()
                 }
-            }
         }
     }
 

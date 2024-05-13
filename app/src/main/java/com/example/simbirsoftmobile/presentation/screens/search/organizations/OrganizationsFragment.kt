@@ -13,8 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentOrganizationsBinding
+import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.core.NetworkError
 import com.example.simbirsoftmobile.domain.usecases.SearchOrganizationsUseCase
 import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
@@ -117,12 +117,15 @@ class OrganizationsFragment : Fragment() {
                         is Either.Left -> {
                             uiState = UiState.Error(
                                 when (response.value) {
-                                    is NetworkError.Api -> response.value.error
+                                    is DataError.Api -> response.value.error
                                         ?: getString(R.string.data_acquisition_error_occurred)
-                                    is NetworkError.InvalidParameters -> getString(R.string.unexpected_error)
-                                    NetworkError.Timeout -> getString(R.string.timeout_error)
-                                    is NetworkError.Unexpected -> getString(R.string.unexpected_error)
-                                    is NetworkError.Connection -> getString(R.string.connection_error)
+
+                                    is DataError.InvalidParameters -> getString(R.string.unexpected_error)
+                                    DataError.Timeout -> getString(R.string.timeout_error)
+//                                    is DataError.Unexpected -> getString(R.string.unexpected_error)
+                                    is DataError.Unexpected -> response.value.error?:getString(R.string.unexpected_error)
+                                    is DataError.Connection -> getString(R.string.connection_error)
+                                    is DataError.NetworkBlock -> getString(R.string.unexpected_error)
                                 }
                             )
                         }

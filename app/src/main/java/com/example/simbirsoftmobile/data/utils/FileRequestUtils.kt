@@ -1,8 +1,9 @@
 package com.example.simbirsoftmobile.data.utils
 
 import com.example.simbirsoftmobile.di.SimbirSoftApp
+import com.example.simbirsoftmobile.domain.core.DataError
+import com.example.simbirsoftmobile.domain.core.DataResult
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.core.NetworkError
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,7 +18,7 @@ private fun <T> getRequestFlow(
     fileName: String,
     gson: Gson,
     type: Type,
-): Flow<Either<NetworkError, T>> = flow {
+): Flow<Either<DataError, T>> = flow {
     emit(
         SimbirSoftApp.INSTANCE.assets
             .open(fileName)
@@ -36,7 +37,7 @@ private fun <T> getRequestFlow(
             )
         } catch (e: Exception) {
             Either.Left(
-                NetworkError.Api(e.localizedMessage)
+                DataError.Api(e.localizedMessage)
             )
         }
     }
@@ -46,11 +47,13 @@ fun <Model, Dto : DataMapper<Model>> getRequestFlowItem(
     fileName: String,
     gson: Gson,
     type: Type,
-): Flow<Either<NetworkError, Model>> = getRequestFlow<Dto>(fileName, gson, type).map {
+): Flow<Either<DataError, DataResult<Model>>> = getRequestFlow<Dto>(fileName, gson, type).map {
     when (it) {
         is Either.Left -> it
         is Either.Right -> {
-            Either.Right(it.value.mapToDomain())
+            Either.Right(
+                DataResult.SuccessFromLocal(it.value.mapToDomain(), DataError.NetworkBlock)
+            )
         }
     }
 }
@@ -59,14 +62,18 @@ fun <Model, Dto : DataMapper<Model>> getRequestFlowList(
     fileName: String,
     gson: Gson,
     type: Type,
-): Flow<Either<NetworkError, List<Model>>> = getRequestFlow<List<Dto>>(fileName, gson, type).map {
-    when (it) {
-        is Either.Left -> it
-        is Either.Right -> {
-            Either.Right(
-                it.value
-                    .map { dtoItem -> dtoItem.mapToDomain() }
-            )
+): Flow<Either<DataError, DataResult<List<Model>>>> =
+    getRequestFlow<List<Dto>>(fileName, gson, type).map {
+        when (it) {
+            is Either.Left -> it
+            is Either.Right -> {
+                Either.Right(
+                    DataResult.SuccessFromLocal(
+                        it.value
+                            .map { dtoItem -> dtoItem.mapToDomain() },
+                        DataError.NetworkBlock
+                    )
+                )
+            }
         }
     }
-}
