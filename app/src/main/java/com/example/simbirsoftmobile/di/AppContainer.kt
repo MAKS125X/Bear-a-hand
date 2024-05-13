@@ -58,7 +58,7 @@ class AppContainer(private val context: Context) {
         Room.databaseBuilder(
             context = context.applicationContext,
             AppDatabase::class.java,
-            "events.db"
+            "events.db",
         ).build()
 
     private fun provideEventRepository(): EventRepository {

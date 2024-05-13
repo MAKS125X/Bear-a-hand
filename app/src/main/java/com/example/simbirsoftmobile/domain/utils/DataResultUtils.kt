@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 inline fun <T, S> Flow<Either<DataError, T>>.mapRightEither(
-    crossinline transform: (T) -> S
+    crossinline transform: (T) -> S,
 ): Flow<Either<DataError, S>> =
     this.map { either ->
         when (either) {
@@ -21,9 +21,8 @@ inline fun <T, S> Flow<Either<DataError, T>>.mapRightEither(
         }
     }
 
-
 inline fun <T, S> Flow<Either<DataError, DataResult<T>>>.mapDataResult(
-    crossinline transform: (T) -> S
+    crossinline transform: (T) -> S,
 ): Flow<Either<DataError, DataResult<S>>> =
     this.mapRightEither {
         when (it) {
@@ -53,13 +52,13 @@ fun <T> Flow<Either<DataError, DataResult<T>>>.extractResult(): Flow<Either<Data
                 when (either.value) {
                     is DataResult.SuccessFromApi -> {
                         Either.Right(
-                            either.value.data
+                            either.value.data,
                         )
                     }
 
                     is DataResult.SuccessFromLocal -> {
                         Either.Right(
-                            either.value.data
+                            either.value.data,
                         )
                     }
                 }

@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.domain.core
 
-
 sealed class DataError {
     class Unexpected(val error: String?) : DataError()
 
@@ -12,5 +11,5 @@ sealed class DataError {
 
     data object Timeout : DataError()
 
-    data object NetworkBlock: DataError()
+    data object NetworkBlock : DataError()
 }

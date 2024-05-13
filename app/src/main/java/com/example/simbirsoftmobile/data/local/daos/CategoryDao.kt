@@ -6,26 +6,26 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.simbirsoftmobile.data.local.entities.CategoryEntity
+import com.example.simbirsoftmobile.data.local.entities.CategorySettingEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCategory(category: CategoryEntity)
+    fun insertCategory(category: CategorySettingEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCategories(vararg categories: CategoryEntity)
+    suspend fun insertCategories(vararg categories: CategorySettingEntity)
 
     @Delete
-    suspend fun deleteCategory(category: CategoryEntity)
+    suspend fun deleteCategory(category: CategorySettingEntity)
 
     @Update
-    fun updateCategories(vararg categories: CategoryEntity): Int
+    fun updateCategories(vararg categories: CategorySettingEntity): Int
 
     @Query("SELECT * FROM category")
-    fun observeCategories(): Flow<List<CategoryEntity>>
+    fun observeCategories(): Flow<List<CategorySettingEntity>>
 
     @Query("SELECT * FROM category WHERE id = :categoryId")
-    fun getCategoryById(categoryId: String): CategoryEntity?
+    fun getCategoryById(categoryId: String): CategorySettingEntity?
 }

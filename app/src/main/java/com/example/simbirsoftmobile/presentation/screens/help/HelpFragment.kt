@@ -135,7 +135,6 @@ class HelpFragment : Fragment() {
                                 when (it.value) {
                                     is DataError.Api -> it.value.error
                                         ?: getString(R.string.error_occurred_while_receiving_data)
-
                                     is DataError.InvalidParameters -> getString(R.string.unexpected_error)
                                     DataError.Timeout -> getString(R.string.timeout_error)
                                     is DataError.Unexpected -> getString(R.string.unexpected_error)

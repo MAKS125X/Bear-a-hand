@@ -11,11 +11,11 @@ import com.example.simbirsoftmobile.domain.models.EventModel
     tableName = "events",
     foreignKeys = [
         ForeignKey(
-            entity = CategoryEntity::class,
+            entity = CategorySettingEntity::class,
             parentColumns = ["id"],
-            childColumns = ["category_id"]
-        )
-    ]
+            childColumns = ["category_id"],
+        ),
+    ],
 )
 data class EventEntity(
     @PrimaryKey val id: String,
@@ -47,6 +47,6 @@ data class EventEntity(
         address,
         email,
         organization,
-        url
+        url,
     )
 }

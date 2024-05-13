@@ -1,6 +1,6 @@
 package com.example.simbirsoftmobile.data.repositories.localWithFetch
 
-import  com.example.simbirsoftmobile.data.local.TransactionProvider
+import com.example.simbirsoftmobile.data.local.TransactionProvider
 import com.example.simbirsoftmobile.data.local.daos.CategoryDao
 import com.example.simbirsoftmobile.data.local.entities.toEntity
 import com.example.simbirsoftmobile.data.network.api.CategoryService
@@ -30,7 +30,7 @@ class CategoryRepositoryWithFetch(
             val updatedCategory = existingCategory.copy(
                 name = category.name,
                 nameEn = category.nameEn,
-                image = category.imageUrl
+                image = category.imageUrl,
             )
             dao.insertCategory(updatedCategory)
         } else {
@@ -55,7 +55,7 @@ class CategoryRepositoryWithFetch(
 
                 shouldFetch = false
             },
-            shouldFetch = shouldFetch
+            shouldFetch = shouldFetch,
         ).mapDataResult {
             it.mapToDomain()
         }

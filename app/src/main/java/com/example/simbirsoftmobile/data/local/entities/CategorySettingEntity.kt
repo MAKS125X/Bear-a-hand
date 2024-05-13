@@ -7,7 +7,7 @@ import com.example.simbirsoftmobile.data.utils.DataMapper
 import com.example.simbirsoftmobile.domain.models.CategoryModel
 
 @Entity(tableName = "category")
-data class CategoryEntity(
+data class CategorySettingEntity(
     @PrimaryKey
     val id: String,
     val name: String,
@@ -15,15 +15,14 @@ data class CategoryEntity(
     val image: String,
     @ColumnInfo("is_selected") val isSelected: Boolean = true,
 ) : DataMapper<CategoryModel> {
-
     override fun mapToDomain() = CategoryModel(id, name, nameEn, image, isSelected)
 }
 
 fun CategoryModel.toEntity() =
-    CategoryEntity(
+    CategorySettingEntity(
         id,
         name,
         nameEn,
         imageUrl,
-        isSelected
+        isSelected,
     )

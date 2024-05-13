@@ -42,7 +42,6 @@ class EventRepositoryNetwork(
             }
         }
 
-
     override fun getEventsByCategory(vararg categoryIds: String): Flow<Either<DataError, DataResult<List<EventModel>>>> =
         getRequestFlowList {
             eventService

@@ -54,5 +54,5 @@ fun EventDto.toEntity() = EventEntity(
     email,
     address,
     organization,
-    url
+    url,
 )

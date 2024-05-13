@@ -1,6 +1,6 @@
 package com.example.simbirsoftmobile.data.network.dtos.category
 
-import com.example.simbirsoftmobile.data.local.entities.CategoryEntity
+import com.example.simbirsoftmobile.data.local.entities.CategorySettingEntity
 import com.example.simbirsoftmobile.data.utils.DataMapper
 import com.example.simbirsoftmobile.domain.models.CategoryModel
 
@@ -20,4 +20,4 @@ data class CategoryDto(
         )
 }
 
-fun CategoryDto.toEntity() = CategoryEntity(id, name, nameEn, imageUrl)
+fun CategoryDto.toEntity() = CategorySettingEntity(id, name, nameEn, imageUrl)

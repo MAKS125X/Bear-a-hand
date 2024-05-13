@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -132,15 +133,23 @@ class FilterFragment : Fragment() {
                 R.id.accept_filter -> {
                     val currentState = uiState
                     if (currentState is UiState.Success) {
-                        viewLifecycleOwner.lifecycleScope.launch {
+                        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+                            Toast.makeText(
+                                requireContext(),
+                                "Произошла ошибка при обновлении израбнных категорий",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                        viewLifecycleOwner.lifecycleScope.launch(exceptionHandler) {
                             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                                 UpdateCategoriesSettingsUseCase().invoke(
                                     *currentState.data.mapToDomain().toTypedArray()
                                 )
+                                parentFragmentManager.popBackStack()
                             }
                         }
                     }
-                    parentFragmentManager.popBackStack()
                 }
             }
 
