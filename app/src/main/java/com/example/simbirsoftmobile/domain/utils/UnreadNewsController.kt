@@ -1,6 +1,6 @@
 package com.example.simbirsoftmobile.domain.utils
 
-import com.example.simbirsoftmobile.domain.models.EventModel
+import com.example.simbirsoftmobile.domain.models.event.EventModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

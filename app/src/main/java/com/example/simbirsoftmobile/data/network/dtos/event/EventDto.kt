@@ -2,7 +2,7 @@ package com.example.simbirsoftmobile.data.network.dtos.event
 
 import com.example.simbirsoftmobile.data.local.entities.EventEntity
 import com.example.simbirsoftmobile.data.utils.DataMapper
-import com.example.simbirsoftmobile.domain.models.EventModel
+import com.example.simbirsoftmobile.domain.models.event.EventModel
 
 data class EventDto(
     val id: String,

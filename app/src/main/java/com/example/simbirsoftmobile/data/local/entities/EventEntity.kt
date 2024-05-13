@@ -5,7 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.simbirsoftmobile.data.utils.DataMapper
-import com.example.simbirsoftmobile.domain.models.EventModel
+import com.example.simbirsoftmobile.domain.models.event.EventModel
+import com.example.simbirsoftmobile.domain.models.event.OrganizationModel
 
 @Entity(
     tableName = "events",
@@ -50,3 +51,5 @@ data class EventEntity(
         url,
     )
 }
+
+fun EventEntity.toOrganization(): OrganizationModel = OrganizationModel(organization)

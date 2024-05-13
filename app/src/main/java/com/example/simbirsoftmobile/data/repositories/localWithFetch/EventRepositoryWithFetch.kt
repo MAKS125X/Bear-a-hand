@@ -2,6 +2,7 @@ package com.example.simbirsoftmobile.data.repositories.localWithFetch
 
 import com.example.simbirsoftmobile.data.local.TransactionProvider
 import com.example.simbirsoftmobile.data.local.daos.EventDao
+import com.example.simbirsoftmobile.data.local.entities.toOrganization
 import com.example.simbirsoftmobile.data.network.api.EventService
 import com.example.simbirsoftmobile.data.network.api.requests.EventsByCategoriesRequest
 import com.example.simbirsoftmobile.data.network.dtos.event.toEntity
@@ -11,7 +12,8 @@ import com.example.simbirsoftmobile.data.utils.networkBoundResource
 import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.DataResult
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.models.EventModel
+import com.example.simbirsoftmobile.domain.models.event.EventModel
+import com.example.simbirsoftmobile.domain.models.event.OrganizationModel
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import com.example.simbirsoftmobile.domain.utils.mapDataResult
 import kotlinx.coroutines.flow.Flow
@@ -106,7 +108,7 @@ class EventRepositoryWithFetch(
             it.mapToDomain()
         }
 
-    override fun searchOrganizations(substring: String): Flow<Either<DataError, DataResult<List<EventModel>>>> =
+    override fun searchOrganizations(substring: String): Flow<Either<DataError, DataResult<List<OrganizationModel>>>> =
         networkBoundResource(
             localQuery = {
                 dao.searchEventsByOrganization(substring)
@@ -123,7 +125,7 @@ class EventRepositoryWithFetch(
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
-        ).mapDataResult {
-            it.mapToDomain()
+        ).mapDataResult { list ->
+            list.map { it.toOrganization() }.distinctBy { it.name }
         }
 }

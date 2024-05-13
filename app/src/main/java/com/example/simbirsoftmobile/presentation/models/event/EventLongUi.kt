@@ -1,7 +1,7 @@
 package com.example.simbirsoftmobile.presentation.models.event
 
 import android.os.Parcelable
-import com.example.simbirsoftmobile.domain.models.EventModel
+import com.example.simbirsoftmobile.domain.models.event.EventModel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

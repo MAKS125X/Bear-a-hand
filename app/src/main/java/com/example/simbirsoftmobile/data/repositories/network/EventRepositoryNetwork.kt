@@ -8,7 +8,8 @@ import com.example.simbirsoftmobile.data.utils.getRequestFlowList
 import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.DataResult
 import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.models.EventModel
+import com.example.simbirsoftmobile.domain.models.event.EventModel
+import com.example.simbirsoftmobile.domain.models.event.OrganizationModel
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import com.example.simbirsoftmobile.domain.utils.mapDataResult
 import kotlinx.coroutines.flow.Flow
@@ -32,14 +33,16 @@ class EventRepositoryNetwork(
             }
         }
 
-    override fun searchOrganizations(substring: String): Flow<Either<DataError, DataResult<List<EventModel>>>> =
+    override fun searchOrganizations(substring: String): Flow<Either<DataError, DataResult<List<OrganizationModel>>>> =
         getRequestFlowList {
             eventService
                 .getEvents()
-        }.mapDataResult {
-            it.filter { event ->
-                event.organization.contains(substring, true)
-            }
+        }.mapDataResult { list ->
+            list.filter {
+                it.organization.contains(substring, true)
+            }.map {
+                OrganizationModel(it.organization)
+            }.distinctBy { it.name }
         }
 
     override fun getEventsByCategory(vararg categoryIds: String): Flow<Either<DataError, DataResult<List<EventModel>>>> =
