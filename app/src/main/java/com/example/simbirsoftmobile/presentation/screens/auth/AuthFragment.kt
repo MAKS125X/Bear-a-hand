@@ -6,26 +6,48 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentAuthBinding
+import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.content.ContentFragment
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 
-class AuthFragment : Fragment() {
+class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>() {
     private var _binding: FragmentAuthBinding? = null
     private val binding: FragmentAuthBinding
         get() = _binding!!
 
-    private val disposable = CompositeDisposable()
+    override val viewModel: AuthViewModel by viewModels()
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
+    override fun renderState(state: AuthState) {
+        with(binding) {
+            authButton.isEnabled = state.isAuthClickable
+            emailET.setText(state.email)
+            emailET.getText()?.let { emailET.setSelection(it.length) };
 
-        outState.putString(EMAIL_KEY, binding.emailET.text.toString())
-        outState.putString(PASSWORD_KEY, binding.passwordET.text.toString())
+            passwordET.setText(state.password)
+            passwordET.getText()?.let { passwordET.setSelection(it.length) };
+        }
+    }
+
+    override fun handleSideEffects(effect: AuthSideEffect) {
+        when (effect) {
+            AuthSideEffect.NavigateToContent -> {
+                parentFragmentManager.beginTransaction().replace(
+                    R.id.fragmentContainerView,
+                    ContentFragment.newInstance(),
+                    ContentFragment.TAG,
+                ).commit()
+            }
+
+            is AuthSideEffect.NavigateToForgetPassword -> {
+                showToast(effect.text.asString(requireContext()))
+            }
+
+            is AuthSideEffect.NavigateToRegistration -> {
+                showToast(effect.text.asString(requireContext()))
+            }
+        }
     }
 
     override fun onCreateView(
@@ -43,70 +65,44 @@ class AuthFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (savedInstanceState != null) {
-            val email = savedInstanceState.getString(EMAIL_KEY, "")
-            val password = savedInstanceState.getString(PASSWORD_KEY, "")
-            with(binding) {
-                emailET.setText(email)
-                passwordET.setText(password)
-            }
-        }
+        initEditTexts()
+        initClicks()
+    }
 
+    private fun initEditTexts() {
         with(binding) {
-            val email = emailET.text
-            val password = passwordET.text
-            if (email != null && password != null) {
-                authButton.isEnabled =
-                    email.length >= 6 && password.length >= 6
+            emailET.addTextChangedListener {
+                viewModel.consumeEvent(AuthEvent.Ui.UpdateEmail(it.toString()))
+            }
+
+            passwordET.addTextChangedListener {
+                viewModel.consumeEvent(AuthEvent.Ui.UpdatePassword(it.toString()))
             }
         }
-
-        binding.authButton.setOnClickListener {
-            parentFragmentManager.beginTransaction().replace(
-                R.id.fragmentContainerView,
-                ContentFragment.newInstance(),
-                ContentFragment.TAG,
-            ).commit()
-        }
-
-        initClickableTextViews()
-        initEditTextObservers()
     }
 
-    private fun initEditTextObservers() {
-        val emailObservable = Observable.create<String> { emitter ->
-            binding.emailET.addTextChangedListener {
-                emitter.onNext(it.toString())
+    private fun initClicks() {
+        with(binding) {
+            authButton.setOnClickListener {
+                viewModel.consumeEvent(AuthEvent.Ui.Authenticate)
             }
-        }
-        val passwordObservable = Observable.create<String> { emitter ->
-            binding.passwordET.addTextChangedListener {
-                emitter.onNext(it.toString())
-            }
-        }
-        val combined = Observable.combineLatest(
-            emailObservable,
-            passwordObservable,
-        ) { email, password ->
-            email.length >= 6 && password.length >= 6
-        }
 
-        disposable.add(
-            combined
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    binding.authButton.isEnabled = it
-                }
-        )
+            forgetPasswordTV.setOnClickListener {
+                viewModel.consumeEvent(AuthEvent.Ui.NavigateToForgetPassword)
+            }
+
+            registrationTV.setOnClickListener {
+                viewModel.consumeEvent(AuthEvent.Ui.NavigateToRegistration)
+            }
+        }
     }
 
-    private fun initClickableTextViews() {
-        binding.forgetPasswordTV.setOnClickListener {
-            Toast.makeText(requireContext(), "Забыли пароль?", Toast.LENGTH_SHORT).show()
-        }
-        binding.registrationTV.setOnClickListener {
-            Toast.makeText(requireContext(), "Зарегистрироваться", Toast.LENGTH_SHORT).show()
-        }
+    private fun showToast(text: String) {
+        Toast.makeText(
+            requireContext(),
+            text,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroyView() {
@@ -114,16 +110,8 @@ class AuthFragment : Fragment() {
         _binding = null
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        disposable.dispose()
-    }
-
     companion object {
         const val TAG = "AuthFragment"
-
-        const val EMAIL_KEY = "authEmailKey"
-        const val PASSWORD_KEY = "authPasswordKey"
 
         @JvmStatic
         fun newInstance() = AuthFragment()

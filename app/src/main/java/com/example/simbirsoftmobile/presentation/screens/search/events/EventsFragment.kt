@@ -1,68 +1,53 @@
 package com.example.simbirsoftmobile.presentation.screens.search.events
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
+import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventsBinding
-import com.example.simbirsoftmobile.domain.core.DataError
-import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.usecases.SearchEventsUseCase
-import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
+import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
-import com.example.simbirsoftmobile.presentation.screens.search.models.EventSearchUi
-import com.example.simbirsoftmobile.presentation.screens.search.models.SearchResultUI
-import com.example.simbirsoftmobile.presentation.screens.search.models.toEventSearchUi
-import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.presentation.screens.search.SearchSideEffect
+import com.example.simbirsoftmobile.presentation.screens.search.SearchViewModel
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
-class EventsFragment : Fragment() {
+class EventsFragment : MviFragment<EventSearchState, EventSearchSideEffect, EventSearchEvent>() {
     private var _binding: FragmentEventsBinding? = null
     private val binding: FragmentEventsBinding
         get() = _binding!!
 
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
-    private var uiState: UiState<List<SearchResultUI>> = UiState.Idle
 
-    private val currentQuery = MutableSharedFlow<String>(
-        replay = 1,
-        extraBufferCapacity = 0,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+    override val viewModel: EventSearchViewModel by viewModels()
+    private val sharedSearchViewModel: SearchViewModel by activityViewModels()
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        val currentState = uiState
-        if (currentState is UiState.Success) {
-            outState.putParcelableArrayList(LIST_KEY, ArrayList(currentState.data))
-        }
-    }
+    override fun renderState(state: EventSearchState) {
+        with(binding) {
+            progressIndicator.isVisible = state.isLoading
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setFragmentResultListener(SearchFragment.QUERY_EVENT_KEY) { _, bundle ->
-            val result = bundle.getString(SearchFragment.RESULT_KEY)
-            if (result != null) {
-                currentQuery.tryEmit(result)
+            errorTV.isVisible = state.error != null
+            state.error?.let {
+                errorTV.text = it.asString(requireContext())
             }
+
+            infoLayout.isVisible = state.showInfo
+
+            searchResultSizeTV.isVisible = state.resultInfo != null
+            state.resultInfo?.let {
+                searchResultSizeTV.text = it.asString(requireContext())
+            }
+
+            queryResultLayout.isVisible = state.events.isNotEmpty()
+            adapter.submitList(state.events)
         }
     }
 
@@ -72,11 +57,9 @@ class EventsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentEventsBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -84,114 +67,16 @@ class EventsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
 
-        if (savedInstanceState != null) {
-            val currentList = getEventListFromBundle(savedInstanceState)
-            uiState = UiState.Success(currentList)
-            updateUiState()
-        } else {
-            uiState = UiState.Idle
-            updateUiState()
-        }
-
-        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-            uiState = UiState.Error(getString(R.string.data_acquisition_error_occurred))
-            updateUiState()
-        }
-
-        lifecycleScope.launch(exceptionHandler) {
-            currentQuery
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    uiState = UiState.Loading
-                    updateUiState()
-                }
-                .flowOn(Dispatchers.Main)
-                .flatMapLatest { query ->
-                    SearchEventsUseCase().invoke(query)
-                }
-                .flowOn(Dispatchers.IO)
-                .collect { response ->
-                    when (response) {
-                        is Either.Left -> {
-                            uiState = UiState.Error(
-                                when (response.value) {
-                                    is DataError.Api -> response.value.error
-                                        ?: getString(R.string.data_acquisition_error_occurred)
-                                    is DataError.InvalidParameters -> getString(R.string.unexpected_error)
-                                    DataError.Timeout -> getString(R.string.timeout_error)
-                                    is DataError.Unexpected -> getString(R.string.unexpected_error)
-                                    is DataError.Connection -> getString(R.string.connection_error)
-                                    is DataError.NetworkBlock -> getString(R.string.unexpected_error)
-                                }
-                            )
-                        }
-
-                        is Either.Right -> {
-                            uiState = UiState.Success(
-                                response.value.map { it.toEventSearchUi() }
-                            )
-                        }
+        sharedSearchViewModel.effects
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .onEach {
+                when (it) {
+                    is SearchSideEffect.SearchByQuery -> {
+                        viewModel.consumeEvent(EventSearchEvent.Ui.LoadEvents(it.query))
                     }
-
-                    updateUiState()
-                }
-        }
-    }
-
-    private fun getEventListFromBundle(savedInstanceState: Bundle): List<EventSearchUi> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            savedInstanceState.getParcelableArrayList(LIST_KEY, EventSearchUi::class.java)
-                ?.toList()
-                ?: listOf()
-        } else {
-            @Suppress("DEPRECATION")
-            savedInstanceState.getParcelableArrayList<EventSearchUi>(LIST_KEY)?.toList()
-                ?: listOf()
-        }
-
-    private fun updateUiState() {
-        with(binding) {
-            when (val currentState = uiState) {
-                is UiState.Error -> {
-                    progressIndicator.visibility = View.GONE
-                    infoLayout.visibility = View.GONE
-                    queryResultLayout.visibility = View.GONE
-                    errorTV.visibility = View.VISIBLE
-                    errorTV.text = currentState.message
-                    searchResultSizeTV.visibility = View.GONE
-                }
-
-                UiState.Idle -> {
-                    progressIndicator.visibility = View.GONE
-                    infoLayout.visibility = View.VISIBLE
-                    queryResultLayout.visibility = View.GONE
-                    errorTV.visibility = View.GONE
-                    searchResultSizeTV.visibility = View.GONE
-                }
-
-                UiState.Loading -> {
-                    progressIndicator.visibility = View.VISIBLE
-                    infoLayout.visibility = View.GONE
-                    queryResultLayout.visibility = View.VISIBLE
-                    errorTV.visibility = View.GONE
-                    searchResultSizeTV.visibility = View.GONE
-                }
-
-                is UiState.Success -> {
-                    progressIndicator.visibility = View.GONE
-                    infoLayout.visibility = View.GONE
-                    queryResultLayout.visibility = View.VISIBLE
-                    errorTV.visibility = View.GONE
-                    searchResultSizeTV.visibility = View.VISIBLE
-                    searchResultSizeTV.text =
-                        getString(
-                            R.string.search_result_events_size,
-                            currentState.data.size.toString(),
-                        )
-                    adapter.submitList(currentState.data)
                 }
             }
-        }
+            .launchIn(lifecycleScope)
     }
 
     private fun initAdapter() {
@@ -208,7 +93,6 @@ class EventsFragment : Fragment() {
 
     companion object {
         const val TAG = "EventsFragment"
-        const val LIST_KEY = "EventsListKey"
 
         @JvmStatic
         fun newInstance() = EventsFragment()

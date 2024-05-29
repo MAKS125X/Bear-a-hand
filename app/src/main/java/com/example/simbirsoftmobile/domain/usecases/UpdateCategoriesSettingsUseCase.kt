@@ -7,6 +7,6 @@ import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 class UpdateCategoriesSettingsUseCase(
     private val categoryRepository: CategoryRepository = SimbirSoftApp.INSTANCE.appContainer.categoryRepository
 ) {
-    suspend operator fun invoke(vararg models: CategoryModel) =
+    operator fun invoke(vararg models: CategoryModel) =
         categoryRepository.updateCategoriesSettings(*models)
 }

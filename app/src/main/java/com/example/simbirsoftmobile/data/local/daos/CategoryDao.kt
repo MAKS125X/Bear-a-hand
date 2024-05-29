@@ -21,7 +21,7 @@ interface CategoryDao {
     suspend fun deleteCategory(category: CategorySettingEntity)
 
     @Update
-    fun updateCategories(vararg categories: CategorySettingEntity): Int
+    suspend fun updateCategories(vararg categories: CategorySettingEntity): Int
 
     @Query("SELECT * FROM category")
     fun observeCategories(): Flow<List<CategorySettingEntity>>

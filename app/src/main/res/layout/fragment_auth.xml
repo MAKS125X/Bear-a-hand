@@ -115,7 +115,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/enter_email"
-                    android:text="test@test.test" />
+                    tools:text="test@test.test" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -139,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/enter_password"
                     android:inputType="textPassword"
-                    android:text="test@test.test" />
+                    tools:text="test@test.test" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button

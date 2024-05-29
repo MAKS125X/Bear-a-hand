@@ -65,3 +65,13 @@ fun <T> Flow<Either<DataError, DataResult<T>>>.extractResult(): Flow<Either<Data
             }
         }
     }
+
+fun <T> Either<DataError, T>.processResult(
+    onError: (DataError) -> Unit,
+    onSuccess: (T) -> Unit,
+) {
+    when (this) {
+        is Either.Left -> onError(this.value)
+        is Either.Right -> onSuccess(this.value)
+    }
+}

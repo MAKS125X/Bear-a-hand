@@ -14,6 +14,7 @@ import com.example.simbirsoftmobile.databinding.FragmentContentBinding
 import com.example.simbirsoftmobile.domain.utils.UnreadNewsController
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.help.HelpFragment
+import com.example.simbirsoftmobile.presentation.screens.history.HistoryFragment
 import com.example.simbirsoftmobile.presentation.screens.news.NewsFragment
 import com.example.simbirsoftmobile.presentation.screens.profile.ProfileFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
@@ -106,6 +107,14 @@ class ContentFragment : Fragment() {
                             NewsFragment.TAG,
                         ).commit()
                     }
+                }
+
+                R.id.history_menu -> {
+                    parentFragmentManager.beginTransaction().replace(
+                        binding.contentHolder.id,
+                        HistoryFragment.newInstance(),
+                        HistoryFragment.TAG,
+                    ).commit()
                 }
 
                 else -> {

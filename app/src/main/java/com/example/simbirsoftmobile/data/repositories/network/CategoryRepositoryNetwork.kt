@@ -18,7 +18,7 @@ class CategoryRepositoryNetwork(
                 .getCategories()
         }
 
-    override suspend fun updateCategoriesSettings(vararg categories: CategoryModel) {
+    override fun updateCategoriesSettings(vararg categories: CategoryModel): Flow<Either<DataError, Unit>> {
         TODO("Not yet implemented")
     }
 }

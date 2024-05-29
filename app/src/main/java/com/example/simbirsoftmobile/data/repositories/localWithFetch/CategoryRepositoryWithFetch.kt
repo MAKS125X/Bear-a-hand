@@ -16,6 +16,7 @@ import com.example.simbirsoftmobile.domain.models.CategoryModel
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.example.simbirsoftmobile.domain.utils.mapDataResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class CategoryRepositoryWithFetch(
     private val categoryService: CategoryService,
@@ -60,9 +61,13 @@ class CategoryRepositoryWithFetch(
             it.mapToDomain()
         }
 
-    override suspend fun updateCategoriesSettings(vararg categories: CategoryModel) {
-        transactionProvider.runAsTransaction {
-            dao.updateCategories(*categories.map { it.toEntity() }.toTypedArray())
+    override fun updateCategoriesSettings(vararg categories: CategoryModel): Flow<Either<DataError, Unit>> {
+        return flow {
+            transactionProvider.runAsTransaction {
+                dao.updateCategories(*categories.map { it.toEntity() }.toTypedArray())
+            }
+
+            emit(Either.Right(Unit))
         }
     }
 }
