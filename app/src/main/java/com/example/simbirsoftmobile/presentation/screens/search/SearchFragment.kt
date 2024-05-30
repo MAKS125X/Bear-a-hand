@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.search
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,24 +8,36 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
 import com.example.simbirsoftmobile.databinding.FragmentSearchBinding
+import com.example.simbirsoftmobile.di.appComponent
 import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.search.events.EventsFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.PagerItem
 import com.example.simbirsoftmobile.presentation.screens.search.organizations.OrganizationsFragment
 import com.google.android.material.tabs.TabLayoutMediator
+import javax.inject.Inject
 
 class SearchFragment : MviFragment<SearchState, SearchSideEffect, SearchEvent>() {
     private var _binding: FragmentSearchBinding? = null
     private val binding: FragmentSearchBinding
         get() = _binding!!
 
-    override val viewModel: SearchViewModel by activityViewModels()
+    @Inject
+    lateinit var factory: SearchViewModel.Factory
+
+    override val viewModel: SearchViewModel by activityViewModels {
+        factory
+    }
 
     override fun renderState(state: SearchState) {
         super.renderState(state)
         with(binding) {
             searchView.setQuery(state.searchQuery, false)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

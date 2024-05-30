@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.eventDetails
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,8 +14,10 @@ import coil.load
 import coil.request.ImageRequest
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
+import com.example.simbirsoftmobile.di.appComponent
 import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.getRemainingDateInfo
+import javax.inject.Inject
 
 class EventDetailsFragment :
     MviFragment<EventDetailsState, EventDetailsSideEffect, EventDetailsEvent>() {
@@ -22,7 +25,17 @@ class EventDetailsFragment :
     private val binding: FragmentEventDetailsBinding
         get() = _binding!!
 
-    override val viewModel: EventDetailsViewModel by viewModels()
+    @Inject
+    lateinit var factory: EventDetailsViewModel.Factory
+
+    override val viewModel: EventDetailsViewModel by viewModels {
+        factory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

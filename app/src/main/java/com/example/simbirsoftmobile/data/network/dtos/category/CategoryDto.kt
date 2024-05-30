@@ -20,4 +20,4 @@ data class CategoryDto(
         )
 }
 
-fun CategoryDto.toEntity() = CategorySettingEntity(id, name, nameEn, imageUrl)
+fun CategoryDto.toEntity() = CategorySettingEntity(id, name, nameEn, imageUrl, true)

@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.search.events
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.databinding.FragmentEventsBinding
+import com.example.simbirsoftmobile.di.appComponent
 import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
 import com.example.simbirsoftmobile.presentation.screens.search.SearchSideEffect
@@ -19,6 +21,7 @@ import com.example.simbirsoftmobile.presentation.screens.search.SearchViewModel
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 class EventsFragment : MviFragment<EventSearchState, EventSearchSideEffect, EventSearchEvent>() {
     private var _binding: FragmentEventsBinding? = null
@@ -27,8 +30,19 @@ class EventsFragment : MviFragment<EventSearchState, EventSearchSideEffect, Even
 
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
 
-    override val viewModel: EventSearchViewModel by viewModels()
-    private val sharedSearchViewModel: SearchViewModel by activityViewModels()
+    @Inject
+    lateinit var factory: EventSearchViewModel.Factory
+
+    override val viewModel: EventSearchViewModel by viewModels {
+        factory
+    }
+
+    @Inject
+    lateinit var searchFactory: SearchViewModel.Factory
+
+    private val sharedSearchViewModel: SearchViewModel by activityViewModels {
+        searchFactory
+    }
 
     override fun renderState(state: EventSearchState) {
         with(binding) {
@@ -49,6 +63,11 @@ class EventsFragment : MviFragment<EventSearchState, EventSearchSideEffect, Even
             queryResultLayout.isVisible = state.events.isNotEmpty()
             adapter.submitList(state.events)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

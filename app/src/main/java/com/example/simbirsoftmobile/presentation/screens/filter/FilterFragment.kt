@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.filter
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +11,10 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentFilterBinding
+import com.example.simbirsoftmobile.di.appComponent
 import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import javax.inject.Inject
 
 class FilterFragment : MviFragment<FilterState, FilterSideEffect, FilterEvent>() {
     private var _binding: FragmentFilterBinding? = null
@@ -24,7 +27,12 @@ class FilterFragment : MviFragment<FilterState, FilterSideEffect, FilterEvent>()
         }
     }
 
-    override val viewModel: FilterViewModel by viewModels()
+    @Inject
+    lateinit var factory: FilterViewModel.Factory
+
+    override val viewModel: FilterViewModel by viewModels {
+        factory
+    }
 
     override fun renderState(state: FilterState) {
         with(binding) {
@@ -59,6 +67,11 @@ class FilterFragment : MviFragment<FilterState, FilterSideEffect, FilterEvent>()
 
     private fun onCheckBoxClick(id: String) {
         viewModel.consumeEvent(FilterEvent.Ui.UpdateSelectedById(id))
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.news
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +10,11 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentNewsBinding
+import com.example.simbirsoftmobile.di.appComponent
 import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
+import javax.inject.Inject
 
 class NewsFragment : MviFragment<NewsState, NewsSideEffect, NewsEvent>() {
     private var _binding: FragmentNewsBinding? = null
@@ -20,7 +23,12 @@ class NewsFragment : MviFragment<NewsState, NewsSideEffect, NewsEvent>() {
 
     private var adapter: NewsAdapter? = null
 
-    override val viewModel: NewsViewModel by viewModels()
+    @Inject
+    lateinit var factory: NewsViewModel.Factory
+
+    override val viewModel: NewsViewModel by viewModels {
+        factory
+    }
 
     override fun renderState(state: NewsState) {
         with(binding) {
@@ -34,6 +42,11 @@ class NewsFragment : MviFragment<NewsState, NewsSideEffect, NewsEvent>() {
                 errorTV.text = it.asString(requireContext())
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

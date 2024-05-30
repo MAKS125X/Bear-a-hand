@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.domain.usecases
 
-import com.example.simbirsoftmobile.di.SimbirSoftApp
 import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.Either
 import com.example.simbirsoftmobile.domain.models.event.EventModel
@@ -12,10 +11,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class GetEventsBySettingsUseCase(
-    private val categoryRepository: CategoryRepository = SimbirSoftApp.INSTANCE.appContainer.categoryRepository,
-    private val eventRepository: EventRepository = SimbirSoftApp.INSTANCE.appContainer.eventRepository,
+class GetEventsBySettingsUseCase @Inject constructor(
+    private val categoryRepository: CategoryRepository,
+    private val eventRepository: EventRepository,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<Either<DataError, List<EventModel>>> =

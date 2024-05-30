@@ -6,6 +6,7 @@ import com.example.simbirsoftmobile.domain.core.Either
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -20,11 +21,11 @@ inline fun <Dto, Entity> networkBoundResource(
     shouldFetch: Boolean,
 ): Flow<Either<DataError, DataResult<Entity>>> {
     return flow {
-        try {
-            val flow: Flow<Either<DataError, DataResult<Entity>>> = if (shouldFetch) {
-                val apiResponse = apiFetch()
+        val flow: Flow<Either<DataError, DataResult<Entity>>> = if (shouldFetch) {
+            val apiResponse = apiFetch()
 
-                apiResponse.flatMapLatest { response ->
+            apiResponse
+                .flatMapLatest { response ->
                     when (response) {
                         is Either.Left -> {
                             localQuery().map {
@@ -46,20 +47,20 @@ inline fun <Dto, Entity> networkBoundResource(
                         }
                     }
                 }
-            } else {
-                localQuery().map {
-                    Either.Right(
-                        DataResult.SuccessFromLocal(
-                            it,
-                            DataError.NetworkBlock
-                        )
+        } else {
+            localQuery().map {
+                Either.Right(
+                    DataResult.SuccessFromLocal(
+                        it,
+                        DataError.NetworkBlock
                     )
-                }
+                )
             }
-
-            emitAll(flow)
-        } catch (e: Exception) {
-            emit(Either.Left(DataError.Unexpected(e.localizedMessage)))
         }
-    }.flowOn(Dispatchers.IO)
+
+        emitAll(flow)
+    }.catch {
+        emit(Either.Left(DataError.Unexpected(it.localizedMessage)))
+    }
+        .flowOn(Dispatchers.IO)
 }

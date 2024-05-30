@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.help
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,9 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.example.simbirsoftmobile.databinding.FragmentHelpBinding
+import com.example.simbirsoftmobile.di.appComponent
 import com.example.simbirsoftmobile.presentation.base.MviFragment
+import javax.inject.Inject
 
 class HelpFragment : MviFragment<HelpState, HelpSideEffect, HelpEvent>() {
     private var _binding: FragmentHelpBinding? = null
@@ -16,7 +19,17 @@ class HelpFragment : MviFragment<HelpState, HelpSideEffect, HelpEvent>() {
 
     var adapter: CategoryAdapter? = null
 
-    override val viewModel: HelpViewModel by viewModels()
+    @Inject
+    lateinit var factory: HelpViewModel.Factory
+
+    override val viewModel: HelpViewModel by viewModels {
+        factory
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
+    }
 
     override fun renderState(state: HelpState) {
         with(binding) {

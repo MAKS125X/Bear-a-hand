@@ -17,8 +17,9 @@ import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.example.simbirsoftmobile.domain.utils.mapDataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class CategoryRepositoryWithFetch(
+class CategoryRepositoryWithFetch @Inject constructor(
     private val categoryService: CategoryService,
     private val dao: CategoryDao,
     private val transactionProvider: TransactionProvider,
@@ -48,10 +49,8 @@ class CategoryRepositoryWithFetch(
                 }
             },
             saveFetchResult = { list ->
-                transactionProvider.runAsTransaction {
-                    for (category in list) {
-                        addOrUpdateCategory(category)
-                    }
+                for (category in list) {
+                    addOrUpdateCategory(category)
                 }
 
                 shouldFetch = false
@@ -63,9 +62,7 @@ class CategoryRepositoryWithFetch(
 
     override fun updateCategoriesSettings(vararg categories: CategoryModel): Flow<Either<DataError, Unit>> {
         return flow {
-            transactionProvider.runAsTransaction {
-                dao.updateCategories(*categories.map { it.toEntity() }.toTypedArray())
-            }
+            dao.updateCategories(*categories.map { it.toEntity() }.toTypedArray())
 
             emit(Either.Right(Unit))
         }

@@ -1,5 +1,7 @@
 package com.example.simbirsoftmobile.presentation.screens.filter
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.usecases.GetCategoriesUseCase
@@ -14,10 +16,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import javax.inject.Inject
 
 class FilterViewModel(
-    private val getCategoriesUseCase: GetCategoriesUseCase = GetCategoriesUseCase(),
-    private val updateCategoriesSettingsUseCase: UpdateCategoriesSettingsUseCase = UpdateCategoriesSettingsUseCase(),
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val updateCategoriesSettingsUseCase: UpdateCategoriesSettingsUseCase,
 ) : MviViewModel<FilterState, FilterSideEffect, FilterEvent>(
     FilterState()
 ) {
@@ -122,5 +125,16 @@ class FilterViewModel(
                 )
             }
             .launchIn(viewModelScope + exceptionHandler)
+    }
+
+    class Factory @Inject constructor(
+        private val getCategoriesUseCase: GetCategoriesUseCase,
+        private val updateCategoriesSettingsUseCase: UpdateCategoriesSettingsUseCase,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass == FilterViewModel::class.java)
+            return FilterViewModel(getCategoriesUseCase, updateCategoriesSettingsUseCase) as T
+        }
     }
 }

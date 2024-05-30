@@ -1,5 +1,7 @@
 package com.example.simbirsoftmobile.presentation.screens.news
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.usecases.GetEventsBySettingsUseCase
@@ -11,9 +13,10 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
+import javax.inject.Inject
 
 class NewsViewModel(
-    private val getEventsBySettingsUseCase: GetEventsBySettingsUseCase = GetEventsBySettingsUseCase()
+    private val getEventsBySettingsUseCase: GetEventsBySettingsUseCase,
 ) : MviViewModel<NewsState, NewsSideEffect, NewsEvent>(
     NewsState(),
 ) {
@@ -75,5 +78,15 @@ class NewsViewModel(
                 )
             }
             .launchIn(scope = viewModelScope + exceptionHandler)
+    }
+
+    class Factory @Inject constructor(
+        private val getEventsBySettingsUseCase: GetEventsBySettingsUseCase,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass == NewsViewModel::class.java)
+            return NewsViewModel(getEventsBySettingsUseCase) as T
+        }
     }
 }

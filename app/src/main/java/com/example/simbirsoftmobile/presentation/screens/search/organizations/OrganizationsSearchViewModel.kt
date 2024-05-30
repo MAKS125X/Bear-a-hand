@@ -1,5 +1,7 @@
 package com.example.simbirsoftmobile.presentation.screens.search.organizations
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.domain.usecases.SearchOrganizationsUseCase
@@ -9,9 +11,10 @@ import com.example.simbirsoftmobile.presentation.base.UiText
 import com.example.simbirsoftmobile.presentation.screens.search.models.toOrganizationSearchUi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 class OrganizationsSearchViewModel(
-    private val searchOrganizationsUseCase: SearchOrganizationsUseCase = SearchOrganizationsUseCase()
+    private val searchOrganizationsUseCase: SearchOrganizationsUseCase,
 ) : MviViewModel<OrganizationSearchState, OrganizationSearchSideEffect, OrganizationSearchEvent>(
     OrganizationSearchState()
 ) {
@@ -76,5 +79,15 @@ class OrganizationsSearchViewModel(
                 )
             }
             .launchIn(viewModelScope)
+    }
+
+    class Factory @Inject constructor(
+        private val searchOrganizationsUseCase: SearchOrganizationsUseCase,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass == OrganizationsSearchViewModel::class.java)
+            return OrganizationsSearchViewModel(searchOrganizationsUseCase) as T
+        }
     }
 }

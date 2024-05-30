@@ -6,14 +6,12 @@ import coil.ImageLoaderFactory
 import coil.request.CachePolicy
 
 class SimbirSoftApp : Application(), ImageLoaderFactory {
-    override fun onCreate() {
-        super.onCreate()
-        INSTANCE = this
+    val appComponent: AppComponent by lazy(LazyThreadSafetyMode.NONE) {
+        DaggerAppComponent.factory().create(this)
     }
 
-    val appContainer = AppContainer(this)
-
     override fun newImageLoader(): ImageLoader {
+        //TODO: Add DI
         return ImageLoader
             .Builder(this)
             .diskCachePolicy(CachePolicy.DISABLED)

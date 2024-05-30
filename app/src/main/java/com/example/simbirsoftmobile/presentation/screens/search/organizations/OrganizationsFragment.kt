@@ -1,5 +1,6 @@
 package com.example.simbirsoftmobile.presentation.screens.search.organizations
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.databinding.FragmentOrganizationsBinding
+import com.example.simbirsoftmobile.di.appComponent
 import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchResultAdapter
 import com.example.simbirsoftmobile.presentation.screens.search.SearchSideEffect
@@ -19,6 +21,7 @@ import com.example.simbirsoftmobile.presentation.screens.search.SearchViewModel
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 class OrganizationsFragment :
     MviFragment<OrganizationSearchState, OrganizationSearchSideEffect, OrganizationSearchEvent>() {
@@ -28,8 +31,19 @@ class OrganizationsFragment :
 
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
 
-    override val viewModel: OrganizationsSearchViewModel by viewModels()
-    private val sharedSearchViewModel: SearchViewModel by activityViewModels()
+    @Inject
+    lateinit var factory: OrganizationsSearchViewModel.Factory
+
+    override val viewModel: OrganizationsSearchViewModel by viewModels {
+        factory
+    }
+
+    @Inject
+    lateinit var searchFactory: SearchViewModel.Factory
+
+    private val sharedSearchViewModel: SearchViewModel by activityViewModels {
+        searchFactory
+    }
 
     override fun renderState(state: OrganizationSearchState) {
         with(binding) {
@@ -49,6 +63,11 @@ class OrganizationsFragment :
             queryResultLayout.isVisible = state.organizations.isNotEmpty()
             adapter.submitList(state.organizations)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

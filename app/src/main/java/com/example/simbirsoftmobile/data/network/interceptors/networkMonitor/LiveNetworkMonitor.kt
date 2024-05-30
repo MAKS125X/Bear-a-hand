@@ -2,8 +2,9 @@ package com.example.simbirsoftmobile.data.network.interceptors.networkMonitor
 
 import android.content.Context
 import android.net.ConnectivityManager
+import javax.inject.Inject
 
-class LiveNetworkMonitor(
+class LiveNetworkMonitor @Inject constructor(
     context: Context,
 ) : NetworkMonitor {
     private val connectivityManager =

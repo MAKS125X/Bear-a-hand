@@ -1,5 +1,7 @@
 package com.example.simbirsoftmobile.presentation.screens.search.events
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.domain.core.DataError
@@ -12,9 +14,10 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
+import javax.inject.Inject
 
 class EventSearchViewModel(
-    private val searchEventsUseCase: SearchEventsUseCase = SearchEventsUseCase()
+    private val searchEventsUseCase: SearchEventsUseCase,
 ) : MviViewModel<EventSearchState, EventSearchSideEffect, EventSearchEvent>(
     EventSearchState()
 ) {
@@ -83,5 +86,15 @@ class EventSearchViewModel(
                 )
             }
             .launchIn(viewModelScope + exceptionHandler)
+    }
+
+    class Factory @Inject constructor(
+        private val searchEventsUseCase: SearchEventsUseCase,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass == EventSearchViewModel::class.java)
+            return EventSearchViewModel(searchEventsUseCase) as T
+        }
     }
 }

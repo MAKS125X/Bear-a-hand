@@ -1,5 +1,7 @@
 package com.example.simbirsoftmobile.presentation.screens.help
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.usecases.GetCategoriesUseCase
@@ -10,9 +12,10 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
+import javax.inject.Inject
 
 class HelpViewModel(
-    private val getCategoriesUseCase: GetCategoriesUseCase = GetCategoriesUseCase()
+    private val getCategoriesUseCase: GetCategoriesUseCase,
 ) : MviViewModel<HelpState, HelpSideEffect, HelpEvent>(
     HelpState()
 ) {
@@ -66,15 +69,32 @@ class HelpViewModel(
                         consumeEvent(HelpEvent.Internal.ErrorLoaded(it))
                     },
                     onSuccess = { list ->
-                        consumeEvent(
-                            HelpEvent.Internal.CategoriesLoaded(
-                                list.map { it.mapToUi() }
+                        if (list.isNotEmpty()) {
+                            consumeEvent(
+                                HelpEvent.Internal.CategoriesLoaded(
+                                    list.map { it.mapToUi() }
+                                )
                             )
-                        )
-
+                        } else {
+                            consumeEvent(
+                                HelpEvent.Internal.ErrorLoaded(
+                                    DataError.Unexpected()
+                                )
+                            )
+                        }
                     }
                 )
             }
             .launchIn(viewModelScope + exceptionHandler)
+    }
+
+    class Factory @Inject constructor(
+        private val getCategoriesUseCase: GetCategoriesUseCase,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass == HelpViewModel::class.java)
+            return HelpViewModel(getCategoriesUseCase) as T
+        }
     }
 }

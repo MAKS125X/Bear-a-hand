@@ -17,8 +17,9 @@ import com.example.simbirsoftmobile.domain.models.event.OrganizationModel
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import com.example.simbirsoftmobile.domain.utils.mapDataResult
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class EventRepositoryWithFetch(
+class EventRepositoryWithFetch @Inject constructor(
     private val eventService: EventService,
     private val dao: EventDao,
     private val transactionProvider: TransactionProvider,
@@ -36,9 +37,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.addEvents(it.map { it.toEntity() })
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
@@ -57,9 +56,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.addEvents(it.map { it.toEntity() })
             },
             shouldFetch = shouldFetch,
         ).mapDataResult {
@@ -77,9 +74,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.addEvents(it.map { it.toEntity() })
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
@@ -98,9 +93,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.addEvents(it.map { it.toEntity() })
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
@@ -119,9 +112,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.addEvents(it.map { it.toEntity() })
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
