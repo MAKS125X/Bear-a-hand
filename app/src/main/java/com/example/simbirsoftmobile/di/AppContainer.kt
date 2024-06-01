@@ -17,6 +17,7 @@ import com.example.simbirsoftmobile.data.repositories.localWithFetch.CategoryRep
 import com.example.simbirsoftmobile.data.repositories.localWithFetch.EventRepositoryWithFetch
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
+import com.example.simbirsoftmobile.presentation.screens.content.ContentFragment
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
 import com.example.simbirsoftmobile.presentation.screens.help.HelpFragment
@@ -34,8 +35,10 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Component(modules = [AppModule::class])
+@Singleton
 interface AppComponent {
 
     @Component.Factory
@@ -50,6 +53,7 @@ interface AppComponent {
     fun inject(fragment: OrganizationsFragment)
     fun inject(fragment: EventsFragment)
     fun inject(fragment: SearchFragment)
+    fun inject(contentFragment: ContentFragment)
 }
 
 val Context.appComponent: AppComponent
@@ -77,6 +81,7 @@ class DatabaseModule {
         return appDatabase.events()
     }
 
+    @Singleton
     @Provides
     fun provideDatabase(
         context: Context,
@@ -85,7 +90,8 @@ class DatabaseModule {
             context = context.applicationContext,
             AppDatabase::class.java,
             "events.db",
-        ).build()
+        )
+            .build()
     }
 }
 

@@ -48,14 +48,7 @@ inline fun <Dto, Entity> networkBoundResource(
                     }
                 }
         } else {
-            localQuery().map {
-                Either.Right(
-                    DataResult.SuccessFromLocal(
-                        it,
-                        DataError.NetworkBlock
-                    )
-                )
-            }
+            getLocalResources(localQuery)
         }
 
         emitAll(flow)
@@ -63,4 +56,18 @@ inline fun <Dto, Entity> networkBoundResource(
         emit(Either.Left(DataError.Unexpected(it.localizedMessage)))
     }
         .flowOn(Dispatchers.IO)
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+inline fun <Entity> getLocalResources(
+    crossinline localQuery: () -> Flow<Entity>,
+): Flow<Either<DataError, DataResult<Entity>>> {
+    return localQuery().map {
+        Either.Right(
+            DataResult.SuccessFromLocal(
+                it,
+                DataError.NetworkBlock
+            )
+        )
+    }
 }

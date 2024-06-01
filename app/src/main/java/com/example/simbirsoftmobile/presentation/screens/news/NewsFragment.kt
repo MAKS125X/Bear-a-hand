@@ -2,6 +2,7 @@ package com.example.simbirsoftmobile.presentation.screens.news
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ class NewsFragment : MviFragment<NewsState, NewsSideEffect, NewsEvent>() {
     }
 
     override fun renderState(state: NewsState) {
+        Log.d(TAG, "renderState: $state")
         with(binding) {
             progressIndicator.isVisible = state.isLoading
 

@@ -62,4 +62,8 @@ class EventRepositoryFile : EventRepository {
                 OrganizationModel(it.organization)
             }.distinctBy { it.name }
         }
+
+    override fun observeUnreadEventsByCategories(vararg categoryIds: String): Flow<Either<DataError, DataResult<Int>>> {
+        TODO("Not yet implemented")
+    }
 }

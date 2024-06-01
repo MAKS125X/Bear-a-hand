@@ -17,4 +17,6 @@ interface EventRepository {
     fun searchEventsByName(substring: String): Flow<Either<DataError, DataResult<List<EventModel>>>>
 
     fun searchOrganizations(substring: String): Flow<Either<DataError, DataResult<List<OrganizationModel>>>>
+
+    fun observeUnreadEventsByCategories(vararg categoryIds: String): Flow<Either<DataError, DataResult<Int>>>
 }
