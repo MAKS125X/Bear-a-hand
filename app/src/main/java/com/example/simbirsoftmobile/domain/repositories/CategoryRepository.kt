@@ -9,5 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryRepository {
     fun getCategories(): Flow<Either<DataError, DataResult<List<CategoryModel>>>>
 
-     fun updateCategoriesSettings(vararg categories: CategoryModel): Flow<Either<DataError, Unit>>
+    fun getCategories(shouldFetch: Boolean): Flow<Either<DataError, DataResult<List<CategoryModel>>>>
+
+    fun updateCategoriesSettings(vararg categories: CategoryModel): Flow<Either<DataError, Unit>>
 }

@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.presentation.screens.content
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -16,9 +15,7 @@ import javax.inject.Inject
 
 class ContentViewModel(
     private val getUnreadEventsCountUseCase: GetUnreadEventsCountUseCase,
-) : MviViewModel<ContentState, ContentSideEffect, ContentEvent>(
-    ContentState()
-) {
+) : MviViewModel<ContentState, ContentSideEffect, ContentEvent>(ContentState()) {
     init {
         observeBadgeValue()
     }
@@ -40,13 +37,11 @@ class ContentViewModel(
     }
 
     private fun observeBadgeValue() {
-        val exceptionHandler = CoroutineExceptionHandler { _, e ->
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
             consumeEvent(ContentEvent.Internal.ErrorUpdate(DataError.Unexpected()))
         }
-
         getUnreadEventsCountUseCase()
             .onEach {
-                Log.d("Badge", "observeBadgeValue: $it")
                 it.processResult({
                     consumeEvent(ContentEvent.Internal.ErrorUpdate(it))
                 }, {

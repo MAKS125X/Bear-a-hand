@@ -23,10 +23,10 @@ class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>() {
         with(binding) {
             authButton.isEnabled = state.isAuthClickable
             emailET.setText(state.email)
-            emailET.getText()?.let { emailET.setSelection(it.length) };
+            emailET.getText()?.let { emailET.setSelection(it.length) }
 
             passwordET.setText(state.password)
-            passwordET.getText()?.let { passwordET.setSelection(it.length) };
+            passwordET.getText()?.let { passwordET.setSelection(it.length) }
         }
     }
 
@@ -101,7 +101,7 @@ class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>() {
         Toast.makeText(
             requireContext(),
             text,
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_SHORT,
         ).show()
     }
 

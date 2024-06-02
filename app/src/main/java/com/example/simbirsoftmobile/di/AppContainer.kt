@@ -40,7 +40,6 @@ import javax.inject.Singleton
 @Component(modules = [AppModule::class])
 @Singleton
 interface AppComponent {
-
     @Component.Factory
     interface Factory {
         fun create(@BindsInstance context: Context): AppComponent
@@ -68,18 +67,10 @@ interface AppModule
 @Module
 class DatabaseModule {
     @Provides
-    fun provideCategoryDao(
-        appDatabase: AppDatabase,
-    ): CategoryDao {
-        return appDatabase.categories()
-    }
+    fun provideCategoryDao(appDatabase: AppDatabase): CategoryDao = appDatabase.categories()
 
     @Provides
-    fun provideEventDao(
-        appDatabase: AppDatabase,
-    ): EventDao {
-        return appDatabase.events()
-    }
+    fun provideEventDao(appDatabase: AppDatabase): EventDao = appDatabase.events()
 
     @Singleton
     @Provides
@@ -97,6 +88,7 @@ class DatabaseModule {
 
 @Module
 class NetworkModule {
+    @Singleton
     @Provides
     fun provideHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
@@ -115,6 +107,7 @@ class NetworkModule {
         return interceptor
     }
 
+    @Singleton
     @Provides
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
@@ -142,23 +135,18 @@ class NetworkModule {
     }
 
     @Provides
-    fun provideCategoryService(
-        retrofit: Retrofit,
-    ): CategoryService {
-        return retrofit.create(CategoryService::class.java)
-    }
+    fun provideCategoryService(retrofit: Retrofit): CategoryService =
+        retrofit.create(CategoryService::class.java)
 
     @Provides
-    fun provideEventService(
-        retrofit: Retrofit,
-    ): EventService {
-        return retrofit.create(EventService::class.java)
-    }
+    fun provideEventService(retrofit: Retrofit): EventService =
+        retrofit.create(EventService::class.java)
 }
 
 @Module
 interface AppBindModule {
     @Suppress("FunctionName")
+    @Singleton
     @Binds
     fun bindCategoryRepositoryWithFetch_to_CategoryRepository(
         categoryRepositoryWithFetch: CategoryRepositoryWithFetch,
@@ -166,6 +154,7 @@ interface AppBindModule {
 
 
     @Suppress("FunctionName")
+    @Singleton
     @Binds
     fun bindEventRepositoryWithFetch_to_EventRepository(
         eventRepositoryWithFetch: EventRepositoryWithFetch,

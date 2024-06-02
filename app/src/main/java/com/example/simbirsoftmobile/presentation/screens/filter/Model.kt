@@ -17,6 +17,7 @@ data class FilterState(
 sealed interface FilterEvent : MviEvent {
     sealed interface Ui : FilterEvent {
         class UpdateSelectedById(val id: String) : Ui
+
         data object AcceptChanges : Ui
     }
 

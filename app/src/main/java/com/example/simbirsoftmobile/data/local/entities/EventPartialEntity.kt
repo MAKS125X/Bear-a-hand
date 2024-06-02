@@ -2,11 +2,10 @@ package com.example.simbirsoftmobile.data.local.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
 @Entity
 data class EventPartialEntity(
-    @PrimaryKey val id: String,
+    val id: String,
     val name: String,
     @ColumnInfo(name = "start_date") val startDate: Long,
     @ColumnInfo(name = "end_date") val endDate: Long,

@@ -99,7 +99,6 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
         return binding.root
     }
 
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,

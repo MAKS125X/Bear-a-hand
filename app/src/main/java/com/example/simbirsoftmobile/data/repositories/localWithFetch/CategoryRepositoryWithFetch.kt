@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.data.repositories.localWithFetch
 
-import com.example.simbirsoftmobile.data.local.TransactionProvider
 import com.example.simbirsoftmobile.data.local.daos.CategoryDao
 import com.example.simbirsoftmobile.data.local.entities.toEntity
 import com.example.simbirsoftmobile.data.network.api.CategoryService
@@ -22,7 +21,6 @@ import javax.inject.Inject
 class CategoryRepositoryWithFetch @Inject constructor(
     private val categoryService: CategoryService,
     private val dao: CategoryDao,
-    private val transactionProvider: TransactionProvider,
 ) : CategoryRepository {
     private var shouldFetch: Boolean = true
 
@@ -41,6 +39,9 @@ class CategoryRepositoryWithFetch @Inject constructor(
     }
 
     override fun getCategories(): Flow<Either<DataError, DataResult<List<CategoryModel>>>> =
+        getCategories(shouldFetch)
+
+    override fun getCategories(shouldFetch: Boolean): Flow<Either<DataError, DataResult<List<CategoryModel>>>> =
         networkBoundResource(
             localQuery = dao::observeCategories,
             apiFetch = {
@@ -52,8 +53,7 @@ class CategoryRepositoryWithFetch @Inject constructor(
                 for (category in list) {
                     addOrUpdateCategory(category)
                 }
-
-                shouldFetch = false
+                this.shouldFetch = false
             },
             shouldFetch = shouldFetch,
         ).mapDataResult {

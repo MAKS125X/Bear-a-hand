@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.presentation.screens.news
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -65,7 +64,6 @@ class NewsViewModel(
 
         getEventsBySettingsUseCase.invoke()
             .onEach { either ->
-                Log.d("News", "loadNews: $either")
                 either.processResult(
                     onError = {
                         consumeEvent(NewsEvent.Internal.ErrorLoaded(it))

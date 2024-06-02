@@ -19,7 +19,7 @@ import javax.inject.Inject
 class EventSearchViewModel(
     private val searchEventsUseCase: SearchEventsUseCase,
 ) : MviViewModel<EventSearchState, EventSearchSideEffect, EventSearchEvent>(
-    EventSearchState()
+    EventSearchState(),
 ) {
     override fun reduce(state: EventSearchState, event: EventSearchEvent) {
         when (event) {
@@ -45,7 +45,8 @@ class EventSearchViewModel(
                             UiText.StringResource(
                                 R.string.search_result_events_size,
                                 event.events.size.toString(),
-                            ) else UiText.StringResource(R.string.empty_search_result),
+                            )
+                        else UiText.StringResource(R.string.empty_search_result),
                     )
                 )
             }
@@ -81,7 +82,6 @@ class EventSearchViewModel(
                             EventSearchEvent.Internal.EventsLoaded(
                                 list.map { it.toEventSearchUi() })
                         )
-
                     }
                 )
             }

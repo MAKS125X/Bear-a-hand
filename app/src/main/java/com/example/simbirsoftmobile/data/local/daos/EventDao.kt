@@ -37,6 +37,9 @@ interface EventDao {
         }
     }
 
+    @Query("UPDATE events SET isRead = 1 WHERE id == :id")
+    fun changeIsReadStateById(id: String)
+
     @Query("SELECT * FROM events WHERE events.name LIKE :nameSubstring")
     fun searchEventsByName(nameSubstring: String): Flow<List<EventEntity>>
 
@@ -60,9 +63,6 @@ interface EventDao {
 
     @Query("SELECT COUNT(*) FROM events WHERE isRead == 0 AND events.category_id IN (:categoryIds)")
     fun observeUnreadEventsCountByCategory(categoryIds: List<String>): Flow<Int>
-
-    @Query("UPDATE events SET isRead = 1 WHERE id == :id")
-    fun changeIsReadStateById(id: String)
 
     fun observeEventWithUpdatingState(eventId: String): Flow<EventEntity> {
         changeIsReadStateById(eventId)

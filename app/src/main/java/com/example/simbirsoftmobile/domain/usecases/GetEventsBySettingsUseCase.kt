@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.domain.usecases
 
-import android.util.Log
 import com.example.simbirsoftmobile.domain.core.DataError
 import com.example.simbirsoftmobile.domain.core.Either
 import com.example.simbirsoftmobile.domain.models.event.EventModel
@@ -24,12 +23,11 @@ class GetEventsBySettingsUseCase @Inject constructor(
             .flatMapLatest { categories ->
                 when (categories) {
                     is Either.Left -> {
-                        Log.d("News", "invoke: $categories")
-                        eventRepository.getAllEvents().extractResult()
+                        eventRepository.getAllEvents()
+                            .extractResult()
                     }
 
                     is Either.Right -> {
-                        Log.d("News", "invoke: $categories")
                         eventRepository
                             .getEventsByCategory(
                                 *categories.value

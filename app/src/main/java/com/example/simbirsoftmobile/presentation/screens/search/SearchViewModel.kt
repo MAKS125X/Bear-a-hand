@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 class SearchViewModel : MviViewModel<SearchState, SearchSideEffect, SearchEvent>(
-    SearchState()
+    SearchState(),
 ) {
     private val queryFlow = state
         .map { it.searchQuery }
@@ -35,7 +35,7 @@ class SearchViewModel : MviViewModel<SearchState, SearchSideEffect, SearchEvent>
             is SearchEvent.Ui.UpdateSearchQuery -> {
                 updateState(
                     state.copy(
-                        searchQuery = event.query
+                        searchQuery = event.query,
                     )
                 )
             }

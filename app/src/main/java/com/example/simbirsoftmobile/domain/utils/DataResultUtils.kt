@@ -5,6 +5,7 @@ import com.example.simbirsoftmobile.domain.core.DataResult
 import com.example.simbirsoftmobile.domain.core.Either
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 inline fun <T, S> Flow<Either<DataError, T>>.mapRightEither(
     crossinline transform: (T) -> S,
@@ -75,3 +76,19 @@ fun <T> Either<DataError, T>.processResult(
         is Either.Right -> onSuccess(this.value)
     }
 }
+
+fun <R, L> Flow<Either<R, L>>.onEach(
+    onLeft: () -> Unit,
+    onRight: () -> Unit,
+): Flow<Either<R, L>> =
+    this.onEach { either ->
+        when (either) {
+            is Either.Left -> {
+                onLeft()
+            }
+
+            is Either.Right -> {
+                onRight()
+            }
+        }
+    }

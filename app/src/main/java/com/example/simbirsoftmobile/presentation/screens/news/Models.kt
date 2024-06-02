@@ -13,7 +13,6 @@ data class NewsState(
     val error: UiText? = null,
 ) : MviState
 
-
 sealed interface NewsEvent : MviEvent {
     sealed interface Ui : NewsEvent
 

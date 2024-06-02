@@ -1,7 +1,6 @@
 package com.example.simbirsoftmobile.presentation.base
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
@@ -25,7 +24,6 @@ abstract class MviFragment<State : MviState, SideEffect : MviSideEffect, Event :
     protected abstract val viewModel: MviViewModel<State, SideEffect, Event>
 
     private fun collectSideEffects() {
-        Log.d("EventDetails", "collectSideEffects: ")
         viewModel.effects
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { handleSideEffects(effect = it) }
@@ -33,7 +31,6 @@ abstract class MviFragment<State : MviState, SideEffect : MviSideEffect, Event :
     }
 
     private fun collectState() {
-        Log.d("EventDetails", "collectState: ")
         viewModel.state
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .distinctUntilChanged()

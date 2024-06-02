@@ -1,7 +1,5 @@
 package com.example.simbirsoftmobile.data.repositories.localWithFetch
 
-import android.util.Log
-import com.example.simbirsoftmobile.data.local.TransactionProvider
 import com.example.simbirsoftmobile.data.local.daos.EventDao
 import com.example.simbirsoftmobile.data.local.entities.toOrganization
 import com.example.simbirsoftmobile.data.network.api.EventService
@@ -26,11 +24,12 @@ import javax.inject.Inject
 class EventRepositoryWithFetch @Inject constructor(
     private val eventService: EventService,
     private val dao: EventDao,
-    private val transactionProvider: TransactionProvider,
 ) : EventRepository {
     private var shouldFetch = true
 
-    override fun getEventsByCategory(vararg categoryIds: String): Flow<Either<DataError, DataResult<List<EventModel>>>> =
+    override fun getEventsByCategory(
+        vararg categoryIds: String,
+    ): Flow<Either<DataError, DataResult<List<EventModel>>>> =
         networkBoundResource(
             localQuery = {
                 dao.getEvents(categoryIds.toList())
@@ -41,9 +40,8 @@ class EventRepositoryWithFetch @Inject constructor(
                 }
             },
             saveFetchResult = { list ->
-                Log.d("Database", "getEventsByCategory: $list")
                 dao.insertOrUpdateEvent(list.map { it.toPartialEntity() })
-                shouldFetch = false
+                this.shouldFetch = false
             },
             shouldFetch = shouldFetch,
         ).mapDataResult {

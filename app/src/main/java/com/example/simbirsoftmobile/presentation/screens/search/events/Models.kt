@@ -23,6 +23,7 @@ sealed interface EventSearchEvent : MviEvent {
 
     sealed interface Internal : EventSearchEvent {
         data class EventsLoaded(val events: List<EventSearchUi>) : Internal
+
         data class ErrorLoaded(val error: UiText) : Internal {
             constructor(error: DataError) : this(error.getDescription())
         }
