@@ -1,33 +1,44 @@
 package com.example.auth.di
 
+import androidx.annotation.RestrictTo
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModel
 import com.example.auth.screen.AuthFragment
 import dagger.Component
 import kotlin.properties.Delegates.notNull
 
-@[Component(dependencies = [AuthNavigation::class])]
+@[Component(dependencies = [AuthDeps::class])]
 internal interface AuthComponent {
     fun inject(fragment: AuthFragment)
 
     @Component.Builder
     interface Builder {
 
-        fun deps(authNavigation: AuthNavigation): Builder
+        fun deps(authNavigation: AuthDeps): Builder
 
         fun build(): AuthComponent
     }
 }
 
-fun interface AuthNavigation {
-    fun goToContent()
+interface AuthDeps {
+    val authNavigation: AuthNavigation
+}
+
+interface AuthNavigation {
+    fun onSuccessNavigation(fragmentManager: FragmentManager)
 }
 
 interface AuthDepsProvider {
-    val deps: AuthNavigation
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY)
+    val deps: AuthDeps
 
     companion object : AuthDepsProvider by AuthDepsStore
 }
 
 object AuthDepsStore : AuthDepsProvider {
-    override var deps: AuthNavigation by notNull()
+    override var deps: AuthDeps by notNull()
+}
 
+internal class AuthComponentViewModel : ViewModel() {
+    val authComponent = DaggerAuthComponent.builder().deps(AuthDepsProvider.deps).build()
 }

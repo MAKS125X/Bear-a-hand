@@ -7,7 +7,7 @@ import com.example.ui.MviSideEffect
 import com.example.ui.MviState
 import com.example.ui.UiText
 
-internal data class AuthState(
+data class AuthState(
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: UiText? = null,
@@ -16,7 +16,7 @@ internal data class AuthState(
     val isAuthClickable: Boolean = false,
 ) : MviState
 
-internal sealed interface AuthEvent : MviEvent {
+sealed interface AuthEvent : MviEvent {
     sealed interface Ui : AuthEvent {
         data object Authenticate : Ui
         data class UpdateEmail(val value: String) : Ui
@@ -34,7 +34,7 @@ internal sealed interface AuthEvent : MviEvent {
     }
 }
 
-internal sealed interface AuthSideEffect : MviSideEffect {
+sealed interface AuthSideEffect : MviSideEffect {
     data object NavigateToContent : AuthSideEffect
     data class NavigateToRegistration(val text: UiText) : AuthSideEffect
     data class NavigateToForgetPassword(val text: UiText) : AuthSideEffect

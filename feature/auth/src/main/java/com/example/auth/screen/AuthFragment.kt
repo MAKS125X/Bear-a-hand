@@ -8,18 +8,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import com.example.auth.databinding.FragmentAuthBinding
-import com.example.auth.di.AuthNavigation
+import com.example.auth.di.AuthComponentViewModel
+import com.example.auth.di.AuthDeps
 import com.example.ui.MviFragment
 import javax.inject.Inject
 
-internal class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>() {
+class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>() {
     private var _binding: FragmentAuthBinding? = null
     private val binding: FragmentAuthBinding
         get() = _binding!!
 
     @Inject
-    lateinit var authSuccess: AuthNavigation
+    lateinit var authDeps: AuthDeps
 
     override val viewModel: AuthViewModel by viewModels()
 
@@ -37,6 +40,7 @@ internal class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>(
     override fun handleSideEffects(effect: AuthSideEffect) {
         when (effect) {
             AuthSideEffect.NavigateToContent -> {
+                authDeps.authNavigation.onSuccessNavigation(parentFragmentManager)
 //                parentFragmentManager.beginTransaction().replace(
 //                    R.id.fragmentContainerView,
 //                    ContentFragment.newInstance(),
@@ -55,6 +59,8 @@ internal class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>(
     }
 
     override fun onAttach(context: Context) {
+        ViewModelProvider(this).get<AuthComponentViewModel>()
+            .authComponent.inject(this)
         super.onAttach(context)
 
     }

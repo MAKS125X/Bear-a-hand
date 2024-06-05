@@ -8,11 +8,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.category_settings.R
 import com.example.category_settings.databinding.FragmentFilterBinding
+import com.example.category_settings.di.FilterComponentViewModel
 import com.example.ui.MviFragment
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import dagger.Lazy
 import javax.inject.Inject
 
 class FilterFragment : MviFragment<FilterState, FilterSideEffect, FilterEvent>() {
@@ -27,10 +31,10 @@ class FilterFragment : MviFragment<FilterState, FilterSideEffect, FilterEvent>()
     }
 
     @Inject
-    lateinit var factory: FilterViewModel.Factory
+    lateinit var factory: Lazy<FilterViewModel.Factory>
 
     override val viewModel: FilterViewModel by viewModels {
-        factory
+        factory.get()
     }
 
     override fun renderState(state: FilterState) {
@@ -69,6 +73,8 @@ class FilterFragment : MviFragment<FilterState, FilterSideEffect, FilterEvent>()
     }
 
     override fun onAttach(context: Context) {
+        ViewModelProvider(this).get<FilterComponentViewModel>()
+            .newDetailsComponent.inject(this)
         super.onAttach(context)
     }
 

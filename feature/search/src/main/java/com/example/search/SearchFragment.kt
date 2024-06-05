@@ -7,13 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import com.example.search.databinding.FragmentSearchBinding
+import com.example.search.di.SearchComponentViewModel
 import com.example.search.events.EventsFragment
 import com.example.search.models.PagerItem
 import com.example.search.organizations.OrganizationsFragment
 import com.example.ui.MviFragment
 
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.Lazy
 import javax.inject.Inject
 
 class SearchFragment : MviFragment<SearchState, SearchSideEffect, SearchEvent>() {
@@ -22,10 +26,10 @@ class SearchFragment : MviFragment<SearchState, SearchSideEffect, SearchEvent>()
         get() = _binding!!
 
     @Inject
-    lateinit var factory: SearchViewModel.Factory
+    lateinit var factory: Lazy<SearchViewModel.Factory>
 
     override val viewModel: SearchViewModel by activityViewModels {
-        factory
+        factory.get()
     }
 
     override fun renderState(state: SearchState) {
@@ -36,8 +40,9 @@ class SearchFragment : MviFragment<SearchState, SearchSideEffect, SearchEvent>()
     }
 
     override fun onAttach(context: Context) {
+        ViewModelProvider(this).get<SearchComponentViewModel>()
+            .searchComponent.inject(this)
         super.onAttach(context)
-//        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

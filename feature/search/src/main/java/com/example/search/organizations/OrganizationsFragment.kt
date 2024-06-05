@@ -9,15 +9,19 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.search.SearchResultAdapter
 import com.example.search.SearchSideEffect
 import com.example.search.SearchViewModel
 import com.example.search.databinding.FragmentOrganizationsBinding
+import com.example.search.di.SearchComponentViewModel
 import com.example.ui.MviFragment
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import dagger.Lazy
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -31,10 +35,10 @@ class OrganizationsFragment :
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
 
     @Inject
-    lateinit var factory: OrganizationsSearchViewModel.Factory
+    lateinit var factory: Lazy<OrganizationsSearchViewModel.Factory>
 
     override val viewModel: OrganizationsSearchViewModel by viewModels {
-        factory
+        factory.get()
     }
 
     @Inject
@@ -65,8 +69,9 @@ class OrganizationsFragment :
     }
 
     override fun onAttach(context: Context) {
+        ViewModelProvider(this).get<SearchComponentViewModel>()
+            .searchComponent.inject(this)
         super.onAttach(context)
-//        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

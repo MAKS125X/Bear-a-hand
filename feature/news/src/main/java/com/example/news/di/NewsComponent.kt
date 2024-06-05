@@ -24,23 +24,19 @@ internal interface NewsComponent {
 }
 
 interface NewsDeps {
-    //    val moveToEventDetails: (String) -> Unit
-//    fun moveToEventDetails(id: String)
-//    fun moveToSettings()
-//    val moveToSettings: MoveToSettings
-    val moveToEventDetails: MoveToEventDetails
+    val newsComponentNavigation: NewsComponentNavigation
     val eventRepository: EventRepository
     val categoryRepository: CategoryRepository
 }
 
-fun interface MoveToEventDetails {
-    fun moveToEventDetails(fragmentManager: FragmentManager, id: String)
-}
+interface NewsComponentNavigation {
+    fun navigateToEventDetails(
+        fragmentManager: FragmentManager,
+        id: String
+    )
 
-fun interface MoveToSettings {
-    fun moveToSettings()
+    fun navigateToSettings(fragmentManager: FragmentManager)
 }
-
 
 interface NewsDepsProvider {
     @get:RestrictTo(RestrictTo.Scope.LIBRARY)

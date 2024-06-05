@@ -79,19 +79,14 @@ class NewsFragment : MviFragment<NewsState, NewsSideEffect, NewsEvent>() {
     }
 
     private fun moveToEventDetailsFragment(eventId: String) {
-        newsDeps.moveToEventDetails.moveToEventDetails(parentFragmentManager, eventId)
+        newsDeps.newsComponentNavigation.navigateToEventDetails(parentFragmentManager, eventId)
     }
 
     private fun initToolbar() {
         binding.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.open_filter -> {
-//                    newsDeps.moveToSettings.moveToSettings()
-//                    parentFragmentManager.beginTransaction().replace(
-//                        R.id.contentHolder,
-//                        FilterFragment.newInstance(),
-//                        FilterFragment.TAG,
-//                    ).addToBackStack(FilterFragment.TAG).commit()
+                    newsDeps.newsComponentNavigation.navigateToSettings(parentFragmentManager)
                 }
             }
             true

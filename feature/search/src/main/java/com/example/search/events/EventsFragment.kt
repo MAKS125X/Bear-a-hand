@@ -9,15 +9,20 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.search.SearchResultAdapter
 import com.example.search.SearchSideEffect
 import com.example.search.SearchViewModel
 import com.example.search.databinding.FragmentEventsBinding
+import com.example.search.di.SearchComponent
+import com.example.search.di.SearchComponentViewModel
 import com.example.ui.MviFragment
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import dagger.Lazy
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -30,10 +35,10 @@ class EventsFragment : MviFragment<EventSearchState, EventSearchSideEffect, Even
     private val adapter: SearchResultAdapter by lazy { SearchResultAdapter() }
 
     @Inject
-    lateinit var factory: EventSearchViewModel.Factory
+    lateinit var factory: Lazy<EventSearchViewModel.Factory>
 
     override val viewModel: EventSearchViewModel by viewModels {
-        factory
+        factory.get()
     }
 
     @Inject
@@ -65,8 +70,9 @@ class EventsFragment : MviFragment<EventSearchState, EventSearchSideEffect, Even
     }
 
     override fun onAttach(context: Context) {
+        ViewModelProvider(this).get<SearchComponentViewModel>()
+            .searchComponent.inject(this)
         super.onAttach(context)
-//        context.appComponent.inject(this)
     }
 
     override fun onCreateView(

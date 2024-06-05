@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-internal class AuthViewModel : MviViewModel<AuthState, AuthSideEffect, AuthEvent>(AuthState()) {
+class AuthViewModel : MviViewModel<AuthState, AuthSideEffect, AuthEvent>(AuthState()) {
     override fun reduce(state: AuthState, event: AuthEvent) {
         when (event) {
             is AuthEvent.Internal.AuthError -> {

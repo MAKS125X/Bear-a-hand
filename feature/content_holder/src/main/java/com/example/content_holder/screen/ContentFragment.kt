@@ -5,11 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import com.example.content_holder.R
 import com.example.content_holder.databinding.FragmentContentBinding
+import com.example.content_holder.di.ContentDeps
+import com.example.content_holder.di.ContentHolderComponentViewModel
 import com.example.ui.MviFragment
+import dagger.Lazy
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEvent>() {
     private var _binding: FragmentContentBinding? = null
@@ -26,10 +33,13 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
     }
 
     @Inject
-    lateinit var factory: ContentViewModel.Factory
+    lateinit var deps: ContentDeps
+
+    @Inject
+    lateinit var factory: Lazy<ContentViewModel.Factory>
 
     override val viewModel: ContentViewModel by activityViewModels {
-        factory
+        factory.get()
     }
 
     override fun renderState(state: ContentState) {
@@ -43,8 +53,9 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
     }
 
     override fun onAttach(context: Context) {
+        ViewModelProvider(this).get<ContentHolderComponentViewModel>()
+            .newDetailsComponent.inject(this)
         super.onAttach(context)
-//        context.appComponent.inject(this)
     }
 
     override fun onViewCreated(
@@ -53,69 +64,45 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-//        initBottomNavigation()
+        initBottomNavigation()
 
         if (savedInstanceState == null) {
             binding.bottomNavigationView.selectedItemId = R.id.help_menu
         }
     }
 
-//    private fun initBottomNavigation() {
-//        binding.bottomNavigationView.setOnItemSelectedListener {
-//            when (it.itemId) {
-//                R.id.profile_menu -> {
-//                    parentFragmentManager.beginTransaction().replace(
-//                        binding.contentHolder.id,
-//                        ProfileFragment.newInstance(),
-//                        ProfileFragment.TAG,
-//                    ).commit()
-//                }
-//
-//                R.id.help_menu -> {
-//                    parentFragmentManager.beginTransaction().replace(
-//                        binding.contentHolder.id,
-//                        HelpFragment.newInstance(),
-//                        HelpFragment.TAG,
-//                    ).commit()
-//                }
-//
-//                R.id.search_menu -> {
-//                    parentFragmentManager.beginTransaction().replace(
-//                        binding.contentHolder.id,
-//                        SearchFragment.newInstance(),
-//                        SearchFragment.TAG,
-//                    ).commit()
-//                }
-//
-//                R.id.news_menu -> {
-//                    val currentFragment =
-//                        parentFragmentManager.findFragmentById(R.id.fragmentHolder)
-//                    if (currentFragment !is EventDetailsFragment) {
-//                        parentFragmentManager.beginTransaction().replace(
-//                            binding.contentHolder.id,
-//                            NewsFragment.newInstance(),
-//                            NewsFragment.TAG,
-//                        ).commit()
-//                    }
-//                }
-//
-//                R.id.history_menu -> {
-//                    parentFragmentManager.beginTransaction().replace(
-//                        binding.contentHolder.id,
-//                        HistoryFragment.newInstance(),
-//                        HistoryFragment.TAG,
-//                    ).commit()
-//                }
-//
-//                else -> {
-//                    val toastMassage = it.title
-//                    Toast.makeText(requireContext(), toastMassage, Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            true
-//        }
-//    }
+    private fun initBottomNavigation() {
+        binding.bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.profile_menu -> {
+                    deps.contentHolderNavigation.navigateToProfile(binding.contentHolder.id, parentFragmentManager)
+                }
+
+                R.id.help_menu -> {
+                    deps.contentHolderNavigation.navigateToHelp(binding.contentHolder.id, parentFragmentManager)
+                }
+
+                R.id.search_menu -> {
+                    deps.contentHolderNavigation.navigateToSearch(binding.contentHolder.id, parentFragmentManager)
+                }
+
+                R.id.news_menu -> {
+                    deps.contentHolderNavigation.navigateToNews(binding.contentHolder.id, parentFragmentManager)
+                }
+
+                R.id.history_menu -> {
+                    deps.contentHolderNavigation.navigateToHistory(binding.contentHolder.id, parentFragmentManager)
+                }
+
+                else -> {
+                    val toastMassage = it.title
+                    Toast.makeText(requireContext(), toastMassage, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            true
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
