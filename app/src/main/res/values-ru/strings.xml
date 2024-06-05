@@ -1,60 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Хочу помочь</string>
-    <string name="mode_icon">Редактировать</string>
-    <string name="push">Получать push-уведомления</string>
-    <string name="your_friends">Ваши друзья</string>
-    <string name="profile_picture">Картинка профиля</string>
-    <string name="logout">Выйти из аккаунта</string>
-    <string name="news">Новости</string>
-    <string name="search">Поиск</string>
-    <string name="help">Помочь</string>
-    <string name="history">История</string>
-    <string name="profile">Профиль</string>
+
     <string name="loading">Загрузка…</string>
     <string name="mobile_simbir_soft">MobileSimbirSoft</string>
-    <string name="pick_photo">Выбрать фото</string>
-    <string name="take_picture">Сделать снимок</string>
-    <string name="delete_picture">Удалить</string>
-    <string name="select_help_category">Выберите категорию помощи:</string>
-    <string name="filter">Фильтр</string>
-    <string name="adults">Взрослые</string>
-    <string name="children">Дети</string>
-    <string name="animals">Животные</string>
-    <string name="events">Мероприятия</string>
-    <string name="old">Пожилые</string>
+
     <string name="incorrect_data_format">Неверный формат файла</string>
     <string name="unknown_category">Неизвестная категория</string>
-    <string name="accept">Подтвердить</string>
-    <string name="write_us_underline"> <u>Напишите нам</u> </string>
-    <string name="go_to_organizer"> <u>Перейти на сайт организации</u> </string>
-    <string name="nothing_was_found_based_on_filters">На основании ваших фильтров ничего не найдено</string>
+
     <string name="not_select_any_categories">Вы не выбрали ни одной категории</string>
-    <string name="do_you_have_questions">У вас есть вопросы?</string>
-    <string name="event_already_ended">Мероприятие уже закончилось</string>
-    <string name="will_start_soon">Начнётся через %1$s дней (%2$s – %3$s)</string>
-    <string name="days_left">Осталось %1$s дней (%2$s – %3$s)</string>
-    <string name="charitable_assistance">Благотворительная помощь</string>
-    <string name="empty_category_list_error">Произошла ошибка получения категорий. Настройте интересующие вас категории.</string>
-    <string name="error_occurred_while_receiving_data">Произошла ошибка при получении данных</string>
-    <string name="forget_password"><u>Забыли пароль?</u></string>
-    <string name="registration"><u>Регистрация</u></string>
-    <string name="authorization">Авторизация</string>
-    <string name="login_via_socials">Для участия в мероприятиях войдите в приложение через социальные сети</string>
-    <string name="login_through_app">Или авторизуйтесь через приложение</string>
-    <string name="email">E-mail</string>
-    <string name="enter_email">Введите e-mail</string>
-    <string name="password">Пароль</string>
-    <string name="enter_password">Введите пароль</string>
-    <string name="login">Войти</string>
-    <string name="event">Событие</string>
-    <string name="search_result_events_size">Результаты поиска: %1$s мероприятий</string>
-    <string name="search_result_organizations_size">Результаты поиска: %1$s организаций</string>
-    <string name="try_search_events">Напишите в строке поиска название \nмероприятия или ключевые слова.</string>
-    <string name="try_search_organization">Напишите в строке поиска название \nорганизации или ключевые слова.</string>
-    <string name="data_acquisition_error_occurred">Произошла ошибка получения данных</string>
-    <string name="unexpected_error">Произошла непредвиденная ошибка</string>
-    <string name="timeout_error">Время ожидания ответа истекло</string>
-    <string name="connection_error">Ошибка подключения к сети</string>
-    <string name="empty_search_result">По данному запросу ничего не найдено</string>
+
+    <string name="select_help_category">Выберите категорию помощи:</string>
 </resources>

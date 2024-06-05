@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="forget_password"><u>Забыли пароль?</u></string>
+    <string name="registration"><u>Регистрация</u></string>
+    <string name="authorization">Авторизация</string>
+    <string name="email">E-mail</string>
+    <string name="enter_email">Введите e-mail</string>
+    <string name="password">Пароль</string>
+    <string name="enter_password">Введите пароль</string>
+    <string name="login">Войти</string>
+    <string name="login_via_socials">Для участия в мероприятиях войдите в приложение через социальные сети</string>
+    <string name="login_through_app">Или авторизуйтесь через приложение</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pick_photo">Выбрать фото</string>
+    <string name="take_picture">Сделать снимок</string>
+    <string name="delete_picture">Удалить</string>
+    <string name="push">Получать push-уведомления</string>
+    <string name="your_friends">Ваши друзья</string>
+    <string name="profile_picture">Картинка профиля</string>
+    <string name="logout">Выйти из аккаунта</string>
+    <string name="mode_icon">Редактировать</string>
+</resources>

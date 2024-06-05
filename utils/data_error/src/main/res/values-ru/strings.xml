@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="data_acquisition_error_occurred">Произошла ошибка получения данных</string>
+    <string name="unexpected_error">Произошла непредвиденная ошибка</string>
+    <string name="timeout_error">Время ожидания ответа истекло</string>
+    <string name="connection_error">Ошибка подключения к сети</string>
+    <string name="error_occurred_while_receiving_data">Произошла ошибка при получении данных</string>
+</resources>
