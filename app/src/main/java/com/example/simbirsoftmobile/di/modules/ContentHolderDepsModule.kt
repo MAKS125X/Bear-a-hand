@@ -9,7 +9,6 @@ import com.example.history.screen.HistoryFragment
 import com.example.news.screen.NewsFragment
 import com.example.profile.screen.ProfileFragment
 import com.example.search.SearchFragment
-import com.example.simbirsoftmobile.R
 import dagger.Binds
 import dagger.Module
 import javax.inject.Inject

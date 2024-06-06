@@ -92,20 +92,20 @@ class EventDetailsFragment :
 
                 toolbar.setOnMenuItemClickListener {
                     when (it.itemId) {
-//                        R.id.share_event -> {
-//                            val shareIntent =
-//                                Intent().apply {
-//                                    action = Intent.ACTION_SEND
-//                                    putExtra(Intent.EXTRA_TEXT, event.name)
-//                                    type = "text/plain"
-//                                }
-//                            startActivity(
-//                                Intent.createChooser(
-//                                    shareIntent,
-//                                    "Поделиться событием",
-//                                )
-//                            )
-//                        }
+                        detailsR.id.share_event -> {
+                            val shareIntent =
+                                Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT, event.name)
+                                    type = "text/plain"
+                                }
+                            startActivity(
+                                Intent.createChooser(
+                                    shareIntent,
+                                    "Поделиться событием",
+                                )
+                            )
+                        }
                     }
                     true
                 }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
 import javax.inject.Inject
+import javax.inject.Provider
 
 class EventDetailsViewModel(
     private val getEventDetailsUseCase: GetEventDetailsUseCase,
@@ -97,13 +98,13 @@ class EventDetailsViewModel(
     }
 
     class Factory @Inject constructor(
-        private val getEventDetailsUseCase: GetEventDetailsUseCase,
+        private val getEventDetailsUseCase: Provider<GetEventDetailsUseCase>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             require(modelClass == EventDetailsViewModel::class.java)
             return EventDetailsViewModel(
-                getEventDetailsUseCase,
+                getEventDetailsUseCase.get(),
                 extras.createSavedStateHandle(),
             ) as T
         }

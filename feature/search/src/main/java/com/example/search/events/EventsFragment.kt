@@ -18,7 +18,6 @@ import com.example.search.SearchResultAdapter
 import com.example.search.SearchSideEffect
 import com.example.search.SearchViewModel
 import com.example.search.databinding.FragmentEventsBinding
-import com.example.search.di.SearchComponent
 import com.example.search.di.SearchComponentViewModel
 import com.example.ui.MviFragment
 import com.google.android.material.divider.MaterialDividerItemDecoration

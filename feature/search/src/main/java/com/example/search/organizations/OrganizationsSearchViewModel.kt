@@ -12,6 +12,7 @@ import com.example.ui.UiText
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import javax.inject.Provider
 
 class OrganizationsSearchViewModel(
     private val searchOrganizationsUseCase: SearchOrganizationsUseCase,
@@ -82,12 +83,12 @@ class OrganizationsSearchViewModel(
     }
 
     class Factory @Inject constructor(
-        private val searchOrganizationsUseCase: SearchOrganizationsUseCase,
+        private val searchOrganizationsUseCase: Provider<SearchOrganizationsUseCase>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass == OrganizationsSearchViewModel::class.java)
-            return OrganizationsSearchViewModel(searchOrganizationsUseCase) as T
+            return OrganizationsSearchViewModel(searchOrganizationsUseCase.get()) as T
         }
     }
 }

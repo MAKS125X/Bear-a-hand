@@ -47,7 +47,6 @@ class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
         }
 
         private fun ItemCategoryBinding.setupUI(model: CategoryLongUi) {
-//            categoryNameIV.setImageResource(helpR.drawable.category_unknown)
             categoryNameIV.load(model.imageUrl) {
                 placeholder(commonR.drawable.loading_animation)
                 this.crossfade(100)

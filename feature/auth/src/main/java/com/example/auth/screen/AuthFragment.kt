@@ -41,11 +41,6 @@ class AuthFragment : MviFragment<AuthState, AuthSideEffect, AuthEvent>() {
         when (effect) {
             AuthSideEffect.NavigateToContent -> {
                 authDeps.authNavigation.onSuccessNavigation(parentFragmentManager)
-//                parentFragmentManager.beginTransaction().replace(
-//                    R.id.fragmentContainerView,
-//                    ContentFragment.newInstance(),
-//                    ContentFragment.TAG,
-//                ).commit()
             }
 
             is AuthSideEffect.NavigateToForgetPassword -> {

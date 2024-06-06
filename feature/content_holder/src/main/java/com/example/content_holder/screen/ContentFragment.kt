@@ -16,7 +16,6 @@ import com.example.content_holder.di.ContentHolderComponentViewModel
 import com.example.ui.MviFragment
 import dagger.Lazy
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEvent>() {
     private var _binding: FragmentContentBinding? = null

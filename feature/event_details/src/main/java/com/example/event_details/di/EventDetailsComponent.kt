@@ -1,7 +1,6 @@
 package com.example.event_details.di
 
 import androidx.annotation.RestrictTo
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import com.example.core.di.Feature
 import com.example.core.repositories.EventRepository

@@ -39,38 +39,3 @@ data class EventDto(
         )
     }
 }
-
-//fun EventDto.toPartialEntity() = EventPartialEntity(
-//    id,
-//    name,
-//    startDate,
-//    endDate,
-//    description,
-//    status,
-//    photo,
-//    category,
-//    createdAt,
-//    phone,
-//    email,
-//    address,
-//    organization,
-//    url,
-//)
-//
-//fun EventDto.toEntity(isRead: Boolean) = EventEntity(
-//    id,
-//    name,
-//    startDate,
-//    endDate,
-//    description,
-//    status,
-//    photo,
-//    category,
-//    createdAt,
-//    phone,
-//    email,
-//    address,
-//    organization,
-//    url,
-//    isRead,
-//)

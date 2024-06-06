@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import javax.inject.Inject
+import javax.inject.Provider
 
 class FilterViewModel(
     private val getCategorySettingsUseCase: GetCategorySettingsUseCase,
@@ -128,13 +129,16 @@ class FilterViewModel(
     }
 
     class Factory @Inject constructor(
-        private val getCategorySettingsUseCase: GetCategorySettingsUseCase,
-        private val updateCategoriesSettingsUseCase: UpdateCategoriesSettingsUseCase,
+        private val getCategorySettingsUseCase: Provider<GetCategorySettingsUseCase>,
+        private val updateCategoriesSettingsUseCase: Provider<UpdateCategoriesSettingsUseCase>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass == FilterViewModel::class.java)
-            return FilterViewModel(getCategorySettingsUseCase, updateCategoriesSettingsUseCase) as T
+            return FilterViewModel(
+                getCategorySettingsUseCase.get(),
+                updateCategoriesSettingsUseCase.get()
+            ) as T
         }
     }
 }

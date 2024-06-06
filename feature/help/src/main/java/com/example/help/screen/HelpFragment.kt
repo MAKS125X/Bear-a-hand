@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
 import com.example.help.databinding.FragmentHelpBinding
-import com.example.help.di.HelpComponent
 import com.example.help.di.HelpComponentViewModel
 import com.example.ui.MviFragment
 import dagger.Lazy

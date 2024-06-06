@@ -24,7 +24,7 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:menu="@menu/profile_toolbar_menu"
             app:popupTheme="@style/Base.Theme.SimbirSoftMobile"
-            app:titleTextColor="?attr/colorOnPrimary">
+            >
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/toolbarTitleTV"
@@ -33,6 +33,7 @@
                 android:layout_gravity="center"
                 android:text="@string/profile"
                 android:theme="@style/ToolbarTitle"
+                android:textColor="?attr/colorOnPrimary"
                 tools:text="Профиль" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

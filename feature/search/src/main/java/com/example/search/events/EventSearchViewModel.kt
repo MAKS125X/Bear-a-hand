@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
 import javax.inject.Inject
+import javax.inject.Provider
 
 class EventSearchViewModel(
     private val searchEventsUseCase: SearchEventsUseCase,
@@ -89,12 +90,12 @@ class EventSearchViewModel(
     }
 
     class Factory @Inject constructor(
-        private val searchEventsUseCase: SearchEventsUseCase,
+        private val searchEventsUseCase: Provider<SearchEventsUseCase>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass == EventSearchViewModel::class.java)
-            return EventSearchViewModel(searchEventsUseCase) as T
+            return EventSearchViewModel(searchEventsUseCase.get()) as T
         }
     }
 }

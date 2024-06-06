@@ -11,8 +11,6 @@ import com.example.event_details.di.EventDepsStore
 import com.example.help.di.HelpDepsStore
 import com.example.news.di.NewsDepsStore
 import com.example.search.di.SearchCDepsStore
-import com.example.search.di.SearchDeps
-import com.example.simbirsoftmobile.di.modules.AuthDepsModule
 
 class SimbirSoftApp : Application(), ImageLoaderFactory {
     val appComponent: AppComponent by lazy {
@@ -33,7 +31,6 @@ class SimbirSoftApp : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
-        //TODO: Add DI
         return ImageLoader
             .Builder(this)
             .diskCachePolicy(CachePolicy.DISABLED)

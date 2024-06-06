@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
 import javax.inject.Inject
+import javax.inject.Provider
 
 class ContentViewModel(
     private val getUnreadEventsCountUseCase: GetUnreadEventsCountUseCase,
@@ -52,12 +53,12 @@ class ContentViewModel(
     }
 
     class Factory @Inject constructor(
-        private val getUnreadEventsCountUseCase: GetUnreadEventsCountUseCase,
+        private val getUnreadEventsCountUseCase: Provider<GetUnreadEventsCountUseCase>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass == ContentViewModel::class.java)
-            return ContentViewModel(getUnreadEventsCountUseCase) as T
+            return ContentViewModel(getUnreadEventsCountUseCase.get()) as T
         }
     }
 }

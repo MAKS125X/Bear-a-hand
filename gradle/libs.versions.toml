@@ -20,7 +20,7 @@ recyclerview = "1.3.2"
 retrofit = "2.9.0"
 room = "2.6.1"
 rxandroid = "3.0.2"
-rxjava = "3.1.8"
+rxjava3 = "3.1.8"
 viewpager2 = "1.0.0"
 androidGradlePlugin = "8.2.2"
 kotlinPlugin = "1.9.22"
@@ -56,7 +56,7 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroid" }
-rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
+rxjava3 = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

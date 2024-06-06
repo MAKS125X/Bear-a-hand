@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
 import javax.inject.Inject
+import javax.inject.Provider
 
 class HelpViewModel(
     private val getCategoriesUseCase: GetCategoriesUseCase,
@@ -89,12 +90,12 @@ class HelpViewModel(
     }
 
     class Factory @Inject constructor(
-        private val getCategoriesUseCase: GetCategoriesUseCase,
+        private val getCategoriesUseCase: Provider<GetCategoriesUseCase>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass == HelpViewModel::class.java)
-            return HelpViewModel(getCategoriesUseCase) as T
+            return HelpViewModel(getCategoriesUseCase.get()) as T
         }
     }
 }
