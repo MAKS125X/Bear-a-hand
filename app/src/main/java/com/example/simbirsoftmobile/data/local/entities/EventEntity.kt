@@ -33,6 +33,7 @@ data class EventEntity(
     val address: String,
     val organization: String,
     val url: String,
+    val isRead: Boolean = false,
 ) : DataMapper<EventModel> {
     override fun mapToDomain() = EventModel(
         id,
@@ -49,6 +50,7 @@ data class EventEntity(
         email,
         organization,
         url,
+        isRead,
     )
 }
 

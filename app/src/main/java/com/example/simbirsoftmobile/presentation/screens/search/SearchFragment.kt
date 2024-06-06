@@ -1,58 +1,43 @@
 package com.example.simbirsoftmobile.presentation.screens.search
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.activityViewModels
 import com.example.simbirsoftmobile.databinding.FragmentSearchBinding
+import com.example.simbirsoftmobile.di.appComponent
+import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.search.events.EventsFragment
 import com.example.simbirsoftmobile.presentation.screens.search.models.PagerItem
 import com.example.simbirsoftmobile.presentation.screens.search.organizations.OrganizationsFragment
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchFragment : Fragment() {
+class SearchFragment : MviFragment<SearchState, SearchSideEffect, SearchEvent>() {
     private var _binding: FragmentSearchBinding? = null
     private val binding: FragmentSearchBinding
         get() = _binding!!
 
-    private var pagerItems: List<PagerItem>? = null
+    @Inject
+    lateinit var factory: SearchViewModel.Factory
 
-    private fun sendFragmentApiQuery(query: String) {
-        childFragmentManager.setFragmentResult(
-            if (binding.fragmentViewPager.currentItem == 0) QUERY_EVENT_KEY else QUERY_ORGANIZATION_KEY,
-            bundleOf(RESULT_KEY to query),
-        )
+    override val viewModel: SearchViewModel by activityViewModels {
+        factory
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (isVisible && isAdded) {
-            outState.putString(RESULT_KEY, binding.searchView.query.toString())
+    override fun renderState(state: SearchState) {
+        super.renderState(state)
+        with(binding) {
+            searchView.setQuery(state.searchQuery, false)
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        pagerItems =
-            listOf(
-                PagerItem("По мероприятиям", EventsFragment.newInstance()),
-                PagerItem("По НКО", OrganizationsFragment.newInstance()),
-            )
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(
@@ -64,69 +49,58 @@ class SearchFragment : Fragment() {
         return binding.root
     }
 
-    @OptIn(FlowPreview::class)
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (savedInstanceState != null) {
-            val query = savedInstanceState.getString(RESULT_KEY)
-            if (query != null) {
-                binding.searchView.setQuery(query, true)
-            }
-        }
+        initPager()
+        initSearchView()
+    }
+
+    private fun initPager() {
+        val pagerItems =
+            listOf(
+                PagerItem("По мероприятиям", EventsFragment.newInstance()),
+                PagerItem("По НКО", OrganizationsFragment.newInstance()),
+            )
 
         val pagerAdapter = PagerAdapter(childFragmentManager, lifecycle)
         binding.fragmentViewPager.adapter = pagerAdapter
 
-        pagerItems?.let { list ->
-            pagerItems?.let {
-                pagerAdapter.update(list.map { it.fragment })
-                TabLayoutMediator(binding.tabLayout, binding.fragmentViewPager) { tab, position ->
-                    tab.text = list[position].title
-                }.attach()
-            }
-
-            lifecycleScope.launch {
-                initSearchObserver()
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                    .filter { str -> str.isNotBlank() }
-                    .distinctUntilChanged()
-                    .debounce(500)
-                    .flowOn(Dispatchers.IO)
-                    .collect {
-                        sendFragmentApiQuery(it)
-                    }
-            }
-        }
+        pagerAdapter.update(pagerItems.map { it.fragment })
+        TabLayoutMediator(binding.tabLayout, binding.fragmentViewPager) { tab, position ->
+            tab.text = pagerItems[position].title
+        }.attach()
     }
 
-    private fun initSearchObserver(): StateFlow<String> {
-        val stateFlow = MutableStateFlow<String>("")
+    private fun initSearchView() {
         with(binding) {
             searchView.setOnSearchClickListener {
-                searchView.query?.let { stateFlow.value = it.toString() }
+                searchView.query?.let {
+                    viewModel.consumeEvent(SearchEvent.Ui.UpdateSearchQuery(it.toString()))
+                }
             }
 
             searchView.setOnQueryTextListener(
-                object :
-                    SearchView.OnQueryTextListener {
+                object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
-                        query?.let { stateFlow.value = it }
+                        query?.let {
+                            viewModel.consumeEvent(SearchEvent.Ui.UpdateSearchQuery(it))
+                        }
                         return true
                     }
 
                     override fun onQueryTextChange(p0: String?): Boolean {
-                        p0?.let { stateFlow.value = it }
+                        p0?.let {
+                            viewModel.consumeEvent(SearchEvent.Ui.UpdateSearchQuery(it))
+                        }
                         return true
                     }
-                },
+                }
             )
         }
-
-        return stateFlow
     }
 
     override fun onDestroyView() {
@@ -136,11 +110,6 @@ class SearchFragment : Fragment() {
 
     companion object {
         const val TAG = "SearchFragment"
-
-        const val QUERY_EVENT_KEY = "SearchFragmentEventResult"
-        const val QUERY_ORGANIZATION_KEY = "SearchFragmentOrganizationResult"
-
-        const val RESULT_KEY = "SearchFragmentKey"
 
         @JvmStatic
         fun newInstance() = SearchFragment()

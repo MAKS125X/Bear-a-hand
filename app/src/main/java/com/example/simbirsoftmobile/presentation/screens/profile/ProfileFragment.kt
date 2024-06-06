@@ -11,21 +11,21 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEditPhotoDialogBinding
 import com.example.simbirsoftmobile.databinding.FragmentProfileBinding
-import com.example.simbirsoftmobile.presentation.models.friend.FriendUI
+import com.example.simbirsoftmobile.presentation.base.MviFragment
 import java.io.File
 import java.io.FileOutputStream
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEvent>() {
     private var _binding: FragmentProfileBinding? = null
     private val binding: FragmentProfileBinding
         get() = _binding!!
 
-    private val adapter: FriendAdapter by lazy { FriendAdapter(testList) }
+    private val adapter: FriendAdapter = FriendAdapter()
 
     private val profilePhotoFile: File
         get() {
@@ -53,8 +53,8 @@ class ProfileFragment : Fragment() {
     private val takePhotoForResult =
         registerForActivityResult(ActivityResultContracts.TakePicture()) {
             if (it != null && it) {
-
-                updateImage()
+                viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(null))
+                viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(profilePhotoUri))
             }
         }
 
@@ -67,6 +67,28 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+
+    override val viewModel: ProfileViewModel by viewModels()
+
+    override fun renderState(state: ProfileState) {
+        with(binding) {
+            if (state.image != null) {
+                layoutBased.profileIV.setImageURI(state.image)
+            } else {
+                layoutBased.profileIV.setImageResource(R.drawable.ic_standard_profile)
+            }
+
+            adapter.submitList(state.friends)
+        }
+    }
+
+    override fun handleSideEffects(effect: ProfileSideEffect) {
+        when (effect) {
+            ProfileSideEffect.DeletePicture -> {
+                profilePhotoFile.delete()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,7 +106,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (profilePhotoFile.exists()) {
-            binding.layoutBased.profileIV.setImageURI(profilePhotoUri)
+            viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(profilePhotoUri))
         }
 
         binding.layoutBased.profileIV.setOnClickListener {
@@ -112,10 +134,10 @@ class ProfileFragment : Fragment() {
             dialog.dismiss()
         }
         dialogBinding.deletePictureLayout.setOnClickListener {
-            profilePhotoFile.delete()
-            binding.layoutBased.profileIV.setImageResource(R.drawable.ic_standard_profile)
+            viewModel.consumeEvent(ProfileEvent.Ui.DeletePicture)
             dialog.dismiss()
         }
+
         dialog.show()
     }
 
@@ -134,12 +156,7 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        updateImage()
-    }
-
-    private fun updateImage() {
-        binding.layoutBased.profileIV.setImageURI(null)
-        binding.layoutBased.profileIV.setImageURI(profilePhotoUri)
+        viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(imageUri))
     }
 
     override fun onDestroyView() {
@@ -152,21 +169,5 @@ class ProfileFragment : Fragment() {
         fun newInstance() = ProfileFragment()
 
         const val TAG = "ProfileFragment"
-
-        private val testList =
-            arrayOf(
-                FriendUI(
-                    "Дмитрий Валерьевич",
-                    "https://wallpaperforu.com/wp-content/uploads/2023/11/Leonardo-DiCaprio-Hd-Wallpapers-For-Pc.jpg",
-                ),
-                FriendUI(
-                    "Евгений Александров",
-                    "https://i.ytimg.com/vi/70jYjONsXTU/maxresdefault.jpg",
-                ),
-                FriendUI(
-                    "Виктор Кузнецов",
-                    "https://i.pinimg.com/originals/74/8c/ea/748ceabaaf1c09d7d00ce1813681343c.jpg",
-                ),
-            )
     }
 }

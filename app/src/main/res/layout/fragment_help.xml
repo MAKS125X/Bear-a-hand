@@ -28,11 +28,22 @@
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/titleTextView"
+        android:id="@+id/titleTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/help_fragment_title_text_margin_vertical"
         android:text="@string/select_help_category"
+        android:theme="@style/ScreenH2TextView"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/errorTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/help_fragment_title_text_margin_vertical"
         android:theme="@style/ScreenH2TextView"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/toolbar"
@@ -49,7 +60,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+        app:layout_constraintTop_toBottomOf="@+id/titleTV"
         app:spanCount="2"
         tools:itemCount="5"
         tools:listitem="@layout/item_category" />

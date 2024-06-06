@@ -56,4 +56,5 @@
     <string name="unexpected_error">Произошла непредвиденная ошибка</string>
     <string name="timeout_error">Время ожидания ответа истекло</string>
     <string name="connection_error">Ошибка подключения к сети</string>
+    <string name="empty_search_result">По данному запросу ничего не найдено</string>
 </resources>

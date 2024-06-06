@@ -1,11 +1,12 @@
 package com.example.simbirsoftmobile.data.repositories.localWithFetch
 
-import com.example.simbirsoftmobile.data.local.TransactionProvider
 import com.example.simbirsoftmobile.data.local.daos.EventDao
 import com.example.simbirsoftmobile.data.local.entities.toOrganization
 import com.example.simbirsoftmobile.data.network.api.EventService
 import com.example.simbirsoftmobile.data.network.api.requests.EventsByCategoriesRequest
 import com.example.simbirsoftmobile.data.network.dtos.event.toEntity
+import com.example.simbirsoftmobile.data.network.dtos.event.toPartialEntity
+import com.example.simbirsoftmobile.data.utils.getLocalResources
 import com.example.simbirsoftmobile.data.utils.getRequestFlowDto
 import com.example.simbirsoftmobile.data.utils.mapToDomain
 import com.example.simbirsoftmobile.data.utils.networkBoundResource
@@ -17,15 +18,18 @@ import com.example.simbirsoftmobile.domain.models.event.OrganizationModel
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
 import com.example.simbirsoftmobile.domain.utils.mapDataResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import javax.inject.Inject
 
-class EventRepositoryWithFetch(
+class EventRepositoryWithFetch @Inject constructor(
     private val eventService: EventService,
     private val dao: EventDao,
-    private val transactionProvider: TransactionProvider,
 ) : EventRepository {
     private var shouldFetch = true
 
-    override fun getEventsByCategory(vararg categoryIds: String): Flow<Either<DataError, DataResult<List<EventModel>>>> =
+    override fun getEventsByCategory(
+        vararg categoryIds: String,
+    ): Flow<Either<DataError, DataResult<List<EventModel>>>> =
         networkBoundResource(
             localQuery = {
                 dao.getEvents(categoryIds.toList())
@@ -35,11 +39,9 @@ class EventRepositoryWithFetch(
                     eventService.getEvents(EventsByCategoriesRequest(categoryIds.toList()))
                 }
             },
-            saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
-                shouldFetch = false
+            saveFetchResult = { list ->
+                dao.insertOrUpdateEvent(list.map { it.toPartialEntity() })
+                this.shouldFetch = false
             },
             shouldFetch = shouldFetch,
         ).mapDataResult {
@@ -49,7 +51,7 @@ class EventRepositoryWithFetch(
     override fun getEventById(id: String): Flow<Either<DataError, DataResult<EventModel>>> =
         networkBoundResource(
             localQuery = {
-                dao.getEventById(id)
+                dao.observeEventWithUpdatingState(id)
             },
             apiFetch = {
                 getRequestFlowDto {
@@ -57,9 +59,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.addEvents(it.map { it.toEntity(true) })
             },
             shouldFetch = shouldFetch,
         ).mapDataResult {
@@ -77,9 +77,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.insertOrUpdateEvent(it.map { it.toPartialEntity() })
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
@@ -98,9 +96,7 @@ class EventRepositoryWithFetch(
                 }
             },
             saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+                dao.insertOrUpdateEvent(it.map { it.toPartialEntity() })
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
@@ -118,14 +114,18 @@ class EventRepositoryWithFetch(
                     eventService.getEvents()
                 }
             },
-            saveFetchResult = {
-                transactionProvider.runAsTransaction {
-                    dao.addEvents(it.map { it.toEntity() })
-                }
+            saveFetchResult = { list ->
+                dao.insertOrUpdateEvent(list.map { it.toPartialEntity() })
                 shouldFetch = false
             },
             shouldFetch = shouldFetch,
         ).mapDataResult { list ->
             list.map { it.toOrganization() }.distinctBy { it.name }
+        }
+
+    override fun observeUnreadEventsByCategories(vararg categoryIds: String): Flow<Either<DataError, DataResult<Int>>> =
+        getLocalResources {
+            dao.observeUnreadEventsCountByCategory(categoryIds.toList())
+                .distinctUntilChanged()
         }
 }

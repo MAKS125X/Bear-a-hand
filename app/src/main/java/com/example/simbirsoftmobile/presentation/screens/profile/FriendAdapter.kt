@@ -4,6 +4,8 @@ import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
@@ -11,9 +13,7 @@ import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.ItemFriendBinding
 import com.example.simbirsoftmobile.presentation.models.friend.FriendUI
 
-class FriendAdapter(
-    private val friendList: Array<FriendUI>,
-) : RecyclerView.Adapter<FriendAdapter.ViewHolder>() {
+class FriendAdapter : ListAdapter<FriendUI, FriendAdapter.ViewHolder>(DiffCallback) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -26,13 +26,13 @@ class FriendAdapter(
             ),
         )
 
-    override fun getItemCount(): Int = friendList.size
+    override fun getItemCount(): Int = currentList.size
 
     override fun onBindViewHolder(
         holder: ViewHolder,
         position: Int,
     ) {
-        holder.bind(friendList[position])
+        holder.bind(currentList[position])
     }
 
     class ViewHolder(private val binding: ItemFriendBinding) :
@@ -69,5 +69,24 @@ class FriendAdapter(
                 outRect.bottom = 0
             }
         }
+    }
+
+    companion object {
+        private val DiffCallback =
+            object : DiffUtil.ItemCallback<FriendUI>() {
+                override fun areItemsTheSame(
+                    oldItem: FriendUI,
+                    newItem: FriendUI,
+                ): Boolean {
+                    return oldItem == newItem
+                }
+
+                override fun areContentsTheSame(
+                    oldItem: FriendUI,
+                    newItem: FriendUI,
+                ): Boolean {
+                    return oldItem.imageUrl == newItem.imageUrl
+                }
+            }
     }
 }

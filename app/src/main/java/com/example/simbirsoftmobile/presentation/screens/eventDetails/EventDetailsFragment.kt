@@ -1,128 +1,49 @@
 package com.example.simbirsoftmobile.presentation.screens.eventDetails
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
+import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import coil.ImageLoader
 import coil.load
 import coil.request.ImageRequest
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentEventDetailsBinding
-import com.example.simbirsoftmobile.domain.core.DataError
-import com.example.simbirsoftmobile.domain.core.Either
-import com.example.simbirsoftmobile.domain.usecases.GetEventDetailsUseCase
-import com.example.simbirsoftmobile.presentation.models.event.EventLongUi
-import com.example.simbirsoftmobile.presentation.models.event.mapToLongUi
-import com.example.simbirsoftmobile.presentation.screens.utils.UiState
+import com.example.simbirsoftmobile.di.appComponent
+import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.utils.getRemainingDateInfo
-import com.example.simbirsoftmobile.presentation.screens.utils.getSingleParcelableFromBundleByKey
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EventDetailsFragment : Fragment() {
+class EventDetailsFragment :
+    MviFragment<EventDetailsState, EventDetailsSideEffect, EventDetailsEvent>() {
     private var _binding: FragmentEventDetailsBinding? = null
     private val binding: FragmentEventDetailsBinding
         get() = _binding!!
 
-    private var eventId: String? = null
-    private var uiState: UiState<EventLongUi> = UiState.Idle
+    @Inject
+    lateinit var factory: EventDetailsViewModel.Factory
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        val currentState = uiState
-        if (currentState is UiState.Success) {
-            outState.putParcelable(EVENT_MODEL_KEY, currentState.data)
-        }
+    override val viewModel: EventDetailsViewModel by viewModels {
+        factory
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            eventId = it.getString(EVENT_ID_KEY)
-        }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
         _binding = FragmentEventDetailsBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    private fun updateUiState() {
-        with(binding) {
-            when (val currentState = uiState) {
-                is UiState.Error -> {
-                    progressIndicator.visibility = View.GONE
-                    eventDetailsLayout.visibility = View.GONE
-                    errorTV.visibility = View.VISIBLE
-                    errorTV.text = currentState.message
-                }
-
-                UiState.Idle -> {}
-
-                UiState.Loading -> {
-                    progressIndicator.visibility = View.VISIBLE
-                    eventDetailsLayout.visibility = View.GONE
-                    errorTV.visibility = View.GONE
-                }
-
-                is UiState.Success -> {
-                    errorTV.visibility = View.GONE
-                    progressIndicator.visibility = View.GONE
-                    eventDetailsLayout.visibility = View.VISIBLE
-
-                    titleTV.text = currentState.data.name
-                    organizerNameTV.text = currentState.data.organization
-                    addressTV.text = currentState.data.address
-
-                    remainDateTV.text =
-                        getRemainingDateInfo(
-                            currentState.data.startDate,
-                            currentState.data.endDate,
-                            requireContext(),
-                        )
-
-                    initEmailSection(currentState.data.email)
-                    initPhoneNumbers(currentState.data.phone)
-                    initImage(currentState.data.photo)
-
-                    descriptionTV.text = currentState.data.description
-                    initOrganizerUrlText(currentState.data.url)
-
-                    toolbar.setOnMenuItemClickListener {
-                        when (it.itemId) {
-                            R.id.share_event -> {
-                                val shareIntent =
-                                    Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        putExtra(Intent.EXTRA_TEXT, currentState.data.name)
-                                        type = "text/plain"
-                                    }
-                                startActivity(
-                                    Intent.createChooser(
-                                        shareIntent,
-                                        "Поделиться событием",
-                                    )
-                                )
-                            }
-                        }
-                        true
-                    }
-                }
-            }
-        }
     }
 
     override fun onViewCreated(
@@ -130,67 +51,60 @@ class EventDetailsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.toolbar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
-
-        if (savedInstanceState != null) {
-            val currentEvent =
-                getSingleParcelableFromBundleByKey<EventLongUi>(savedInstanceState, EVENT_MODEL_KEY)
-            if (currentEvent != null) {
-                uiState = UiState.Success(currentEvent)
-                updateUiState()
-            }
-        } else {
-            val currentId = eventId
-            if (currentId != null) {
-                getEventById(currentId)
-            } else {
-                UiState.Error(getString(R.string.error_occurred_while_receiving_data))
-                updateUiState()
-            }
-        }
     }
 
-    private fun getEventById(id: String) {
-        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-            uiState = UiState.Error(getString(R.string.unexpected_error))
-            updateUiState()
-        }
+    override fun renderState(state: EventDetailsState) {
+        with(binding) {
+            progressIndicator.isVisible = state.isLoading
 
-        lifecycleScope.launch(exceptionHandler) {
-            GetEventDetailsUseCase()
-                .invoke(id)
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    uiState = UiState.Loading
-                    updateUiState()
-                }
-                .collect{
-                    uiState = when (it) {
-                        is Either.Left -> {
-                            UiState.Error(
-                                when (it.value) {
-                                    is DataError.Api -> it.value.error
-                                        ?: getString(R.string.error_occurred_while_receiving_data)
-                                    is DataError.InvalidParameters -> getString(R.string.unexpected_error)
-                                    DataError.Timeout -> getString(R.string.timeout_error)
-                                    is DataError.Unexpected -> getString(R.string.unexpected_error)
-                                    is DataError.Connection -> getString(R.string.connection_error)
-                                    DataError.NetworkBlock -> getString(R.string.unexpected_error)
+            errorTV.isVisible = state.error != null
+            state.error?.let {
+                errorTV.text = it.asString(requireContext())
+            }
+
+            eventDetailsLayout.isVisible = state.eventDetails != null
+            state.eventDetails?.let { event ->
+                titleTV.text = event.name
+                organizerNameTV.text = event.organization
+                addressTV.text = event.address
+
+                remainDateTV.text =
+                    getRemainingDateInfo(
+                        event.startDate,
+                        event.endDate,
+                        requireContext(),
+                    )
+
+                initEmailSection(event.email)
+                initPhoneNumbers(event.phone)
+                initImage(event.photo)
+
+                descriptionTV.text = event.description
+                initOrganizerUrlText(event.url)
+
+                toolbar.setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.share_event -> {
+                            val shareIntent =
+                                Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT, event.name)
+                                    type = "text/plain"
                                 }
-                            )
-                        }
-
-                        is Either.Right -> {
-                            UiState.Success(
-                                it.value.mapToLongUi()
+                            startActivity(
+                                Intent.createChooser(
+                                    shareIntent,
+                                    "Поделиться событием",
+                                )
                             )
                         }
                     }
-                    updateUiState()
+                    true
                 }
+            }
         }
     }
 
@@ -282,7 +196,6 @@ class EventDetailsFragment : Fragment() {
     companion object {
         const val TAG = "EventDetailsFragment"
         const val EVENT_ID_KEY = "eventId"
-        private const val EVENT_MODEL_KEY = "EventModel"
 
         @JvmStatic
         fun newInstance(eventId: String) =

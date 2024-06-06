@@ -6,6 +6,7 @@ import com.example.simbirsoftmobile.domain.core.DataResult
 import com.example.simbirsoftmobile.domain.core.Either
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -16,25 +17,27 @@ fun <Dto> getRequestFlowDto(
     apiCall: suspend () -> Response<Dto>,
 ): Flow<Either<DataError, Dto>> = flow {
     withTimeoutOrNull(5000L) {
-        try {
-            val response = apiCall.invoke()
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    emit(Either.Right(it))
-                }
-            } else {
-                response.errorBody()?.let { error ->
-                    error.close()
-                    emit(Either.Left(DataError.Api(error.string())))
-                }
+        val response = apiCall.invoke()
+        if (response.isSuccessful) {
+            response.body()?.let {
+                emit(Either.Right(it))
             }
-        } catch (e: ConnectionException) {
-            emit(Either.Left(DataError.Connection))
-        } catch (e: Exception) {
-            emit(Either.Left(DataError.Unexpected(e.localizedMessage)))
+        } else {
+            response.errorBody()?.let { error ->
+                error.close()
+                emit(Either.Left(DataError.Api(error.string())))
+            }
         }
-    } ?: emit(Either.Left(DataError.Timeout))
-}.flowOn(Dispatchers.IO)
+    }
+        ?: emit(Either.Left(DataError.Timeout))
+}
+    .catch {
+        when (it) {
+            is ConnectionException -> emit(Either.Left(DataError.Connection))
+            else -> emit(Either.Left(DataError.Unexpected(it.localizedMessage)))
+        }
+    }
+    .flowOn(Dispatchers.IO)
 
 fun <Model, Dto : DataMapper<Model>> getRequestFlowItem(
     apiCall: suspend () -> Response<Dto>,

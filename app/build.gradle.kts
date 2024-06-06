@@ -93,9 +93,12 @@ dependencies {
     implementation("io.coil-kt:coil:$coil")
 
     val room = "2.6.1"
-
     implementation("androidx.room:room-runtime:$room")
     annotationProcessor("androidx.room:room-compiler:$room")
     kapt("androidx.room:room-compiler:$room")
     implementation("androidx.room:room-ktx:$room")
+
+    val dagger = "2.51.1"
+    implementation("com.google.dagger:dagger:$dagger")
+    kapt("com.google.dagger:dagger-compiler:$dagger")
 }

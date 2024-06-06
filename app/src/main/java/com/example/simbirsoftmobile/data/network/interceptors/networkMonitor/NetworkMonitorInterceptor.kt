@@ -3,8 +3,9 @@ package com.example.simbirsoftmobile.data.network.interceptors.networkMonitor
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import javax.inject.Inject
 
-class NetworkMonitorInterceptor(
+class NetworkMonitorInterceptor @Inject constructor(
     private val liveNetworkMonitor: NetworkMonitor,
 ) : Interceptor {
     @Throws(ConnectionException::class)

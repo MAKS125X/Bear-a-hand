@@ -1,6 +1,7 @@
 package com.example.simbirsoftmobile.data.network.dtos.event
 
 import com.example.simbirsoftmobile.data.local.entities.EventEntity
+import com.example.simbirsoftmobile.data.local.entities.EventPartialEntity
 import com.example.simbirsoftmobile.data.utils.DataMapper
 import com.example.simbirsoftmobile.domain.models.event.EventModel
 
@@ -36,11 +37,12 @@ data class EventDto(
             email,
             organization,
             url,
+            false,
         )
     }
 }
 
-fun EventDto.toEntity() = EventEntity(
+fun EventDto.toPartialEntity() = EventPartialEntity(
     id,
     name,
     startDate,
@@ -55,4 +57,22 @@ fun EventDto.toEntity() = EventEntity(
     address,
     organization,
     url,
+)
+
+fun EventDto.toEntity(isRead: Boolean) = EventEntity(
+    id,
+    name,
+    startDate,
+    endDate,
+    description,
+    status,
+    photo,
+    category,
+    createdAt,
+    phone,
+    email,
+    address,
+    organization,
+    url,
+    isRead,
 )

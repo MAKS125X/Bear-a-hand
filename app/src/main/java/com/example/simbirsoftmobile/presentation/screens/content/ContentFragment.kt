@@ -1,27 +1,25 @@
 package com.example.simbirsoftmobile.presentation.screens.content
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.fragment.app.activityViewModels
 import com.example.simbirsoftmobile.R
 import com.example.simbirsoftmobile.databinding.FragmentContentBinding
-import com.example.simbirsoftmobile.domain.utils.UnreadNewsController
+import com.example.simbirsoftmobile.di.appComponent
+import com.example.simbirsoftmobile.presentation.base.MviFragment
 import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
 import com.example.simbirsoftmobile.presentation.screens.help.HelpFragment
+import com.example.simbirsoftmobile.presentation.screens.history.HistoryFragment
 import com.example.simbirsoftmobile.presentation.screens.news.NewsFragment
 import com.example.simbirsoftmobile.presentation.screens.profile.ProfileFragment
 import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.launch
-import java.io.IOException
+import javax.inject.Inject
 
-class ContentFragment : Fragment() {
+class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEvent>() {
     private var _binding: FragmentContentBinding? = null
     private val binding: FragmentContentBinding
         get() = _binding!!
@@ -35,6 +33,28 @@ class ContentFragment : Fragment() {
         return binding.root
     }
 
+    @Inject
+    lateinit var factory: ContentViewModel.Factory
+
+    override val viewModel: ContentViewModel by activityViewModels {
+        factory
+    }
+
+    override fun renderState(state: ContentState) {
+        with(binding) {
+            if (state.badge <= 0) {
+                bottomNavigationView.removeBadge(R.id.news_menu)
+            } else {
+                bottomNavigationView.getOrCreateBadge(R.id.news_menu).number = state.badge
+            }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.appComponent.inject(this)
+    }
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -45,27 +65,6 @@ class ContentFragment : Fragment() {
 
         if (savedInstanceState == null) {
             binding.bottomNavigationView.selectedItemId = R.id.help_menu
-        }
-
-        val exceptionHandler = CoroutineExceptionHandler { _, e ->
-            if (e !is IOException) {
-                binding.bottomNavigationView.removeBadge(R.id.news_menu)
-            }
-        }
-
-        lifecycleScope.launch(exceptionHandler) {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                UnreadNewsController.notificationFlow
-                    .collect {
-                        with(binding) {
-                            if (it <= 0) {
-                                bottomNavigationView.removeBadge(R.id.news_menu)
-                            } else {
-                                bottomNavigationView.getOrCreateBadge(R.id.news_menu).number = it
-                            }
-                        }
-                    }
-            }
         }
     }
 
@@ -106,6 +105,14 @@ class ContentFragment : Fragment() {
                             NewsFragment.TAG,
                         ).commit()
                     }
+                }
+
+                R.id.history_menu -> {
+                    parentFragmentManager.beginTransaction().replace(
+                        binding.contentHolder.id,
+                        HistoryFragment.newInstance(),
+                        HistoryFragment.TAG,
+                    ).commit()
                 }
 
                 else -> {

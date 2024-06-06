@@ -1,6 +1,5 @@
 package com.example.simbirsoftmobile.data.repositories.localWithFetch
 
-import com.example.simbirsoftmobile.data.local.TransactionProvider
 import com.example.simbirsoftmobile.data.local.daos.CategoryDao
 import com.example.simbirsoftmobile.data.local.entities.toEntity
 import com.example.simbirsoftmobile.data.network.api.CategoryService
@@ -16,11 +15,12 @@ import com.example.simbirsoftmobile.domain.models.CategoryModel
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.example.simbirsoftmobile.domain.utils.mapDataResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class CategoryRepositoryWithFetch(
+class CategoryRepositoryWithFetch @Inject constructor(
     private val categoryService: CategoryService,
     private val dao: CategoryDao,
-    private val transactionProvider: TransactionProvider,
 ) : CategoryRepository {
     private var shouldFetch: Boolean = true
 
@@ -39,6 +39,9 @@ class CategoryRepositoryWithFetch(
     }
 
     override fun getCategories(): Flow<Either<DataError, DataResult<List<CategoryModel>>>> =
+        getCategories(shouldFetch)
+
+    override fun getCategories(shouldFetch: Boolean): Flow<Either<DataError, DataResult<List<CategoryModel>>>> =
         networkBoundResource(
             localQuery = dao::observeCategories,
             apiFetch = {
@@ -47,22 +50,21 @@ class CategoryRepositoryWithFetch(
                 }
             },
             saveFetchResult = { list ->
-                transactionProvider.runAsTransaction {
-                    for (category in list) {
-                        addOrUpdateCategory(category)
-                    }
+                for (category in list) {
+                    addOrUpdateCategory(category)
                 }
-
-                shouldFetch = false
+                this.shouldFetch = false
             },
             shouldFetch = shouldFetch,
         ).mapDataResult {
             it.mapToDomain()
         }
 
-    override suspend fun updateCategoriesSettings(vararg categories: CategoryModel) {
-        transactionProvider.runAsTransaction {
+    override fun updateCategoriesSettings(vararg categories: CategoryModel): Flow<Either<DataError, Unit>> {
+        return flow {
             dao.updateCategories(*categories.map { it.toEntity() }.toTypedArray())
+
+            emit(Either.Right(Unit))
         }
     }
 }

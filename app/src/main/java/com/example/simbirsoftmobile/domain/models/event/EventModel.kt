@@ -15,4 +15,5 @@ data class EventModel(
     val email: String,
     val organization: String,
     val url: String,
+    val isRead: Boolean,
 )

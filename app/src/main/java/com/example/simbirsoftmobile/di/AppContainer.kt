@@ -3,73 +3,115 @@ package com.example.simbirsoftmobile.di
 import android.content.Context
 import androidx.room.Room
 import com.example.simbirsoftmobile.data.local.AppDatabase
-import com.example.simbirsoftmobile.data.local.TransactionProvider
+import com.example.simbirsoftmobile.data.local.daos.CategoryDao
+import com.example.simbirsoftmobile.data.local.daos.EventDao
 import com.example.simbirsoftmobile.data.network.api.CategoryService
 import com.example.simbirsoftmobile.data.network.api.EventService
 import com.example.simbirsoftmobile.data.network.dtos.category.CategoryNetworkDeserializer
 import com.example.simbirsoftmobile.data.network.dtos.event.EventNetworkDeserializer
 import com.example.simbirsoftmobile.data.network.dtos.event.EventsNetworkDeserializer
 import com.example.simbirsoftmobile.data.network.interceptors.networkMonitor.LiveNetworkMonitor
+import com.example.simbirsoftmobile.data.network.interceptors.networkMonitor.NetworkMonitor
 import com.example.simbirsoftmobile.data.network.interceptors.networkMonitor.NetworkMonitorInterceptor
 import com.example.simbirsoftmobile.data.repositories.localWithFetch.CategoryRepositoryWithFetch
 import com.example.simbirsoftmobile.data.repositories.localWithFetch.EventRepositoryWithFetch
 import com.example.simbirsoftmobile.domain.repositories.CategoryRepository
 import com.example.simbirsoftmobile.domain.repositories.EventRepository
+import com.example.simbirsoftmobile.presentation.screens.content.ContentFragment
+import com.example.simbirsoftmobile.presentation.screens.eventDetails.EventDetailsFragment
+import com.example.simbirsoftmobile.presentation.screens.filter.FilterFragment
+import com.example.simbirsoftmobile.presentation.screens.help.HelpFragment
+import com.example.simbirsoftmobile.presentation.screens.news.NewsFragment
+import com.example.simbirsoftmobile.presentation.screens.search.SearchFragment
+import com.example.simbirsoftmobile.presentation.screens.search.events.EventsFragment
+import com.example.simbirsoftmobile.presentation.screens.search.organizations.OrganizationsFragment
 import com.google.gson.GsonBuilder
+import dagger.Binds
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
-class AppContainer(private val context: Context) {
-    val eventRepository by lazy {
-        provideEventRepository()
+@Component(modules = [AppModule::class])
+@Singleton
+interface AppComponent {
+    @Component.Factory
+    interface Factory {
+        fun create(@BindsInstance context: Context): AppComponent
     }
 
-    val categoryRepository by lazy {
-        provideCategoryRepository()
+    fun inject(fragment: HelpFragment)
+    fun inject(fragment: FilterFragment)
+    fun inject(fragment: NewsFragment)
+    fun inject(fragment: EventDetailsFragment)
+    fun inject(fragment: OrganizationsFragment)
+    fun inject(fragment: EventsFragment)
+    fun inject(fragment: SearchFragment)
+    fun inject(contentFragment: ContentFragment)
+}
+
+val Context.appComponent: AppComponent
+    get() = when (this) {
+        is SimbirSoftApp -> appComponent
+        else -> this.applicationContext.appComponent
     }
 
-    private val retrofit: Retrofit by lazy {
-        provideRetrofit()
-    }
+@Module(includes = [NetworkModule::class, DatabaseModule::class, AppBindModule::class])
+interface AppModule
 
-    private val categoryService by lazy {
-        retrofit.create(CategoryService::class.java)
-    }
+@Module
+class DatabaseModule {
+    @Provides
+    fun provideCategoryDao(appDatabase: AppDatabase): CategoryDao = appDatabase.categories()
 
-    private val eventService by lazy {
-        retrofit.create(EventService::class.java)
-    }
+    @Provides
+    fun provideEventDao(appDatabase: AppDatabase): EventDao = appDatabase.events()
 
-    private val db by lazy {
-        provideDatabase()
-    }
-
-    private val transactionProvider by lazy {
-        provideTransactionProvider()
-    }
-
-    private fun provideTransactionProvider(): TransactionProvider {
-        return TransactionProvider(db)
-    }
-
-    private fun provideDatabase() =
-        Room.databaseBuilder(
+    @Singleton
+    @Provides
+    fun provideDatabase(
+        context: Context,
+    ): AppDatabase {
+        return Room.databaseBuilder(
             context = context.applicationContext,
             AppDatabase::class.java,
             "events.db",
-        ).build()
+        )
+            .build()
+    }
+}
 
-    private fun provideEventRepository(): EventRepository {
-        return EventRepositoryWithFetch(eventService, db.events(), transactionProvider)
+@Module
+class NetworkModule {
+    @Singleton
+    @Provides
+    fun provideHttpClient(
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        liveNetworkMonitor: NetworkMonitorInterceptor,
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(liveNetworkMonitor)
+            .build()
     }
 
-    private fun provideCategoryRepository(): CategoryRepository {
-        return CategoryRepositoryWithFetch(categoryService, db.categories(), transactionProvider)
+    @Provides
+    fun httpLoggingInterceptor(): HttpLoggingInterceptor {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        return interceptor
     }
 
-    private fun provideRetrofit(): Retrofit {
+    @Singleton
+    @Provides
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+    ): Retrofit {
         val gson = GsonBuilder()
             .registerTypeAdapter(
                 CategoryNetworkDeserializer.typeToken,
@@ -87,17 +129,40 @@ class AppContainer(private val context: Context) {
 
         return Retrofit.Builder()
             .baseUrl("https://mock.apidog.com/m1/509685-468980-default/")
-            .client(provideHttpClient())
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
-    private fun provideHttpClient(): OkHttpClient {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        return OkHttpClient.Builder()
-            .addInterceptor(interceptor)
-            .addInterceptor(NetworkMonitorInterceptor(LiveNetworkMonitor(SimbirSoftApp.INSTANCE)))
-            .build()
-    }
+    @Provides
+    fun provideCategoryService(retrofit: Retrofit): CategoryService =
+        retrofit.create(CategoryService::class.java)
+
+    @Provides
+    fun provideEventService(retrofit: Retrofit): EventService =
+        retrofit.create(EventService::class.java)
+}
+
+@Module
+interface AppBindModule {
+    @Suppress("FunctionName")
+    @Singleton
+    @Binds
+    fun bindCategoryRepositoryWithFetch_to_CategoryRepository(
+        categoryRepositoryWithFetch: CategoryRepositoryWithFetch,
+    ): CategoryRepository
+
+
+    @Suppress("FunctionName")
+    @Singleton
+    @Binds
+    fun bindEventRepositoryWithFetch_to_EventRepository(
+        eventRepositoryWithFetch: EventRepositoryWithFetch,
+    ): EventRepository
+
+    @Suppress("FunctionName")
+    @Binds
+    fun bindNetworkLiveMonitor_to_NetworkMonitor(
+        networkLiveMonitor: LiveNetworkMonitor,
+    ): NetworkMonitor
 }

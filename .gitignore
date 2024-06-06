@@ -97,6 +97,7 @@ obj/
 .idea/navEditor.xml
 .idea/sonarlint
 .idea/deploymentTargetDropDown.xml
+/.idea/deploymentTargetSelector.xml
 
 # Legacy Eclipse project files
 .classpath
