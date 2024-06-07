@@ -76,6 +76,14 @@ class AuthViewModel : MviViewModel<AuthState, AuthSideEffect, AuthEvent>(AuthSta
                     AuthSideEffect.NavigateToRegistration(UiText.StringResource(R.string.registration))
                 )
             }
+
+            AuthEvent.Ui.ChangePasswordVisibility -> {
+                updateState(
+                    state.copy(
+                        showPassword = !state.showPassword,
+                    )
+                )
+            }
         }
     }
 

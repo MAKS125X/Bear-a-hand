@@ -20,7 +20,7 @@ import com.example.event_details.di.EventDetailsComponentViewModel
 import com.example.ui.MviFragment
 import dagger.Lazy
 import javax.inject.Inject
-import com.example.common.R as commonR
+import com.example.common_view.R as commonR
 import com.example.event_details.R as detailsR
 
 class EventDetailsFragment :

@@ -7,4 +7,6 @@
     <dimen name="auth_icon_size">40dp</dimen>
     <dimen name="auth_icon_layout_margin_horizontal">60dp</dimen>
     <dimen name="auth_title_margin_horizontal">36dp</dimen>
+    <dimen name="button_corners">2dp</dimen>
+    <dimen name="button_elevation">2dp</dimen>
 </resources>

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.profile"
+    namespace = "com.example.common_view"
     compileSdk = 34
 
     defaultConfig {
@@ -27,28 +27,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    buildFeatures {
-        viewBinding = true
-    }
     kotlinOptions {
         jvmTarget = "17"
     }
 }
 
 dependencies {
-    implementation(project(":ui"))
-    implementation(project(":utils:result"))
-    implementation(project(":utils:data_error"))
-    implementation(project(":utils:date"))
-    implementation(project(":common_view"))
-    implementation(project(":core"))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.coordinatorlayout)
-    implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.coil)
 }

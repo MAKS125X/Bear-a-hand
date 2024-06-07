@@ -10,4 +10,6 @@
     <string name="login">Login</string>
     <string name="login_via_socials">To participate in events, log in to the app via social media</string>
     <string name="login_through_app">Log in through the app</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
 </resources>

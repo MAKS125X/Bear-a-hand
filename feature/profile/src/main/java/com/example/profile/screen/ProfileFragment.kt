@@ -18,7 +18,7 @@ import com.example.profile.databinding.FragmentProfileBinding
 import com.example.ui.MviFragment
 import java.io.File
 import java.io.FileOutputStream
-import com.example.common.R as commonR
+import com.example.common_view.R as commonR
 import com.example.profile.R as profileR
 
 class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEvent>() {

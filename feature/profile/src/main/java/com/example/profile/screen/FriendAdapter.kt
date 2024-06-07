@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
-import com.example.common.R
+import com.example.common_view.R
 import com.example.profile.databinding.ItemFriendBinding
 import com.example.profile.models.FriendUI
 

@@ -3,6 +3,7 @@
   <component name="SonarLintProjectSettings">
     <option name="moduleMapping">
       <map>
+        <entry key="SimbirSoftMobile.common_view" value="SimbirSoftMobile.common" />
         <entry key="SimbirSoftMobile.network" value="SimbirSoftMobile.api" />
         <entry key="SimbirSoftMobile.utils.data_error" value="SimbirSoftMobile.utils.dataError" />
       </map>

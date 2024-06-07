@@ -20,6 +20,6 @@ class AuthNavigationImpl @Inject constructor() : AuthNavigation {
             R.id.fragmentContainerView,
             ContentFragment.newInstance(),
             ContentFragment.TAG,
-        ).addToBackStack(ContentFragment.TAG).commit()
+        ).commit()
     }
 }

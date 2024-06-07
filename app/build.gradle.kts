@@ -60,7 +60,7 @@ dependencies {
     implementation(project(":api"))
     implementation(project(":local"))
     implementation(project(":network"))
-    implementation(project(":common"))
+    implementation(project(":common_view"))
     implementation(project(":feature:help"))
     implementation(project(":feature:news"))
     implementation(project(":feature:event_details"))

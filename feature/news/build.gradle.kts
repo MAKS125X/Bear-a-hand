@@ -42,7 +42,7 @@ dependencies {
     implementation(project(":utils:result"))
     implementation(project(":utils:data_error"))
     implementation(project(":utils:date"))
-    implementation(project(":common"))
+    implementation(project(":common_view"))
     implementation(project(":core"))
 
     implementation(libs.androidx.core.ktx)
