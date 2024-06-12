@@ -74,13 +74,4 @@
     <dimen name="filter_item_padding_vertical">16dp</dimen>
     <dimen name="filter_item_padding_start">20dp</dimen>
     <dimen name="filter_recycler_padding">8dp</dimen>
-
-    <dimen name="event_item_padding">4dp</dimen>
-    <dimen name="event_item_title_padding_horizontal">40dp</dimen>
-    <dimen name="event_item_description_padding_horizontal">26dp</dimen>
-    <dimen name="event_item_spacer">8dp</dimen>
-    <dimen name="events_recycler_padding">8dp</dimen>
-    <dimen name="events_text_margin_top">8dp</dimen>
-
-
 </resources>

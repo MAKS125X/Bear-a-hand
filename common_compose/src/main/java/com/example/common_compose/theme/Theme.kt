@@ -33,6 +33,10 @@ private val LightColorScheme
         onSurface = colorResource(id = R.color.black54),
     )
 
+val BlueGrey
+    @Composable
+    get() = colorResource(id = R.color.blue_grey)
+
 val DividerColor
     @Composable
     get() = colorResource(id = R.color.cool_grey)

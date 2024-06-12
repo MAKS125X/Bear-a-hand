@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="event_item_padding">4dp</dimen>
+    <dimen name="event_item_title_padding_horizontal">40dp</dimen>
+    <dimen name="event_item_spacer">8dp</dimen>
+    <dimen name="events_recycler_padding">8dp</dimen>
+    <dimen name="events_text_margin_top">8dp</dimen>
+    <dimen name="event_card_radius">2dp</dimen>
+    <dimen name="event_card_elevation">4dp</dimen>
+    <dimen name="event_header_line_height">23sp</dimen>
+    <dimen name="event_description_padding_horizontal">26dp</dimen>
+    <dimen name="event_description_padding_top">10dp</dimen>
+    <dimen name="event_description_padding_bottom">16dp</dimen>
+    <dimen name="event_date_icon_padding">4dp</dimen>
+</resources>

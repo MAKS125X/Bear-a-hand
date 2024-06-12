@@ -5,48 +5,31 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
-import androidx.recyclerview.widget.RecyclerView
-import com.example.news.R
-import com.example.news.databinding.FragmentNewsBinding
+import com.example.common_compose.theme.SimbirSoftMobileTheme
 import com.example.news.di.NewsComponentViewModel
 import com.example.news.di.NewsDeps
-import com.example.ui.MviFragment
 import dagger.Lazy
+import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
 
-class NewsFragment : MviFragment<NewsState, NewsSideEffect, NewsEvent>() {
-    private var _binding: FragmentNewsBinding? = null
-    private val binding: FragmentNewsBinding
-        get() = _binding!!
-
-    private var adapter: NewsAdapter? = null
-
+class NewsFragment : Fragment() {
     @Inject
     lateinit var newsDeps: NewsDeps
 
     @Inject
     lateinit var factory: Lazy<NewsViewModel.Factory>
 
-    override val viewModel: NewsViewModel by viewModels {
+    private val viewModel: NewsViewModel by activityViewModels {
         factory.get()
-    }
-
-    override fun renderState(state: NewsState) {
-        with(binding) {
-            progressIndicator.isVisible = state.isLoading
-
-            newsRecyclerView.isVisible = state.news.isNotEmpty()
-            adapter?.submitList(state.news)
-
-            errorTV.isVisible = state.error != null
-            state.error?.let {
-                errorTV.text = it.asString(requireContext())
-            }
-        }
     }
 
     override fun onAttach(context: Context) {
@@ -60,43 +43,33 @@ class NewsFragment : MviFragment<NewsState, NewsSideEffect, NewsEvent>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentNewsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initAdapter()
-        initToolbar()
-    }
-
-    private fun initAdapter() {
-        adapter = NewsAdapter(this::moveToEventDetailsFragment, requireContext())
-        adapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        binding.newsRecyclerView.adapter = adapter
+        val sideEffectFlow =
+            viewModel.effects.distinctUntilChanged()
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val state = viewModel.state.collectAsState()
+                val sideEffect = sideEffectFlow.collectAsState(NewsSideEffect.NoEffect)
+                SimbirSoftMobileTheme {
+                    NewsScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        state = state.value,
+                        onEvent = viewModel::consumeEvent,
+                        sideEffect = sideEffect.value,
+                        navigateToEventDetails = this@NewsFragment::moveToEventDetailsFragment,
+                        navigateToSettings = {
+                            newsDeps.newsComponentNavigation.navigateToSettings(
+                                parentFragmentManager
+                            )
+                        },
+                    )
+                }
+            }
+        }
     }
 
     private fun moveToEventDetailsFragment(eventId: String) {
         newsDeps.newsComponentNavigation.navigateToEventDetails(parentFragmentManager, eventId)
-    }
-
-    private fun initToolbar() {
-        binding.toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.open_filter -> {
-                    newsDeps.newsComponentNavigation.navigateToSettings(parentFragmentManager)
-                }
-            }
-            true
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        adapter = null
-        _binding = null
     }
 
     companion object {

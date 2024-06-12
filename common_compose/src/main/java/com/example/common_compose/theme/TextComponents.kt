@@ -20,22 +20,6 @@ import androidx.core.content.res.ResourcesCompat
 import com.example.common_view.R
 
 @Composable
-fun HorizontalDivider(modifier: Modifier = Modifier) {
-    androidx.compose.material3.HorizontalDivider(
-        modifier = modifier,
-        color = DividerColor,
-    )
-}
-
-@Composable
-fun VerticalDivider(modifier: Modifier = Modifier) {
-    androidx.compose.material3.VerticalDivider(
-        modifier = modifier,
-        color = DividerColor,
-    )
-}
-
-@Composable
 fun HeaderText(
     text: String,
     modifier: Modifier = Modifier,
