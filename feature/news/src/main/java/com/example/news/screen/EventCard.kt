@@ -1,6 +1,5 @@
 package com.example.news.screen
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.imageResource
@@ -34,10 +32,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.common_compose.theme.BlueGrey
+import com.example.common_compose.theme.CircularProgressIndicator
 import com.example.common_compose.theme.CommonText
 import com.example.common_compose.theme.HeaderText
 import com.example.common_compose.theme.SimbirSoftMobileTheme
-import com.example.common_compose.theme.CircularProgressIndicator
 import com.example.date.getRemainingDateInfo
 import com.example.news.models.EventShortUi
 import com.example.common_view.R as commonR
