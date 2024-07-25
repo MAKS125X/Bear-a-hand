@@ -60,6 +60,5 @@ dependencies {
     implementation(project(":utils:data_error"))
     implementation(project(":common_view"))
     implementation(project(":common_compose"))
-    implementation(project(":common"))
     implementation(project(":core"))
 }
