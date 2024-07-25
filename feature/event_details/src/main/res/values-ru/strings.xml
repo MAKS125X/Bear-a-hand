@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="charitable_assistance">Благотворительная помощь</string>
+    <string name="write_us_underline"> <u>Напишите нам</u> </string>
+    <string name="go_to_organizer"> <u>Перейти на сайт организации</u> </string>
+    <string name="do_you_have_questions">У вас есть вопросы?</string>
+    <string name="event">Событие</string>
+    <string name="accept">Подтвердить</string>
+</resources>

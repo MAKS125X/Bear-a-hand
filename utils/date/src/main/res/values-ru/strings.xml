@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_already_ended">Мероприятие уже закончилось</string>
+    <string name="will_start_soon">Начнётся через %1$s дней (%2$s – %3$s)</string>
+    <string name="days_left">Осталось %1$s дней (%2$s – %3$s)</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_occurred_while_receiving_data">An error occurred while receiving the data</string>
+    <string name="data_acquisition_error_occurred">Data acquisition error occurred</string>
+    <string name="unexpected_error">An unexpected error occurred</string>
+    <string name="timeout_error">The response time has expired</string>
+    <string name="connection_error">Network connection error</string>
+</resources>

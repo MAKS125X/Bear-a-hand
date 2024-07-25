@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="charitable_assistance">Charitable assistance</string>
+    <string name="write_us_underline"> <u>Write us</u> </string>
+    <string name="go_to_organizer"> <u>Go to the organization\'s website</u> </string>
+    <string name="do_you_have_questions">Do you have any questions?</string>
+    <string name="event">Event</string>
+    <string name="accept">Accept</string>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pick_photo">Pick a photo</string>
+    <string name="take_picture">Take a picture</string>
+    <string name="delete_picture">Delete</string>
+    <string name="temp_images_dir" translatable="false">temp_images</string>
+    <string name="temp_image" translatable="false">temp_image.jpg</string>
+    <string name="push">Receive push notifications</string>
+    <string name="your_friends">Your friends</string>
+    <string name="profile_picture">Profile picture</string>
+    <string name="logout">Logout</string>
+    <string name="mode_icon">Mode</string>
+</resources>
