@@ -28,15 +28,18 @@ inline fun <Dto, Entity> networkBoundResource(
                 .flatMapLatest { response ->
                     when (response) {
                         is Either.Left -> {
-                            localQuery().map {
-                                Either.Right(
-                                    DataResult.SuccessFromLocal(
-                                        it,
-                                        response.value
+                            if (response.value !is DataError.Timeout && response.value !is DataError.Connection) {
+                                localQuery().map {
+                                    Either.Right(
+                                        DataResult.SuccessFromLocal(
+                                            it,
+                                            response.value
+                                        )
                                     )
-                                )
+                                }
+                            } else {
+                                flow { emit(response) }
                             }
-
                         }
 
                         is Either.Right -> {

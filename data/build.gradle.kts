@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.api"
+    namespace = "com.example.data"
     compileSdk = 34
 
     defaultConfig {
@@ -15,12 +15,28 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+        }
+        forEach {
+            it.buildConfigField(
+                "Long",
+                "TIMEOUT_MILLISECONDS",
+                "5000L"
+            )
+            it.buildConfigField(
+                "String",
+                "URL",
+                "\"https://mock.apidog.com/m1/509685-468980-default/\""
             )
         }
     }
