@@ -10,6 +10,7 @@ import com.example.api.dtos.event.EventsNetworkDeserializer
 import com.example.core.di.AppScope
 import com.example.core.repositories.CategoryRepository
 import com.example.core.repositories.EventRepository
+import com.example.data.BuildConfig
 import com.example.data.localWithFetch.CategoryRepositoryWithFetch
 import com.example.data.localWithFetch.EventRepositoryWithFetch
 import com.example.local.AppDatabase
@@ -22,10 +23,12 @@ import com.google.gson.GsonBuilder
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 @Module(includes = [DatabaseModule::class, NetworkModule::class, AppBindModule::class])
 interface DataModule
@@ -63,6 +66,13 @@ class NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
             .addInterceptor(liveNetworkMonitor)
+            .addInterceptor(Interceptor {
+                val request = it.request().newBuilder()
+                    .header("Content-Type", "application/json")
+                    .build()
+                it.proceed(request)
+            })
+            .connectTimeout(BuildConfig.TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
             .build()
     }
 
@@ -94,7 +104,7 @@ class NetworkModule {
             .create()
 
         return Retrofit.Builder()
-            .baseUrl("https://mock.apidog.com/m1/509685-468980-default/")
+            .baseUrl(BuildConfig.URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

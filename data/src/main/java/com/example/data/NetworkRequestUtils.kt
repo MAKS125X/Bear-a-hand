@@ -11,30 +11,31 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withTimeoutOrNull
 import retrofit2.Response
+import java.net.SocketTimeoutException
 
 fun <Dto> getRequestFlowDto(
     apiCall: suspend () -> Response<Dto>,
 ): Flow<Either<DataError, Dto>> = flow {
-    withTimeoutOrNull(5000L) {
-        val response = apiCall.invoke()
+    val response = apiCall.invoke()
+    emit(
         if (response.isSuccessful) {
             response.body()?.let {
-                emit(Either.Right(it))
+                Either.Right(it)
             }
         } else {
             response.errorBody()?.let { error ->
                 error.close()
-                emit(Either.Left(DataError.Api(error.string())))
+                Either.Left(DataError.Api(error.string()))
             }
         }
-    }
-        ?: emit(Either.Left(DataError.Timeout))
+            ?: Either.Left(DataError.Unexpected())
+    )
 }
     .catch {
         when (it) {
             is ConnectionException -> emit(Either.Left(DataError.Connection))
+            is SocketTimeoutException -> emit(Either.Left(DataError.Timeout))
             else -> emit(Either.Left(DataError.Unexpected(it.localizedMessage)))
         }
     }
