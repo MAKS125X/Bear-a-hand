@@ -4,10 +4,11 @@ import androidx.annotation.RestrictTo
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import com.example.auth.screen.AuthFragment
+import com.example.core.di.Feature
 import dagger.Component
 import kotlin.properties.Delegates.notNull
 
-@[Component(dependencies = [AuthDeps::class])]
+@[Feature Component(dependencies = [AuthDeps::class])]
 internal interface AuthComponent {
     fun inject(fragment: AuthFragment)
 

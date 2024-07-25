@@ -48,4 +48,5 @@ dependencies {
     implementation(project(":utils:result"))
     implementation(project(":utils:data_error"))
     implementation(project(":common"))
+    implementation(project(":core"))
 }
