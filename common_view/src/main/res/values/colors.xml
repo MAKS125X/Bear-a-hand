@@ -5,6 +5,7 @@
     <color name="black70">#B3000000</color>
     <color name="black60">#99000000</color>
     <color name="black54">#8a000000</color>
+    <color name="black40">#66000000</color>
     <color name="black38">#61000000</color>
     <color name="cool_grey">#FFaabbbb</color>
     <color name="light_grey">#FFeff3f6</color>
@@ -17,4 +18,6 @@
     <color name="blue_grey">#FF627f8f</color>
     <color name="turtle_green">#FF7db354</color>
     <color name="grey">#FF94998a</color>
+    <color name="white_grey">#FFD8D8D8</color>
+    <color name="gradient_based_grey">#FFD8D8D8</color>
 </resources>

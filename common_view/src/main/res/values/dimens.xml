@@ -74,4 +74,6 @@
     <dimen name="filter_item_padding_vertical">16dp</dimen>
     <dimen name="filter_item_padding_start">20dp</dimen>
     <dimen name="filter_recycler_padding">8dp</dimen>
+
+    <dimen name="icon_label_text_size">10sp</dimen>
 </resources>

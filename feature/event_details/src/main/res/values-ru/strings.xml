@@ -6,4 +6,14 @@
     <string name="do_you_have_questions">У вас есть вопросы?</string>
     <string name="event">Событие</string>
     <string name="accept">Подтвердить</string>
+    <string name="help_with_things">Помочь вещами</string>
+    <string name="become_volunteer">Стать волонтёром</string>
+    <string name="prof_help">Проф. помощь</string>
+    <string name="help_with_money">Помочь деньгами</string>
+    <string name="transfer">Перевести</string>
+    <string name="cancel">Отмена</string>
+    <string name="thanks_for_deciding_to_help">Спасибо за решение помочь!</string>
+    <string name="choose_donation_size">Выберите размер пожертвования</string>
+    <string name="or_enter_required_amount">или введите нужную сумму</string>
+    <string name="enter_amount">Введите сумму</string>
 </resources>

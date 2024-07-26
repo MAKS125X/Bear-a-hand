@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -42,6 +43,17 @@ class EventDetailsFragment :
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        childFragmentManager.setFragmentResultListener(
+            HelpWithMoneyDialogFragment.REQUEST_RESULT_KEY,
+            this
+        ) { _, bundle ->
+            val result = bundle.getInt(HelpWithMoneyDialogFragment.BUNDLE_RESULT_KEY)
+            Toast.makeText(requireContext(), result.toString(), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,6 +71,13 @@ class EventDetailsFragment :
         binding.toolbar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
+        binding.moneyIcon.setOnClickListener {
+            showHelpDialog()
+        }
+    }
+
+    private fun showHelpDialog() {
+        HelpWithMoneyDialogFragment().show(childFragmentManager, HelpWithMoneyDialogFragment.TAG)
     }
 
     override fun renderState(state: EventDetailsState) {
