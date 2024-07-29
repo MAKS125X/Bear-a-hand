@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +17,7 @@ import coil.request.ImageRequest
 import com.example.date.getRemainingDateInfo
 import com.example.event_details.databinding.FragmentEventDetailsBinding
 import com.example.event_details.di.EventDetailsComponentViewModel
+import com.example.event_details.di.WorkerDeps
 import com.example.ui.MviFragment
 import dagger.Lazy
 import javax.inject.Inject
@@ -29,6 +29,9 @@ class EventDetailsFragment :
     private var _binding: FragmentEventDetailsBinding? = null
     private val binding: FragmentEventDetailsBinding
         get() = _binding!!
+
+    @Inject
+    lateinit var workerDeps: WorkerDeps
 
     @Inject
     lateinit var factory: Lazy<EventDetailsViewModel.Factory>
@@ -50,7 +53,14 @@ class EventDetailsFragment :
             this
         ) { _, bundle ->
             val result = bundle.getInt(HelpWithMoneyDialogFragment.BUNDLE_RESULT_KEY)
-            Toast.makeText(requireContext(), result.toString(), Toast.LENGTH_SHORT).show()
+
+            viewModel.state.value.eventDetails?.let {
+                workerDeps.launchWorker(
+                    it.id,
+                    it.name,
+                    result
+                )
+            }
         }
     }
 

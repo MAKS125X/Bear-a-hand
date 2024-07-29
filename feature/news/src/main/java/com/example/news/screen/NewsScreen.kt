@@ -26,10 +26,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.common_compose.theme.CircularProgressIndicator
 import com.example.common_compose.theme.CommonText
 import com.example.common_compose.theme.HeaderText
 import com.example.common_compose.theme.SimbirSoftMobileTheme
-import com.example.common_compose.theme.CircularProgressIndicator
 import com.example.news.models.EventShortUi
 import com.example.ui.UiText
 import com.example.common_view.R as commonR

@@ -287,6 +287,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/profIcon"
             android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -325,7 +326,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/profIcon"
+            android:id="@+id/moneyIcon"
             android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -344,7 +345,6 @@
                 android:src="@drawable/ic_coins" />
 
             <TextView
-                android:id="@+id/moneyIcon"
                 style="@style/IconLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

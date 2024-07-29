@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="thanks_for_donate">Спасибо, что пожертвовали %1$d ₽! Будем очень признательны, если вы сможете пожертвовать еще больше.</string>
+</resources>

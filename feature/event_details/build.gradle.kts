@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":utils:date"))
     implementation(project(":common_view"))
     implementation(project(":core"))
+    implementation(project(":feature:notification"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -54,4 +55,6 @@ dependencies {
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
     implementation(libs.coil)
+
+    implementation(libs.androidx.work.runtime.ktx)
 }

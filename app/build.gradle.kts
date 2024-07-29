@@ -70,6 +70,7 @@ dependencies {
     implementation(project(":feature:search"))
     implementation(project(":feature:history"))
     implementation(project(":feature:category_settings"))
+    implementation(project(":feature:notification"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -94,4 +95,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
+
+    implementation(libs.androidx.work.runtime.ktx)
 }

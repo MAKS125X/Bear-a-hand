@@ -10,4 +10,6 @@
     <string name="profile_picture">Profile picture</string>
     <string name="logout">Logout</string>
     <string name="mode_icon">Mode</string>
+
+    <string name="authorities" translatable="false">com.example.fileprovider</string>
 </resources>
