@@ -16,12 +16,23 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+        }
+        forEach {
+            it.buildConfigField(
+                "Long",
+                "REPEAT_NOTIFICATION_DELAY_MINUTES",
+                "30L"
             )
         }
     }

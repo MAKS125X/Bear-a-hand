@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import androidx.work.WorkerFactory
 import com.example.event_details.di.WorkerDeps
-import com.example.event_details.screen.HelpWorkerFactory
-import com.example.event_details.screen.MoneyHelpNotificationIntentKey
-import com.example.event_details.screen.MoneyHelpNotificationIntentValue
-import com.example.event_details.screen.NotificationWorker
+import com.example.event_details.screen.notification.HelpWorkerFactory
+import com.example.event_details.screen.notification.MoneyHelpNotificationIntentKey
+import com.example.event_details.screen.notification.MoneyHelpNotificationIntentValue
+import com.example.event_details.screen.notification.NotificationWorker
 import com.example.simbirsoftmobile.MainActivity
 import dagger.Binds
 import dagger.Module
@@ -23,8 +23,7 @@ interface EventDetailsModule {
 @Module
 class WorkerModule {
     @Provides
-    fun workerFactory(notificationNavigation: WorkerDeps):
-            WorkerFactory {
+    fun workerFactory(notificationNavigation: WorkerDeps): WorkerFactory {
         return HelpWorkerFactory { eventId: String ->
             notificationNavigation.openEventDetailsEventIntent(
                 eventId

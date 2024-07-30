@@ -23,6 +23,7 @@ import com.example.event_details.databinding.FragmentEventDetailsBinding
 import com.example.event_details.di.EventDetailsComponentViewModel
 import com.example.event_details.di.WorkerDeps
 import com.example.event_details.models.EventLongUi
+import com.example.event_details.screen.notification.NotificationWorker
 import com.example.ui.MviFragment
 import dagger.Lazy
 import javax.inject.Inject

@@ -7,7 +7,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.event_details.screen.NotificationWorker
+import com.example.event_details.BuildConfig
 import java.util.concurrent.TimeUnit
 
 class RepeatMoneyNotificationBroadcastReceiver : BroadcastReceiver() {
@@ -28,7 +28,7 @@ class RepeatMoneyNotificationBroadcastReceiver : BroadcastReceiver() {
                 NotificationManagerCompat.from(it).cancel(eventId.hashCode())
 
                 val request = OneTimeWorkRequestBuilder<NotificationWorker>()
-                    .setInitialDelay(30, TimeUnit.MINUTES)
+                    .setInitialDelay(BuildConfig.REPEAT_NOTIFICATION_DELAY_MINUTES, TimeUnit.MINUTES)
                     .setInputData(data.build())
                     .build()
 

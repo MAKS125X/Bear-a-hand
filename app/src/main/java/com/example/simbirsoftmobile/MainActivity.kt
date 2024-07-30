@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.auth.screen.AuthFragment
 import com.example.event_details.screen.EventDetailsFragment
-import com.example.event_details.screen.MoneyHelpNotificationIntentKey
-import com.example.event_details.screen.MoneyHelpNotificationIntentValue
-import com.example.event_details.screen.NotificationWorker.Companion.MONEY_HELP_ID_KEY
+import com.example.event_details.screen.notification.MoneyHelpNotificationIntentKey
+import com.example.event_details.screen.notification.MoneyHelpNotificationIntentValue
+import com.example.event_details.screen.notification.NotificationWorker.Companion.MONEY_HELP_ID_KEY
 import com.example.simbirsoftmobile.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

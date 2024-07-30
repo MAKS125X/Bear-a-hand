@@ -43,12 +43,13 @@ class SimbirSoftApp() : Application(), ImageLoaderFactory {
         createNotificationChannel()
 
         WorkManager.initialize(
-            this, Configuration.Builder()
+            this,
+            Configuration.Builder()
                 .setWorkerFactory(workerFactory)
                 .build()
         )
     }
-    
+
     override fun newImageLoader(): ImageLoader {
         return ImageLoader
             .Builder(this)
