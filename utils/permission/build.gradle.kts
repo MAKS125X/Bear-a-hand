@@ -1,12 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
-    namespace = "com.example.content_holder"
+    namespace = "com.example.permission"
     compileSdk = 34
 
     defaultConfig {
@@ -29,30 +27,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    buildFeatures {
-        viewBinding = true
-    }
     kotlinOptions {
         jvmTarget = "17"
     }
 }
 
 dependencies {
-    implementation(project(":ui"))
-    implementation(project(":ui"))
-    implementation(project(":utils:result"))
-    implementation(project(":utils:data_error"))
-    implementation(project(":utils:permission"))
-    implementation(project(":common_view"))
-    implementation(project(":core"))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.fragment.ktx)
-    implementation(libs.dagger)
-    kapt(libs.dagger.compiler)
-    implementation(libs.coil)
 }

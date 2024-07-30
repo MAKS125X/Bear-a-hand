@@ -47,9 +47,18 @@ fun getNotificationBuilder(
             Intent(context, RepeatMoneyNotificationBroadcastReceiver::class.java).apply {
                 action = REPEAT_NOTIFICATION
                 putExtra(EXTRA_NOTIFICATION_ID, 0)
-                putExtra(EVENT_ID_KEY, notificationModel.eventId)
-                putExtra(EVENT_NAME_KEY, notificationModel.eventName)
-                putExtra(MONEY_AMOUNT_KEY, notificationModel.moneyAmount)
+                putExtra(
+                    RepeatMoneyNotificationBroadcastReceiver.EVENT_ID_KEY,
+                    notificationModel.eventId,
+                )
+                putExtra(
+                    RepeatMoneyNotificationBroadcastReceiver.EVENT_NAME_KEY,
+                    notificationModel.eventName,
+                )
+                putExtra(
+                    RepeatMoneyNotificationBroadcastReceiver.MONEY_AMOUNT_KEY,
+                    notificationModel.moneyAmount,
+                )
             }
 
         val repeatPendingIntent: PendingIntent =

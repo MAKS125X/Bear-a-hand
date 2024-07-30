@@ -10,10 +10,6 @@ import androidx.work.WorkManager
 import com.example.event_details.screen.NotificationWorker
 import java.util.concurrent.TimeUnit
 
-internal const val EVENT_ID_KEY = "EventId"
-internal const val EVENT_NAME_KEY = "EventName"
-internal const val MONEY_AMOUNT_KEY = "MoneyAmount"
-
 class RepeatMoneyNotificationBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == REPEAT_NOTIFICATION) {
@@ -39,5 +35,11 @@ class RepeatMoneyNotificationBroadcastReceiver : BroadcastReceiver() {
                 WorkManager.getInstance(it).enqueue(request)
             }
         }
+    }
+
+    companion object {
+        const val EVENT_ID_KEY = "EventId"
+        const val EVENT_NAME_KEY = "EventName"
+        const val MONEY_AMOUNT_KEY = "MoneyAmount"
     }
 }
