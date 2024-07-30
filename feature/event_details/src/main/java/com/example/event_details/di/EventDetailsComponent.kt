@@ -1,9 +1,8 @@
 package com.example.event_details.di
 
-import android.content.Context
+import android.content.Intent
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.ViewModel
-import androidx.work.ListenableWorker
 import com.example.core.di.Feature
 import com.example.core.repositories.EventRepository
 import com.example.event_details.screen.EventDetailsFragment
@@ -29,9 +28,7 @@ interface EventDetailsDeps {
 }
 
 interface WorkerDeps {
-    val workerAction: (context: Context, String, String, Int) -> ListenableWorker.Result
-
-    fun launchWorker(eventId: String, eventName: String, eventAmount: Int)
+    fun openEventDetailsEventIntent(eventId: String): Intent
 }
 
 interface EventDetailsDepsProvider {

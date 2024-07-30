@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.auth.screen.AuthFragment
 import com.example.event_details.screen.EventDetailsFragment
-import com.example.event_details.screen.EventDetailsFragment.Companion.EVENT_ID_KEY
 import com.example.event_details.screen.MoneyHelpNotificationIntentKey
 import com.example.event_details.screen.MoneyHelpNotificationIntentValue
+import com.example.event_details.screen.NotificationWorker.Companion.MONEY_HELP_ID_KEY
 import com.example.simbirsoftmobile.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -18,14 +18,19 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val notificationIntent = intent.getStringExtra(MoneyHelpNotificationIntentKey)
+
         when {
-            intent.getStringExtra(MoneyHelpNotificationIntentKey) == MoneyHelpNotificationIntentValue -> {
-                val eventId = intent.getStringExtra(EVENT_ID_KEY)
+            notificationIntent == MoneyHelpNotificationIntentValue -> {
+                val eventId = intent.getStringExtra(MONEY_HELP_ID_KEY)
                 eventId?.let {
-                    val fragment = EventDetailsFragment.newInstance(it)
                     supportFragmentManager
                         .beginTransaction()
-                        .replace(R.id.fragmentContainerView, fragment)
+                        .replace(
+                            R.id.fragmentContainerView,
+                            EventDetailsFragment.newInstance(it),
+                            EventDetailsFragment.TAG,
+                        )
                         .commit()
                 }
             }
@@ -37,7 +42,8 @@ class MainActivity : AppCompatActivity() {
                         R.id.fragmentContainerView,
                         AuthFragment.newInstance(),
                         AuthFragment.TAG,
-                    ).commit()
+                    )
+                    .commit()
             }
         }
     }

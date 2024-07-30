@@ -39,6 +39,7 @@ class SimbirSoftApp() : Application(), ImageLoaderFactory {
         ContentDepsStore.deps = appComponent
         FilterDepsStore.deps = appComponent
         SearchCDepsStore.deps = appComponent
+
         createNotificationChannel()
 
         WorkManager.initialize(

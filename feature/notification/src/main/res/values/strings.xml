@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="thanks_for_donate">Thank you for donating %1$d ₽! We will be very grateful if you can donate even more.</string>
+    <string name="repeat_thanks_for_donate">We remind you that we will be very grateful if you can donate even more</string>
 </resources>
