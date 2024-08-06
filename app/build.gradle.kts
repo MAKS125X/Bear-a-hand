@@ -72,6 +72,7 @@ dependencies {
     implementation(project(":feature:category_settings"))
     implementation(project(":feature:notification"))
 
+    debugImplementation(libs.leakcanary.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

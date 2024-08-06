@@ -37,8 +37,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:paddingVertical="@dimen/event_details_elements_margin_vertical"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/helpDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
@@ -59,7 +60,6 @@
                     style="@style/EventDetailsTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/event_details_elements_margin_vertical"
                     tools:text="Спонсоры отремонтируют школу-интернат" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -193,6 +193,7 @@
     </ScrollView>
 
     <View
+        android:id="@+id/helpDivider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
         android:background="@color/white_grey"
@@ -224,6 +225,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
+                android:contentDescription="@string/help_with_things"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_shirt" />
 
@@ -262,6 +264,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
+                android:contentDescription="@string/become_volunteer"
                 android:gravity="center"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_hands" />
@@ -301,6 +304,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
+                android:contentDescription="@string/prof_help"
                 android:gravity="center"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_tools" />
@@ -340,6 +344,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
+                android:contentDescription="@string/help_with_money"
                 android:gravity="center"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_coins" />
