@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":utils:result"))
     implementation(project(":utils:data_error"))
+    implementation(project(":utils:permission"))
     implementation(project(":common_view"))
     implementation(project(":core"))
 

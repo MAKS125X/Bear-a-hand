@@ -6,4 +6,18 @@
     <string name="do_you_have_questions">Do you have any questions?</string>
     <string name="event">Event</string>
     <string name="accept">Accept</string>
+    <string name="help_with_things">Help with things</string>
+    <string name="become_volunteer">Become a volunteer</string>
+    <string name="prof_help">Prof. help</string>
+    <string name="help_with_money">To help with money</string>
+    <string name="transfer">Transfer</string>
+    <string name="cancel">Cancel</string>
+    <string name="rubles_100" translatable="false">100 ₽</string>
+    <string name="rubles_500" translatable="false">500 ₽</string>
+    <string name="rubles_1000" translatable="false">1000 ₽</string>
+    <string name="rubles_2000" translatable="false">2000 ₽</string>
+    <string name="thanks_for_deciding_to_help">Thank you for deciding to help!</string>
+    <string name="choose_donation_size">Choose the size of the donation</string>
+    <string name="or_enter_required_amount">or enter the required amount</string>
+    <string name="enter_amount">Enter the amount</string>
 </resources>

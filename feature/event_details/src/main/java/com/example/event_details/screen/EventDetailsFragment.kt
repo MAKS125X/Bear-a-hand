@@ -11,12 +11,19 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import coil.ImageLoader
 import coil.load
 import coil.request.ImageRequest
 import com.example.date.getRemainingDateInfo
 import com.example.event_details.databinding.FragmentEventDetailsBinding
 import com.example.event_details.di.EventDetailsComponentViewModel
+import com.example.event_details.di.WorkerDeps
+import com.example.event_details.models.EventLongUi
+import com.example.event_details.screen.notification.NotificationWorker
 import com.example.ui.MviFragment
 import dagger.Lazy
 import javax.inject.Inject
@@ -30,6 +37,9 @@ class EventDetailsFragment :
         get() = _binding!!
 
     @Inject
+    lateinit var workerDeps: WorkerDeps
+
+    @Inject
     lateinit var factory: Lazy<EventDetailsViewModel.Factory>
 
     override val viewModel: EventDetailsViewModel by viewModels {
@@ -40,6 +50,40 @@ class EventDetailsFragment :
         ViewModelProvider(this).get<EventDetailsComponentViewModel>()
             .eventDetailsComponent.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        childFragmentManager.setFragmentResultListener(
+            HelpWithMoneyDialogFragment.REQUEST_RESULT_KEY,
+            this
+        ) { _, bundle ->
+            val result = bundle.getInt(HelpWithMoneyDialogFragment.BUNDLE_RESULT_KEY)
+
+            viewModel.state.value.eventDetails?.let {
+                launchNotificationWorker(it, result)
+            }
+        }
+    }
+
+    private fun launchNotificationWorker(eventDetails: EventLongUi, moneyAmount: Int) {
+        val constraints = Constraints.Builder()
+            .setRequiresCharging(true)
+            .build()
+
+        val data = Data.Builder().apply {
+            putString(NotificationWorker.MONEY_HELP_ID_KEY, eventDetails.id)
+            putString(NotificationWorker.MONEY_HELP_EVENT_NAME_KEY, eventDetails.name)
+            putInt(NotificationWorker.MONEY_HELP_AMOUNT_KEY, moneyAmount)
+            putBoolean(NotificationWorker.IS_REPEATED_NOTIFICATION_KEY, false)
+        }
+
+        val request = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInputData(data.build())
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(requireContext()).enqueue(request)
     }
 
     override fun onCreateView(
@@ -59,6 +103,13 @@ class EventDetailsFragment :
         binding.toolbar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
+        binding.moneyIcon.setOnClickListener {
+            showHelpDialog()
+        }
+    }
+
+    private fun showHelpDialog() {
+        HelpWithMoneyDialogFragment().show(childFragmentManager, HelpWithMoneyDialogFragment.TAG)
     }
 
     override fun renderState(state: EventDetailsState) {

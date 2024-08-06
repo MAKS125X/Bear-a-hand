@@ -16,12 +16,23 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+        }
+        forEach {
+            it.buildConfigField(
+                "Long",
+                "REPEAT_NOTIFICATION_DELAY_MINUTES",
+                "30L"
             )
         }
     }
@@ -44,6 +55,7 @@ dependencies {
     implementation(project(":utils:date"))
     implementation(project(":common_view"))
     implementation(project(":core"))
+    implementation(project(":feature:notification"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -54,4 +66,6 @@ dependencies {
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
     implementation(libs.coil)
+
+    implementation(libs.androidx.work.runtime.ktx)
 }

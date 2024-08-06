@@ -115,4 +115,10 @@
         <item name="android:background">@color/selector_button_color</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
+
+    <style name="IconLabel">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/black40</item>
+        <item name="android:textSize">@dimen/icon_label_text_size</item>
+    </style>
 </resources>

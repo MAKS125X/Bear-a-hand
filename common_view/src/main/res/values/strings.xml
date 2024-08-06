@@ -15,6 +15,6 @@
 
     <string name="select_help_category">Select the help category:</string>
     <string name="nothing_was_found_based_on_filters">Nothing was found based on your filters</string>
-    <string name="authorities" translatable="false">com.example.fileprovider</string>
+
 
 </resources>

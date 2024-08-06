@@ -1,5 +1,6 @@
 package com.example.event_details.di
 
+import android.content.Intent
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.ViewModel
 import com.example.core.di.Feature
@@ -23,6 +24,11 @@ internal interface EventDetailsComponent {
 
 interface EventDetailsDeps {
     val eventRepository: EventRepository
+    val notificationDeps: WorkerDeps
+}
+
+interface WorkerDeps {
+    fun openEventDetailsEventIntent(eventId: String): Intent
 }
 
 interface EventDetailsDepsProvider {

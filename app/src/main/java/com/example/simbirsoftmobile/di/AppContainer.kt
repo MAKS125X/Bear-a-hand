@@ -17,14 +17,16 @@ import com.example.news.di.NewsDeps
 import com.example.search.di.SearchDeps
 import com.example.simbirsoftmobile.di.modules.AuthDepsModule
 import com.example.simbirsoftmobile.di.modules.ContentHolderDepsModule
+import com.example.simbirsoftmobile.di.modules.EventDetailsModule
 import com.example.simbirsoftmobile.di.modules.NewsDepsModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 
-@Component(modules = [AppModule::class, NewsDepsModule::class, AuthDepsModule::class, ContentHolderDepsModule::class, AuthDepsModule::class])
+@Component(modules = [AppModule::class, NewsDepsModule::class, AuthDepsModule::class, ContentHolderDepsModule::class, AuthDepsModule::class, EventDetailsModule::class])
 @AppScope
-interface AppComponent : HelpDeps, NewsDeps, EventDetailsDeps, ContentDeps, AuthDeps, SearchDeps, FilterDeps {
+interface AppComponent : HelpDeps, NewsDeps, EventDetailsDeps, ContentDeps, AuthDeps, SearchDeps,
+    FilterDeps {
     override val repository: CategoryRepository
     override val categoryRepository: CategoryRepository
     override val eventRepository: EventRepository
@@ -39,13 +41,9 @@ interface AppComponent : HelpDeps, NewsDeps, EventDetailsDeps, ContentDeps, Auth
 
         fun build(): AppComponent
     }
-}
 
-val Context.appComponent: AppComponent
-    get() = when (this) {
-        is SimbirSoftApp -> appComponent
-        else -> this.applicationContext.appComponent
-    }
+    fun inject(application: SimbirSoftApp)
+}
 
 @Module(includes = [DataModule::class])
 interface AppModule

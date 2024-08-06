@@ -47,7 +47,7 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
         get() =
             FileProvider.getUriForFile(
                 requireContext(),
-                getString(commonR.string.authorities),
+                getString(profileR.string.authorities),
                 profilePhotoFile,
             )
 

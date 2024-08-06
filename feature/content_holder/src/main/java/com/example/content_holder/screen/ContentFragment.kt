@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
@@ -13,6 +14,8 @@ import com.example.content_holder.R
 import com.example.content_holder.databinding.FragmentContentBinding
 import com.example.content_holder.di.ContentDeps
 import com.example.content_holder.di.ContentHolderComponentViewModel
+import com.example.permission.registerForRequestPermissionResult
+import com.example.permission.requestPermission
 import com.example.ui.MviFragment
 import dagger.Lazy
 import javax.inject.Inject
@@ -41,6 +44,11 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
         factory.get()
     }
 
+    private var _registerForResult: ActivityResultLauncher<String>? = null
+    private val registerForResult: ActivityResultLauncher<String>
+        get() = _registerForResult!!
+
+
     override fun renderState(state: ContentState) {
         with(binding) {
             if (state.badge <= 0) {
@@ -54,6 +62,10 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
     override fun onAttach(context: Context) {
         ViewModelProvider(this).get<ContentHolderComponentViewModel>()
             .newDetailsComponent.inject(this)
+
+        _registerForResult =
+            registerForRequestPermissionResult(getString(R.string.request_notification_permission))
+
         super.onAttach(context)
     }
 
@@ -67,6 +79,12 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
 
         if (savedInstanceState == null) {
             binding.bottomNavigationView.selectedItemId = R.id.help_menu
+            requestPermission(
+                registerForResult,
+                requireContext(),
+                android.Manifest.permission.POST_NOTIFICATIONS,
+                requireActivity(),
+            )
         }
     }
 
@@ -74,23 +92,38 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
         binding.bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.profile_menu -> {
-                    deps.contentHolderNavigation.navigateToProfile(binding.contentHolder.id, parentFragmentManager)
+                    deps.contentHolderNavigation.navigateToProfile(
+                        binding.contentHolder.id,
+                        parentFragmentManager
+                    )
                 }
 
                 R.id.help_menu -> {
-                    deps.contentHolderNavigation.navigateToHelp(binding.contentHolder.id, parentFragmentManager)
+                    deps.contentHolderNavigation.navigateToHelp(
+                        binding.contentHolder.id,
+                        parentFragmentManager
+                    )
                 }
 
                 R.id.search_menu -> {
-                    deps.contentHolderNavigation.navigateToSearch(binding.contentHolder.id, parentFragmentManager)
+                    deps.contentHolderNavigation.navigateToSearch(
+                        binding.contentHolder.id,
+                        parentFragmentManager
+                    )
                 }
 
                 R.id.news_menu -> {
-                    deps.contentHolderNavigation.navigateToNews(binding.contentHolder.id, parentFragmentManager)
+                    deps.contentHolderNavigation.navigateToNews(
+                        binding.contentHolder.id,
+                        parentFragmentManager
+                    )
                 }
 
                 R.id.history_menu -> {
-                    deps.contentHolderNavigation.navigateToHistory(binding.contentHolder.id, parentFragmentManager)
+                    deps.contentHolderNavigation.navigateToHistory(
+                        binding.contentHolder.id,
+                        parentFragmentManager
+                    )
                 }
 
                 else -> {
@@ -106,6 +139,11 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        _registerForResult = null
     }
 
     companion object {
