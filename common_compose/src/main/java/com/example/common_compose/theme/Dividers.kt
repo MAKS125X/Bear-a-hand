@@ -2,10 +2,12 @@ package com.example.common_compose.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.HorizontalDivider as ComposeHorizontalDivider
+import androidx.compose.material3.VerticalDivider as ComposeVerticalDivider
 
 @Composable
 fun HorizontalDivider(modifier: Modifier = Modifier) {
-    androidx.compose.material3.HorizontalDivider(
+    ComposeHorizontalDivider(
         modifier = modifier,
         color = DividerColor,
     )
@@ -13,7 +15,7 @@ fun HorizontalDivider(modifier: Modifier = Modifier) {
 
 @Composable
 fun VerticalDivider(modifier: Modifier = Modifier) {
-    androidx.compose.material3.VerticalDivider(
+    ComposeVerticalDivider(
         modifier = modifier,
         color = DividerColor,
     )
