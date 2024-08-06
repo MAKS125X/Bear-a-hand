@@ -10,4 +10,6 @@
     <string name="login">Войти</string>
     <string name="login_via_socials">Для участия в мероприятиях войдите в приложение через социальные сети</string>
     <string name="login_through_app">Или авторизуйтесь через приложение</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="hide_password">Скрыть пароль</string>
 </resources>

@@ -23,4 +23,6 @@ sealed interface NewsEvent : MviEvent {
     }
 }
 
-sealed interface NewsSideEffect : MviSideEffect
+sealed interface NewsSideEffect : MviSideEffect {
+    data object NoEffect: NewsSideEffect
+}

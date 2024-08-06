@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="3"
-            android:paddingHorizontal="@dimen/event_item_description_padding_horizontal"
+            android:paddingHorizontal="@dimen/event_description_padding_horizontal"
             android:textAlignment="center"
             tools:text="Дубовская школа-интернат для детей с ограниченными возможностями здоровья стала первой в области области области области области области области" />
     </androidx.appcompat.widget.LinearLayoutCompat>

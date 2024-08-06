@@ -13,7 +13,8 @@ data class AuthState(
     val error: UiText? = null,
     val email: String = "test@test.test",
     val password: String = "test@test.test",
-    val isAuthClickable: Boolean = false,
+    val showPassword: Boolean = false,
+    val isAuthClickable: Boolean = email.length >= 6 && password.length >= 6,
 ) : MviState
 
 sealed interface AuthEvent : MviEvent {
@@ -21,6 +22,7 @@ sealed interface AuthEvent : MviEvent {
         data object Authenticate : Ui
         data class UpdateEmail(val value: String) : Ui
         data class UpdatePassword(val value: String) : Ui
+        data object ChangePasswordVisibility : Ui
         data object NavigateToRegistration : Ui
         data object NavigateToForgetPassword : Ui
     }
@@ -38,4 +40,5 @@ sealed interface AuthSideEffect : MviSideEffect {
     data object NavigateToContent : AuthSideEffect
     data class NavigateToRegistration(val text: UiText) : AuthSideEffect
     data class NavigateToForgetPassword(val text: UiText) : AuthSideEffect
+    data object NoEffect : AuthSideEffect
 }

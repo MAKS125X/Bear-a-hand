@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.help.databinding.ItemCategoryBinding
 import com.example.help.model.CategoryLongUi
-import com.example.common.R as commonR
+import com.example.common_view.R as commonR
 import com.example.help.R as helpR
 
 class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {

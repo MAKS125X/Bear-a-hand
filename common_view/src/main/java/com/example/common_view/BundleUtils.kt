@@ -1,4 +1,4 @@
-package com.example.common
+package com.example.common_view
 
 import android.os.Build
 import android.os.Bundle

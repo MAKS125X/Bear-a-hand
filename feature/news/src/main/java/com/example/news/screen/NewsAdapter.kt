@@ -11,7 +11,7 @@ import com.example.date.getRemainingDateInfo
 import com.example.news.databinding.ItemNewBinding
 import com.example.news.models.EventShortUi
 import com.example.ui.TypedListener
-import com.example.common.R as commonR
+import com.example.common_view.R as commonR
 import com.example.news.R as newsR
 
 class NewsAdapter(

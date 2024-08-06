@@ -31,9 +31,13 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
     kotlinOptions {
         jvmTarget = "17"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 }
 
@@ -42,8 +46,9 @@ dependencies {
     implementation(project(":utils:result"))
     implementation(project(":utils:data_error"))
     implementation(project(":utils:date"))
-    implementation(project(":common"))
+    implementation(project(":common_view"))
     implementation(project(":core"))
+    implementation(project(":common_compose"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -54,4 +59,12 @@ dependencies {
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
     implementation(libs.coil)
+
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+    debugImplementation(libs.ui.tooling)
+    implementation(libs.coil.compose)
 }
