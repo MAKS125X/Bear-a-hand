@@ -29,6 +29,8 @@ class HelpFragment : MviFragment<HelpState, HelpSideEffect, HelpEvent>() {
         factory.get()
     }
 
+    override val initialEvent = HelpEvent.Internal.LoadCategories
+
     override fun onAttach(context: Context) {
         ViewModelProvider(this).get<HelpComponentViewModel>()
             .helpComponent.inject(this)

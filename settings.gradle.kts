@@ -29,6 +29,7 @@ include(":utils:mapper")
 include(":utils:date")
 include(":utils:permission")
 include(":utils:data_error")
+include(":utils:test_rules")
 
 include(":feature:auth")
 include(":feature:news")
