@@ -21,10 +21,6 @@ class NewsViewModel(
 ) : MviViewModel<NewsState, NewsSideEffect, NewsEvent>(
     NewsState(),
 ) {
-    init {
-        consumeEvent(NewsEvent.Internal.LoadNews)
-    }
-
     override fun reduce(state: NewsState, event: NewsEvent) {
         when (event) {
             is NewsEvent.Internal.ErrorLoaded -> {

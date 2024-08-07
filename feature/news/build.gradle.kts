@@ -67,4 +67,10 @@ dependencies {
     implementation(libs.material3)
     debugImplementation(libs.ui.tooling)
     implementation(libs.coil.compose)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":utils:test_rules"))
 }

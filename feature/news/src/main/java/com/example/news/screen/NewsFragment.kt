@@ -50,6 +50,10 @@ class NewsFragment : Fragment() {
             setContent {
                 val state = viewModel.state.collectAsState()
                 val sideEffect = sideEffectFlow.collectAsState(NewsSideEffect.NoEffect)
+                if (savedInstanceState == null){
+                    viewModel.consumeEvent(NewsEvent.Internal.LoadNews)
+                }
+
                 SimbirSoftMobileTheme {
                     NewsScreen(
                         modifier = Modifier.fillMaxSize(),
