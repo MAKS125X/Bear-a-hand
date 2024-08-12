@@ -11,7 +11,7 @@ import com.example.ui.UiText
 data class FilterState(
     val categories: List<SettingUi> = emptyList(),
     val error: UiText? = null,
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
 ) : MviState
 
 sealed interface FilterEvent : MviEvent {

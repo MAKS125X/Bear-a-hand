@@ -37,6 +37,8 @@ class FilterFragment : MviFragment<FilterState, FilterSideEffect, FilterEvent>()
         factory.get()
     }
 
+    override val initialEvent: FilterEvent = FilterEvent.Internal.LoadCategories
+
     override fun renderState(state: FilterState) {
         with(binding) {
             progressIndicator.isVisible = state.isLoading

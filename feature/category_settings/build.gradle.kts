@@ -54,4 +54,10 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":utils:test_rules"))
 }
