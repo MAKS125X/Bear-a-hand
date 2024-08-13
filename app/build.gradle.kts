@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":local"))
     implementation(project(":network"))
     implementation(project(":common_view"))
+    implementation(project(":android_settings"))
     implementation(project(":feature:help"))
     implementation(project(":feature:news"))
     implementation(project(":feature:event_details"))

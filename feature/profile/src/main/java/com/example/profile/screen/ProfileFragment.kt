@@ -1,25 +1,32 @@
 package com.example.profile.screen
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.permission.registerForRequestPermissionResult
+import com.example.permission.requestPermission
 import com.example.profile.databinding.FragmentEditPhotoDialogBinding
 import com.example.profile.databinding.FragmentProfileBinding
+import com.example.profile.di.ProfileComponentViewModel
 import com.example.ui.MviFragment
-import java.io.File
-import java.io.FileOutputStream
+import dagger.Lazy
+import javax.inject.Inject
 import com.example.common_view.R as commonR
-import com.example.profile.R as profileR
+
 
 class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEvent>() {
     private var _binding: FragmentProfileBinding? = null
@@ -28,34 +35,10 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
 
     private val adapter: FriendAdapter = FriendAdapter()
 
-    private val profilePhotoFile: File
-        get() {
-            val tempImagesDir =
-                File(
-                    requireContext().filesDir,
-                    getString(profileR.string.temp_images_dir),
-                )
-            tempImagesDir.mkdir()
-
-            return File(
-                tempImagesDir,
-                getString(profileR.string.temp_image),
-            )
-        }
-
-    private val profilePhotoUri: Uri
-        get() =
-            FileProvider.getUriForFile(
-                requireContext(),
-                getString(profileR.string.authorities),
-                profilePhotoFile,
-            )
-
     private val takePhotoForResult =
         registerForActivityResult(ActivityResultContracts.TakePicture()) {
             if (it != null && it) {
-                viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(null))
-                viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(profilePhotoUri))
+                refreshProfileImage()
             }
         }
 
@@ -64,31 +47,89 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
                 data?.data?.let { uri ->
-                    copyImageToProfileLocation(uri)
+                    viewModel.consumeEvent(ProfileEvent.Ui.UpdateImageByUri(uri))
                 }
             }
         }
 
-    override val viewModel: ProfileViewModel by viewModels()
+    private var _registerForResult: ActivityResultLauncher<String>? = null
+    private val registerForResult: ActivityResultLauncher<String>
+        get() = _registerForResult!!
+
+    @Inject
+    lateinit var factory: Lazy<ProfileViewModel.Factory>
+
+    override val viewModel: ProfileViewModel by viewModels {
+        factory.get()
+    }
 
     override fun renderState(state: ProfileState) {
         with(binding) {
-            if (state.image != null) {
-                layoutBased.profileIV.setImageURI(state.image)
-            } else {
-                layoutBased.profileIV.setImageResource(commonR.drawable.ic_standard_profile)
-            }
+            refreshProfileImage()
 
             adapter.submitList(state.friends)
+
+            unregisterSwitchChangeListener()
+            layoutBased.notificationSwitch.isChecked = state.sendNotifications
+            registerSwitchChangeListener()
+        }
+    }
+
+    private fun registerSwitchChangeListener() {
+        binding.layoutBased.notificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.consumeEvent(ProfileEvent.Ui.UpdateSendNotificationStatus(isChecked))
+
+            if (isChecked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermission(
+                    registerForResult,
+                    requireContext(),
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                    requireActivity(),
+                )
+            }
+        }
+    }
+
+    private fun unregisterSwitchChangeListener() {
+        binding.layoutBased.notificationSwitch.setOnCheckedChangeListener(null)
+    }
+
+    private fun refreshProfileImage() {
+        with(binding.layoutBased) {
+            // Fix ImageView cache
+            profileIV.setImageURI(null)
+            profileIV.setImageURI(viewModel.state.value.imageUri)
+
+            if (profileIV.drawable == null) {
+                profileIV.setImageResource(commonR.drawable.ic_standard_profile)
+            }
         }
     }
 
     override fun handleSideEffects(effect: ProfileSideEffect) {
         when (effect) {
-            ProfileSideEffect.DeletePicture -> {
-                profilePhotoFile.delete()
+            is ProfileSideEffect.ShowErrorMessage -> {
+                Toast.makeText(
+                    requireContext(),
+                    effect.error.asString(requireContext()),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            ProfileSideEffect.RefreshProfileImage -> {
+                refreshProfileImage()
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        ViewModelProvider(this).get<ProfileComponentViewModel>()
+            .profileComponent.inject(this)
+
+        _registerForResult =
+            registerForRequestPermissionResult(getString(commonR.string.request_notification_permission))
+
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -106,8 +147,10 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (profilePhotoFile.exists()) {
-            viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(profilePhotoUri))
+        if (savedInstanceState == null) {
+            viewModel.consumeEvent(ProfileEvent.Internal.LoadNotificationStatus)
+            viewModel.consumeEvent(ProfileEvent.Internal.LoadFriends)
+            viewModel.consumeEvent(ProfileEvent.Internal.LoadProfileImageUri)
         }
 
         binding.layoutBased.profileIV.setOnClickListener {
@@ -129,13 +172,12 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
             pickImageForResult.launch(pickImg)
             dialog.dismiss()
         }
-
         dialogBinding.takePictureLayout.setOnClickListener {
-            takePhotoForResult.launch(profilePhotoUri)
+            takePhotoForResult.launch(viewModel.state.value.imageUri)
             dialog.dismiss()
         }
         dialogBinding.deletePictureLayout.setOnClickListener {
-            viewModel.consumeEvent(ProfileEvent.Ui.DeletePicture)
+            viewModel.consumeEvent(ProfileEvent.Ui.DeleteImage)
             dialog.dismiss()
         }
 
@@ -146,18 +188,6 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
         binding.layoutBased.friendRecycler.addItemDecoration(FriendAdapter.CustomItemDecoration())
         binding.layoutBased.friendRecycler.adapter = adapter
         binding.layoutBased.friendRecycler.layoutManager = LinearLayoutManager(requireContext())
-    }
-
-    private fun copyImageToProfileLocation(imageUri: Uri) {
-        val inputStream = requireContext().contentResolver.openInputStream(imageUri)
-        val outputStream = FileOutputStream(profilePhotoFile)
-        inputStream?.use { input ->
-            outputStream.use { output ->
-                input.copyTo(output)
-            }
-        }
-
-        viewModel.consumeEvent(ProfileEvent.Ui.UpdateImage(imageUri))
     }
 
     override fun onDestroyView() {

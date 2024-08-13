@@ -43,3 +43,4 @@ include(":feature:content_holder")
 include(":feature:notification")
 
 include(":basics")
+include(":android_settings")

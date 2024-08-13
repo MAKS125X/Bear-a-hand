@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -50,5 +51,14 @@ dependencies {
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.dagger)
+    implementation(project(":utils:permission"))
+    kapt(libs.dagger.compiler)
     implementation(libs.coil)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":utils:test_rules"))
 }

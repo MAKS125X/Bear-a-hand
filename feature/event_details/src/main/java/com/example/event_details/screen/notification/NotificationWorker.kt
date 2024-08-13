@@ -10,11 +10,17 @@ import androidx.work.ListenableWorker
 import androidx.work.Worker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import com.example.core.repositories.SettingsRepository
+import com.example.event_details.usecase.GetNotificationStatusUseCase
 
-class NotificationWorker(private val appContext: Context, workerParams: WorkerParameters) :
+class NotificationWorker(
+    private val appContext: Context,
+    workerParams: WorkerParameters,
+) :
     Worker(appContext, workerParams) {
 
     lateinit var activityIntent: (String) -> Intent
+    lateinit var getNotificationStatusUseCase: GetNotificationStatusUseCase
 
     override fun doWork(): Result {
         val eventId = inputData.getString(MONEY_HELP_ID_KEY)
@@ -27,7 +33,7 @@ class NotificationWorker(private val appContext: Context, workerParams: WorkerPa
         return if (ContextCompat.checkSelfPermission(
                 appContext,
                 Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED && getNotificationStatusUseCase.invoke()
         ) {
             val builder = getNotificationBuilder(
                 appContext,
@@ -58,7 +64,10 @@ class NotificationWorker(private val appContext: Context, workerParams: WorkerPa
     }
 }
 
-class HelpWorkerFactory(private val intentById: (String) -> Intent) :
+class HelpWorkerFactory(
+    private val settingsRepository: SettingsRepository,
+    private val intentById: (String) -> Intent,
+) :
     WorkerFactory() {
     override fun createWorker(
         appContext: Context,
@@ -73,6 +82,8 @@ class HelpWorkerFactory(private val intentById: (String) -> Intent) :
         when (instance) {
             is NotificationWorker -> {
                 instance.activityIntent = intentById
+                instance.getNotificationStatusUseCase =
+                    GetNotificationStatusUseCase(settingsRepository)
             }
         }
 
