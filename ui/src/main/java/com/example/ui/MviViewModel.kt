@@ -3,16 +3,12 @@ package com.example.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,19 +21,20 @@ abstract class MviViewModel<State : MviState, SideEffect : MviSideEffect, Event 
             .asStateFlow()
 
     private val _effects: MutableSharedFlow<SideEffect> = MutableSharedFlow(
-        replay = 1,
-        extraBufferCapacity = 0,
+        replay = 0,
+        extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val effects: SharedFlow<SideEffect>
         get() = _effects.asSharedFlow()
 
-    private val _events = Channel<Event>(Channel.CONFLATED)
-    private val events: SharedFlow<Event> = _events.receiveAsFlow().shareIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(SHARE_TIMEOUT_MILLIS),
+    private val _events: MutableSharedFlow<Event> = MutableSharedFlow(
         replay = 1,
+        extraBufferCapacity = 15,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    private val events: SharedFlow<Event>
+        get() = _events.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -52,7 +49,7 @@ abstract class MviViewModel<State : MviState, SideEffect : MviSideEffect, Event 
     }
 
     fun consumeEvent(event: Event) {
-        _events.trySend(event)
+        _events.tryEmit(event)
     }
 
     protected fun processSideEffect(sideEffect: SideEffect) {
