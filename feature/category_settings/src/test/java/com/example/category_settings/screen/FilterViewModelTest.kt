@@ -10,6 +10,8 @@ import com.example.result.DataError
 import com.example.result.Either
 import com.example.test_rules.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -46,16 +48,15 @@ class FilterViewModelTest {
                 categories = emptyList(),
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
     @Test
     fun categoriesLoaded_CategoriesListLoaded_HoldsStateWithCategories() = runTest {
-        val categoryLongUiList: List<SettingUi> =
-            listOf(
-                SettingUi("id", "name", "nameEn", "imageUrl", false)
-            )
+        val categoryLongUiList: List<SettingUi> = List(3) {
+            SettingUi("id$it", "name$it", "nameEn$it", "imageUrl$it", false)
+        }
 
         viewModel.consumeEvent(FilterEvent.Internal.CategoriesLoaded(categoryLongUiList))
 
@@ -67,7 +68,7 @@ class FilterViewModelTest {
                 categories = categoryLongUiList,
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -85,13 +86,13 @@ class FilterViewModelTest {
                 categories = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
     @Test
     fun loadCategories_NotEmptyCategoriesListLoaded_HoldsStateWithCategories() = runTest {
-        val categoryModel = CategoryModel("", "", "", "", false)
+        val categoryModel = CategoryModel("id", "name", "nameEn", "imageUrl", false)
         val categoryLongUi = categoryModel.mapToUi()
 
         val categoryModelList: List<CategoryModel> = listOf(categoryModel)
@@ -114,7 +115,7 @@ class FilterViewModelTest {
                 categories = categoryLongUiList,
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -141,7 +142,7 @@ class FilterViewModelTest {
                 categories = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -166,19 +167,16 @@ class FilterViewModelTest {
                 categories = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
     @Test
     fun changeCategories_UpdateCategory_HoldsStateUpdatedCategories() = runTest {
-        val categories: List<SettingUi> = listOf(
-            SettingUi("1", "", "", "", false),
-            SettingUi("2", "", "", "", false),
-            SettingUi("3", "", "", "", false),
-            SettingUi("4", "", "", "", false),
-            SettingUi("5", "", "", "", false),
-        )
+        val categories: List<SettingUi> = List(5) {
+            SettingUi("$it", "name$it", "nameEn$it", "imageUrl$it", false)
+        }
+
         viewModel.consumeEvent(FilterEvent.Internal.CategoriesLoaded(categories))
 
         advanceUntilIdle()
@@ -194,12 +192,16 @@ class FilterViewModelTest {
 
         assertEquals(
             categories,
-            viewModel.state.value.categories
+            viewModel.state.value.categories,
         )
     }
 
     @Test
     fun updateChanges_SuccessUpdating_ProcessSideSuccessSideEffect() = runTest {
+        val deferredEffect = async {
+            viewModel.effects.first()
+        }
+
         viewModel.consumeEvent(FilterEvent.Ui.AcceptChanges)
 
         whenever(updateCategoriesSettingsUseCase.invoke())
@@ -213,13 +215,15 @@ class FilterViewModelTest {
 
         assertEquals(
             FilterSideEffect.SuccessChangesUpdate,
-            viewModel.effects.firstOrNull()
+            deferredEffect.await(),
         )
     }
 
     @Test
     fun updateChanges_ErrorUpdating_ProcessSideSuccessSideEffect() = runTest {
-        viewModel.consumeEvent(FilterEvent.Ui.AcceptChanges)
+        val deferredEffect = async {
+            viewModel.effects.first()
+        }
 
         val updatingError = DataError.Unexpected()
 
@@ -230,11 +234,13 @@ class FilterViewModelTest {
                 }
             )
 
+        viewModel.consumeEvent(FilterEvent.Ui.AcceptChanges)
+
         advanceUntilIdle()
 
         assertEquals(
             FilterSideEffect.ErrorChangesUpdate(updatingError),
-            viewModel.effects.firstOrNull()
+            deferredEffect.await(),
         )
     }
 }

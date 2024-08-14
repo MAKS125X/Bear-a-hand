@@ -42,7 +42,7 @@ class NewsViewModelTest {
                 news = emptyList(),
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -71,7 +71,7 @@ class NewsViewModelTest {
                 news = newShortUiList,
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -89,7 +89,7 @@ class NewsViewModelTest {
                 news = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -134,7 +134,7 @@ class NewsViewModelTest {
                 news = newShortUiList,
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -159,7 +159,7 @@ class NewsViewModelTest {
                 news = emptyList(),
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -185,7 +185,7 @@ class NewsViewModelTest {
                 news = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 }

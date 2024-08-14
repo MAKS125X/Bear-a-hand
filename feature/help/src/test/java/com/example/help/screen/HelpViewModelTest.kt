@@ -42,7 +42,7 @@ class HelpViewModelTest {
                 categories = emptyList(),
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -62,7 +62,7 @@ class HelpViewModelTest {
                 categories = categoryLongUiList,
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -80,7 +80,7 @@ class HelpViewModelTest {
                 categories = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -109,7 +109,7 @@ class HelpViewModelTest {
                 categories = categoryLongUiList,
                 error = null,
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -136,7 +136,7 @@ class HelpViewModelTest {
                 categories = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 
@@ -164,7 +164,7 @@ class HelpViewModelTest {
                 categories = emptyList(),
                 error = error.getDescription(),
             ),
-            viewModel.state.value
+            viewModel.state.value,
         )
     }
 }
