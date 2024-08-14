@@ -14,6 +14,7 @@ import com.example.profile.useCase.UpdateProfileImageUseCase
 import com.example.result.DataError
 import com.example.result.processResult
 import com.example.ui.MviViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -25,11 +26,12 @@ import javax.inject.Provider
 
 class ProfileViewModel(
     private val getFriendListUseCase: GetFriendListUseCase,
-    private val getShowNotificationSettingUseCase: GetShowNotificationSettingUseCase,
+    private val getNotificationSettingUseCase: GetShowNotificationSettingUseCase,
     private val setShowNotificationSettingUseCase: SetShowNotificationSettingUseCase,
     private val getProfileImageUriUseCase: GetProfileImageUriUseCase,
     private val updateProfileImageUseCase: UpdateProfileImageUseCase,
     private val deleteProfileImageUseCase: DeleteProfileImageUseCase,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : MviViewModel<ProfileState, ProfileSideEffect, ProfileEvent>(
     ProfileState()
 ) {
@@ -47,7 +49,7 @@ class ProfileViewModel(
                 )
             }
 
-            is ProfileEvent.Internal.ErrorFriendsLoading -> {
+            is ProfileEvent.Internal.ErrorFriendsLoaded -> {
                 updateState(
                     state.copy(
                         friends = emptyList(),
@@ -57,7 +59,7 @@ class ProfileViewModel(
             }
 
             is ProfileEvent.Ui.UpdateSendNotificationStatus -> {
-                sendNewNotificationStatus(event.newStatus)
+                updateNotificationStatus(event.newStatus)
             }
 
             ProfileEvent.Internal.LoadNotificationStatus -> {
@@ -99,7 +101,7 @@ class ProfileViewModel(
             processSideEffect(ProfileSideEffect.ShowErrorMessage(DataError.Unexpected()))
         }
 
-        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+        viewModelScope.launch(ioDispatcher + exceptionHandler) {
             val result = async {
                 updateProfileImageUseCase.invoke(newImageUri.toString())
             }
@@ -119,7 +121,7 @@ class ProfileViewModel(
             processSideEffect(ProfileSideEffect.ShowErrorMessage(DataError.Unexpected()))
         }
 
-        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+        viewModelScope.launch(ioDispatcher + exceptionHandler) {
             val result = async {
                 deleteProfileImageUseCase.invoke()
             }
@@ -139,7 +141,7 @@ class ProfileViewModel(
             processSideEffect(ProfileSideEffect.ShowErrorMessage(DataError.Unexpected()))
         }
 
-        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+        viewModelScope.launch(ioDispatcher + exceptionHandler) {
             val result = async {
                 getProfileImageUriUseCase.invoke()
             }
@@ -154,12 +156,12 @@ class ProfileViewModel(
         }
     }
 
-    private fun sendNewNotificationStatus(newStatus: Boolean) {
+    private fun updateNotificationStatus(newStatus: Boolean) {
         val exceptionHandler = CoroutineExceptionHandler { _, _ ->
             processSideEffect(ProfileSideEffect.ShowErrorMessage(DataError.Unexpected()))
         }
 
-        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+        viewModelScope.launch(ioDispatcher + exceptionHandler) {
             val result = async {
                 setShowNotificationSettingUseCase.invoke(newStatus)
             }
@@ -179,9 +181,9 @@ class ProfileViewModel(
             processSideEffect(ProfileSideEffect.ShowErrorMessage(DataError.Unexpected()))
         }
 
-        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+        viewModelScope.launch(ioDispatcher + exceptionHandler) {
             val result = async {
-                getShowNotificationSettingUseCase.invoke()
+                getNotificationSettingUseCase.invoke()
             }
             result.await().processResult(
                 onError = {
@@ -200,8 +202,7 @@ class ProfileViewModel(
             .onEach { either ->
                 either.processResult(
                     onError = {
-                        consumeEvent(ProfileEvent.Internal.ErrorFriendsLoading(it))
-
+                        consumeEvent(ProfileEvent.Internal.ErrorFriendsLoaded(it))
                     },
                     onSuccess = {
                         consumeEvent(ProfileEvent.Internal.FriendsLoaded(it))

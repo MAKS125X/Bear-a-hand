@@ -25,7 +25,7 @@ sealed interface ProfileEvent : MviEvent {
     sealed interface Internal : ProfileEvent {
         data object LoadFriends : Internal
         data class FriendsLoaded(val list: List<FriendUI>) : Internal
-        data class ErrorFriendsLoading(val error: UiText) : Internal {
+        data class ErrorFriendsLoaded(val error: UiText) : Internal {
             constructor(error: DataError) : this(error.getDescription())
         }
 

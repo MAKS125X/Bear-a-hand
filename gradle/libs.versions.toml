@@ -23,6 +23,7 @@ mockitoCore = "5.12.0"
 mockitoKotlin = "5.4.0"
 recyclerview = "1.3.2"
 retrofit = "2.9.0"
+robolectric = "4.13"
 room = "2.6.1"
 rxandroid = "3.0.2"
 rxjava3 = "3.1.8"
@@ -75,6 +76,7 @@ material3 = { module = "androidx.compose.material3:material3" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroid" }
 rxjava3 = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava3" }
 ui = { module = "androidx.compose.ui:ui" }

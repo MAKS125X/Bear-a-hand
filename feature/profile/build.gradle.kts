@@ -61,4 +61,5 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(project(":utils:test_rules"))
+    testImplementation(libs.robolectric)
 }
