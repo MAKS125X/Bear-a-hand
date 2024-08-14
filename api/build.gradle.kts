@@ -9,14 +9,14 @@ java {
 }
 
 dependencies {
-    val coroutines = "1.8.0"
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
-
-    val retrofit = "2.9.0"
-    implementation("com.squareup.retrofit2:retrofit:$retrofit")
-    implementation("com.squareup.retrofit2:converter-gson:$retrofit")
-    implementation(project(":utils:mapper"))
     implementation(project(":core"))
+    implementation(project(":utils:mapper"))
 
-    //ToDo: исправить импорты
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
 }
