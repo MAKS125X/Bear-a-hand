@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,9 +58,7 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
     @Inject
     lateinit var factory: Lazy<ProfileViewModel.Factory>
 
-    override val viewModel: ProfileViewModel by viewModels {
-        factory.get()
-    }
+    public override lateinit var viewModel: ProfileViewModel
 
     override fun renderState(state: ProfileState) {
         with(binding) {
@@ -123,8 +120,11 @@ class ProfileFragment : MviFragment<ProfileState, ProfileSideEffect, ProfileEven
     }
 
     override fun onAttach(context: Context) {
-        ViewModelProvider(this).get<ProfileComponentViewModel>()
-            .profileComponent.inject(this)
+        if (!this::factory.isInitialized) {
+            ViewModelProvider(this).get<ProfileComponentViewModel>()
+                .profileComponent.inject(this)
+            viewModel = ViewModelProvider(this, factory.get()).get()
+        }
 
         _registerForResult =
             registerForRequestPermissionResult(getString(commonR.string.request_notification_permission))

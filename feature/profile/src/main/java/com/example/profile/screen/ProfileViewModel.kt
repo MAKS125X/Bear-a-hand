@@ -212,7 +212,7 @@ class ProfileViewModel(
             .launchIn(viewModelScope)
     }
 
-    class Factory @Inject constructor(
+    open class Factory @Inject constructor(
         private val getShowNotificationSettingUseCase: Provider<GetShowNotificationSettingUseCase>,
         private val setShowNotificationSettingUseCase: Provider<SetShowNotificationSettingUseCase>,
         private val getProfileImageUriUseCase: Provider<GetProfileImageUriUseCase>,

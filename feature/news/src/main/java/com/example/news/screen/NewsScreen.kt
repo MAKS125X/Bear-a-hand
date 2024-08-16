@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,6 +35,8 @@ import com.example.news.models.EventShortUi
 import com.example.ui.UiText
 import com.example.common_view.R as commonR
 import com.example.news.R as newsR
+
+internal const val NEWS_LIST_TEST_TAG = "NewsListTestTag"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,11 +93,8 @@ fun NewsScreen(
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(
-                                dimensionResource(
-                                    id = newsR.dimen.events_recycler_padding
-                                )
-                            )
+                            .padding(dimensionResource(id = newsR.dimen.events_recycler_padding))
+
                     ) {
                         CommonText(text = state.error.asString(LocalContext.current))
                     }
@@ -103,11 +103,9 @@ fun NewsScreen(
                 state.news.isNotEmpty() -> {
                     LazyColumn(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(
-                            dimensionResource(
-                                id = newsR.dimen.events_recycler_padding
-                            )
-                        )
+                        modifier = Modifier
+                            .padding(dimensionResource(id = newsR.dimen.events_recycler_padding))
+                            .testTag(NEWS_LIST_TEST_TAG)
                     ) {
                         items(
                             items = state.news,

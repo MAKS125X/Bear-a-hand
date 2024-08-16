@@ -44,3 +44,4 @@ include(":feature:notification")
 
 include(":basics")
 include(":android_settings")
+include(":utils:test_matchers")

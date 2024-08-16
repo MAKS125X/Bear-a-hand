@@ -45,7 +45,7 @@ class FriendAdapter : ListAdapter<FriendUI, FriendAdapter.ViewHolder>(DiffCallba
 
         private fun ItemFriendBinding.setupUI(model: FriendUI) {
             nameTextView.text = model.name
-            profileIV.load(model.imageUrl) {
+            friendIV.load(model.imageUrl) {
                 placeholder(R.drawable.loading_animation)
                 this.error(R.drawable.friend_error_square)
                 transformations(CircleCropTransformation())

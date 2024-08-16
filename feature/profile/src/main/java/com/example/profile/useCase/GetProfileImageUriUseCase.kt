@@ -5,9 +5,9 @@ import com.example.result.DataError
 import com.example.result.Either
 import javax.inject.Inject
 
-class GetProfileImageUriUseCase @Inject constructor(
+open class GetProfileImageUriUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) {
-    suspend operator fun invoke(): Either<DataError, String> =
+    open suspend operator fun invoke(): Either<DataError, String> =
         settingsRepository.getProfileImageStringUri()
 }

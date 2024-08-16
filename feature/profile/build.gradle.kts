@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.dagger)
     implementation(project(":utils:permission"))
+    implementation(libs.androidx.junit.ktx)
     kapt(libs.dagger.compiler)
     implementation(libs.coil)
 
@@ -62,4 +63,16 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(project(":utils:test_rules"))
     testImplementation(libs.robolectric)
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+    androidTestImplementation(libs.androidx.fragment.testing)
+    debugImplementation(libs.androidx.fragment.testing.manifest)
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(project(":utils:test_matchers"))
+    androidTestImplementation(libs.androidx.espresso.intents)
 }

@@ -41,6 +41,8 @@ android {
     }
 }
 
+
+
 dependencies {
     implementation(project(":ui"))
     implementation(project(":utils:result"))
@@ -73,4 +75,12 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(project(":utils:test_rules"))
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.ui.test.manifest)
 }

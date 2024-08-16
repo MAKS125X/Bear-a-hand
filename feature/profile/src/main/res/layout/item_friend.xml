@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profileIV"
+        android:id="@+id/friendIV"
         android:layout_width="@dimen/friend_card_image_size"
         android:layout_height="@dimen/friend_card_image_size"
         android:layout_marginEnd="@dimen/friend_card_image_margin_horizontal"

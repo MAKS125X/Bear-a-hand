@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 
-class GetFriendListUseCase {
-    operator fun invoke(): Flow<Either<DataError, List<FriendUI>>> =
+open class GetFriendListUseCase {
+    open operator fun invoke(): Flow<Either<DataError, List<FriendUI>>> =
         flowOf(
             Either.Right(
                 listOf(

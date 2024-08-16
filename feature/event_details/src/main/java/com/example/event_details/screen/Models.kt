@@ -18,8 +18,8 @@ sealed interface EventDetailsEvent : MviEvent {
     sealed interface Ui : EventDetailsEvent
     sealed interface Internal : EventDetailsEvent {
         data class LoadEventDetails(val eventId: String) : Internal
-        data class DetailsLoaded(val eventDetails: EventLongUi) : Internal
-        data class ErrorLoading(val error: UiText) : Internal {
+        data class EventDetailsLoaded(val eventDetails: EventLongUi) : Internal
+        data class ErrorLoaded(val error: UiText) : Internal {
             constructor(error: DataError) : this(error.getDescription())
         }
     }

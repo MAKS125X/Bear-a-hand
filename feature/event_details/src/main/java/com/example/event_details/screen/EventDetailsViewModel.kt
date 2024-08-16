@@ -34,13 +34,13 @@ class EventDetailsViewModel(
                 EventDetailsEvent.Internal.LoadEventDetails(id)
             )
         } else {
-            consumeEvent(EventDetailsEvent.Internal.ErrorLoading(DataError.Unexpected()))
+            consumeEvent(EventDetailsEvent.Internal.ErrorLoaded(DataError.Unexpected()))
         }
     }
 
     override fun reduce(state: EventDetailsState, event: EventDetailsEvent) {
         when (event) {
-            is EventDetailsEvent.Internal.DetailsLoaded -> {
+            is EventDetailsEvent.Internal.EventDetailsLoaded -> {
                 updateState(
                     state.copy(
                         eventDetails = event.eventDetails,
@@ -50,7 +50,7 @@ class EventDetailsViewModel(
                 )
             }
 
-            is EventDetailsEvent.Internal.ErrorLoading -> {
+            is EventDetailsEvent.Internal.ErrorLoaded -> {
                 updateState(
                     state.copy(
                         eventDetails = null,
@@ -75,7 +75,7 @@ class EventDetailsViewModel(
 
     private fun getEventById(id: String) {
         val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-            consumeEvent(EventDetailsEvent.Internal.ErrorLoading(DataError.Unexpected()))
+            consumeEvent(EventDetailsEvent.Internal.ErrorLoaded(DataError.Unexpected()))
         }
 
         getEventDetailsUseCase
@@ -83,11 +83,11 @@ class EventDetailsViewModel(
             .onEach { either ->
                 either.processResult(
                     onError = {
-                        consumeEvent(EventDetailsEvent.Internal.ErrorLoading(it.getDescription()))
+                        consumeEvent(EventDetailsEvent.Internal.ErrorLoaded(it.getDescription()))
                     },
                     onSuccess = { event ->
                         consumeEvent(
-                            EventDetailsEvent.Internal.DetailsLoaded(
+                            EventDetailsEvent.Internal.EventDetailsLoaded(
                                 eventDetails = event.mapToLongUi()
                             )
                         )
@@ -97,7 +97,7 @@ class EventDetailsViewModel(
             .launchIn(viewModelScope + exceptionHandler)
     }
 
-    class Factory @Inject constructor(
+    open class Factory @Inject constructor(
         private val getEventDetailsUseCase: Provider<GetEventDetailsUseCase>,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
