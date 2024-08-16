@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.imageResource
@@ -42,6 +43,8 @@ import com.example.news.models.EventShortUi
 import com.example.common_view.R as commonR
 import com.example.news.R as newsR
 
+const val EVENT_CARD_TEST_TAG = "EventCard test tag"
+
 @Composable
 fun EventCard(
     modifier: Modifier = Modifier,
@@ -57,7 +60,8 @@ fun EventCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.background
         ),
-        modifier = modifier,
+        modifier = modifier
+            .testTag(EVENT_CARD_TEST_TAG),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -5,6 +5,7 @@ import androidx.annotation.RestrictTo
 import androidx.lifecycle.ViewModel
 import com.example.core.di.Feature
 import com.example.core.repositories.EventRepository
+import com.example.core.repositories.SettingsRepository
 import com.example.event_details.screen.EventDetailsFragment
 import dagger.Component
 import kotlin.properties.Delegates
@@ -29,6 +30,7 @@ interface EventDetailsDeps {
 
 interface WorkerDeps {
     fun openEventDetailsEventIntent(eventId: String): Intent
+    val settingsRepository: SettingsRepository
 }
 
 interface EventDetailsDepsProvider {

@@ -3,6 +3,7 @@ package com.example.simbirsoftmobile.di.modules
 import android.content.Context
 import android.content.Intent
 import androidx.work.WorkerFactory
+import com.example.core.repositories.SettingsRepository
 import com.example.event_details.di.WorkerDeps
 import com.example.event_details.screen.notification.HelpWorkerFactory
 import com.example.event_details.screen.notification.MoneyHelpNotificationIntentKey
@@ -23,8 +24,11 @@ interface EventDetailsModule {
 @Module
 class WorkerModule {
     @Provides
-    fun workerFactory(notificationNavigation: WorkerDeps): WorkerFactory {
-        return HelpWorkerFactory { eventId: String ->
+    fun workerFactory(
+        notificationNavigation: WorkerDeps,
+        settingsRepository: SettingsRepository,
+    ): WorkerFactory {
+        return HelpWorkerFactory(settingsRepository) { eventId: String ->
             notificationNavigation.openEventDetailsEventIntent(
                 eventId
             )
@@ -34,6 +38,7 @@ class WorkerModule {
 
 class WorkerDepsImpl @Inject constructor(
     private val context: Context,
+    override val settingsRepository: SettingsRepository,
 ) : WorkerDeps {
     override fun openEventDetailsEventIntent(eventId: String): Intent =
         Intent(context, MainActivity::class.java).apply {

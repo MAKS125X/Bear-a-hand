@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
 import androidx.work.Constraints
@@ -42,13 +41,14 @@ class EventDetailsFragment :
     @Inject
     lateinit var factory: Lazy<EventDetailsViewModel.Factory>
 
-    override val viewModel: EventDetailsViewModel by viewModels {
-        factory.get()
-    }
+    public override lateinit var viewModel: EventDetailsViewModel
 
     override fun onAttach(context: Context) {
-        ViewModelProvider(this).get<EventDetailsComponentViewModel>()
-            .eventDetailsComponent.inject(this)
+        if (!this::factory.isInitialized) {
+            ViewModelProvider(this).get<EventDetailsComponentViewModel>()
+                .eventDetailsComponent.inject(this)
+            viewModel = ViewModelProvider(this, factory.get()).get()
+        }
         super.onAttach(context)
     }
 

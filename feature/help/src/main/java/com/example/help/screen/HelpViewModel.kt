@@ -20,10 +20,6 @@ class HelpViewModel(
 ) : MviViewModel<HelpState, HelpSideEffect, HelpEvent>(
     HelpState()
 ) {
-    init {
-        consumeEvent(HelpEvent.Internal.LoadCategories)
-    }
-
     override fun reduce(state: HelpState, event: HelpEvent) {
         when (event) {
             HelpEvent.Internal.LoadCategories -> {
@@ -31,6 +27,7 @@ class HelpViewModel(
                     state.copy(
                         isLoading = true,
                         error = null,
+                        categories = emptyList()
                     )
                 )
                 loadCategories()
@@ -51,6 +48,7 @@ class HelpViewModel(
                     state.copy(
                         isLoading = false,
                         error = event.error,
+                        categories = emptyList(),
                     )
                 )
             }

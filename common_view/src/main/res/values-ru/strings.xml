@@ -6,11 +6,15 @@
     <string name="history">История</string>
     <string name="profile">Профиль</string>
     <string name="filter">Фильтр</string>
+
     <string name="adults">Взрослые</string>
     <string name="children">Дети</string>
     <string name="animals">Животные</string>
     <string name="events">Мероприятия</string>
     <string name="old">Пожилые</string>
+
     <string name="select_help_category">Выберите категории:</string>
     <string name="nothing_was_found_based_on_filters">На основании ваших фильтров ничего не найдено</string>
+
+    <string name="request_notification_permission">Приложению необходимо разрешение на отправку уведомлений для информирования об успешном пожертвовании</string>
 </resources>

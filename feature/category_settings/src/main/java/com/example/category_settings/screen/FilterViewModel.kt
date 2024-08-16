@@ -25,10 +25,6 @@ class FilterViewModel(
 ) : MviViewModel<FilterState, FilterSideEffect, FilterEvent>(
     FilterState()
 ) {
-    init {
-        consumeEvent(FilterEvent.Internal.LoadCategories)
-    }
-
     override fun reduce(state: FilterState, event: FilterEvent) {
         when (event) {
             is FilterEvent.Ui.UpdateSelectedById -> {

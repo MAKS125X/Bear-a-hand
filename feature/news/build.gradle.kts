@@ -41,6 +41,8 @@ android {
     }
 }
 
+
+
 dependencies {
     implementation(project(":ui"))
     implementation(project(":utils:result"))
@@ -67,4 +69,18 @@ dependencies {
     implementation(libs.material3)
     debugImplementation(libs.ui.tooling)
     implementation(libs.coil.compose)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":utils:test_rules"))
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.ui.test.manifest)
 }

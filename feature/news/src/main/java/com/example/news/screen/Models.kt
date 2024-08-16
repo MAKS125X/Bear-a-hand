@@ -8,7 +8,7 @@ import com.example.ui.MviState
 import com.example.ui.UiText
 
 data class NewsState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val news: List<EventShortUi> = emptyList(),
     val error: UiText? = null,
 ) : MviState
@@ -24,5 +24,5 @@ sealed interface NewsEvent : MviEvent {
 }
 
 sealed interface NewsSideEffect : MviSideEffect {
-    data object NoEffect: NewsSideEffect
+    data object NoEffect : NewsSideEffect
 }

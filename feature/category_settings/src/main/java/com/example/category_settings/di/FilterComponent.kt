@@ -6,7 +6,7 @@ import com.example.category_settings.screen.FilterFragment
 import com.example.core.di.Feature
 import com.example.core.repositories.CategoryRepository
 import dagger.Component
-import kotlin.properties.Delegates.notNull
+import kotlin.properties.Delegates
 
 @[Feature Component(dependencies = [FilterDeps::class])]
 internal interface FilterComponent {
@@ -33,7 +33,7 @@ interface FilterDepsProvider {
 }
 
 object FilterDepsStore : FilterDepsProvider {
-    override var deps: FilterDeps by notNull()
+    override var deps: FilterDeps by Delegates.notNull()
 }
 
 internal class FilterComponentViewModel : ViewModel() {

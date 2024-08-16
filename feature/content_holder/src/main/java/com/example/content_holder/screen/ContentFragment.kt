@@ -1,6 +1,7 @@
 package com.example.content_holder.screen
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
-import com.example.content_holder.R
+import com.example.content_holder.R as contentR
+import com.example.common_view.R as commonR
 import com.example.content_holder.databinding.FragmentContentBinding
 import com.example.content_holder.di.ContentDeps
 import com.example.content_holder.di.ContentHolderComponentViewModel
@@ -48,13 +50,12 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
     private val registerForResult: ActivityResultLauncher<String>
         get() = _registerForResult!!
 
-
     override fun renderState(state: ContentState) {
         with(binding) {
             if (state.badge <= 0) {
-                bottomNavigationView.removeBadge(R.id.news_menu)
+                bottomNavigationView.removeBadge(contentR.id.news_menu)
             } else {
-                bottomNavigationView.getOrCreateBadge(R.id.news_menu).number = state.badge
+                bottomNavigationView.getOrCreateBadge(contentR.id.news_menu).number = state.badge
             }
         }
     }
@@ -64,7 +65,7 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
             .newDetailsComponent.inject(this)
 
         _registerForResult =
-            registerForRequestPermissionResult(getString(R.string.request_notification_permission))
+            registerForRequestPermissionResult(getString(commonR.string.request_notification_permission))
 
         super.onAttach(context)
     }
@@ -78,48 +79,51 @@ class ContentFragment : MviFragment<ContentState, ContentSideEffect, ContentEven
         initBottomNavigation()
 
         if (savedInstanceState == null) {
-            binding.bottomNavigationView.selectedItemId = R.id.help_menu
-            requestPermission(
-                registerForResult,
-                requireContext(),
-                android.Manifest.permission.POST_NOTIFICATIONS,
-                requireActivity(),
-            )
+            binding.bottomNavigationView.selectedItemId = contentR.id.help_menu
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermission(
+                    registerForResult,
+                    requireContext(),
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                    requireActivity(),
+                )
+            }
         }
     }
 
     private fun initBottomNavigation() {
         binding.bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.profile_menu -> {
+                contentR.id.profile_menu -> {
                     deps.contentHolderNavigation.navigateToProfile(
                         binding.contentHolder.id,
                         parentFragmentManager
                     )
                 }
 
-                R.id.help_menu -> {
+                contentR.id.help_menu -> {
                     deps.contentHolderNavigation.navigateToHelp(
                         binding.contentHolder.id,
                         parentFragmentManager
                     )
                 }
 
-                R.id.search_menu -> {
+                contentR.id.search_menu -> {
                     deps.contentHolderNavigation.navigateToSearch(
                         binding.contentHolder.id,
                         parentFragmentManager
                     )
                 }
 
-                R.id.news_menu -> {
+                contentR.id.news_menu -> {
                     deps.contentHolderNavigation.navigateToNews(
                         binding.contentHolder.id,
                         parentFragmentManager
                     )
                 }
 
-                R.id.history_menu -> {
+                contentR.id.history_menu -> {
                     deps.contentHolderNavigation.navigateToHistory(
                         binding.contentHolder.id,
                         parentFragmentManager

@@ -29,6 +29,7 @@ include(":utils:mapper")
 include(":utils:date")
 include(":utils:permission")
 include(":utils:data_error")
+include(":utils:test_rules")
 
 include(":feature:auth")
 include(":feature:news")
@@ -42,3 +43,5 @@ include(":feature:content_holder")
 include(":feature:notification")
 
 include(":basics")
+include(":android_settings")
+include(":utils:test_matchers")

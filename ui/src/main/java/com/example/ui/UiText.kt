@@ -15,4 +15,24 @@ sealed class UiText {
             is DynamicString -> value
             is StringResource -> context.getString(resId, *args)
         }
+
+    override fun equals(other: Any?): Boolean {
+        return when {
+            this is DynamicString && other is DynamicString
+                    && this.value == other.value -> true
+
+            this is StringResource && other is StringResource
+                    && this.resId == other.resId && this.args.contentEquals(other.args) -> true
+
+            else -> false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return when (this) {
+            is DynamicString -> value.hashCode()
+
+            is StringResource -> resId.hashCode()
+        }
+    }
 }

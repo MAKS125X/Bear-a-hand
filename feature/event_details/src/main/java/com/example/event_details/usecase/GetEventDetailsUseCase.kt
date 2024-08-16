@@ -4,10 +4,10 @@ import com.example.core.repositories.EventRepository
 import com.example.result.extractResult
 import javax.inject.Inject
 
-class GetEventDetailsUseCase @Inject constructor(
+open class GetEventDetailsUseCase @Inject constructor(
     private val repository: EventRepository,
 ) {
-    operator fun invoke(eventId: String) =
+    open operator fun invoke(eventId: String) =
         repository.getEventById(eventId)
             .extractResult()
 }

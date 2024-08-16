@@ -14,10 +14,11 @@ import com.example.event_details.di.EventDepsStore
 import com.example.help.di.HelpDepsStore
 import com.example.news.di.NewsDepsStore
 import com.example.notification.createNotificationChannel
+import com.example.profile.di.ProfileDepsStore
 import com.example.search.di.SearchCDepsStore
 import javax.inject.Inject
 
-class SimbirSoftApp() : Application(), ImageLoaderFactory {
+class SimbirSoftApp : Application(), ImageLoaderFactory {
     val appComponent: AppComponent by lazy {
         DaggerAppComponent.builder()
             .context(this)
@@ -39,6 +40,7 @@ class SimbirSoftApp() : Application(), ImageLoaderFactory {
         ContentDepsStore.deps = appComponent
         FilterDepsStore.deps = appComponent
         SearchCDepsStore.deps = appComponent
+        ProfileDepsStore.deps = appComponent
 
         createNotificationChannel()
 

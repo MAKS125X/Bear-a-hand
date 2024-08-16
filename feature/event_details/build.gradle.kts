@@ -68,4 +68,16 @@ dependencies {
     implementation(libs.coil)
 
     implementation(libs.androidx.work.runtime.ktx)
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+    androidTestImplementation(libs.androidx.fragment.testing)
+    debugImplementation(libs.androidx.fragment.testing.manifest)
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(project(":utils:test_matchers"))
+    androidTestImplementation(libs.androidx.espresso.intents)
 }
