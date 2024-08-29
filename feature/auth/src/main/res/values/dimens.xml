@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="auth_elements_margin_top">20dp</dimen>
+    <dimen name="auth_section_margin_top">40dp</dimen>
+    <dimen name="auth_padding_horizontal">20dp</dimen>
+    <dimen name="auth_padding_vertical">20dp</dimen>
+    <dimen name="auth_icon_size">40dp</dimen>
+    <dimen name="auth_icon_layout_margin_horizontal">60dp</dimen>
+    <dimen name="auth_title_margin_horizontal">36dp</dimen>
+    <dimen name="button_corners">2dp</dimen>
+    <dimen name="button_elevation">2dp</dimen>
+</resources>

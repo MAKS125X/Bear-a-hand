@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/dialog_padding">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/pickPhotoLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:gravity="center_vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/pickPhotoIV"
+            android:layout_width="@dimen/dialog_item_image_size"
+            android:layout_height="@dimen/dialog_item_image_size"
+            android:layout_marginEnd="@dimen/dialog_image_margin_left"
+            android:theme="@style/DialogItemsImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_upload" />
+
+        <TextView
+            android:id="@+id/pickPhotoTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pick_photo"
+            android:theme="@style/DialogItemsText"
+            app:layout_constraintStart_toEndOf="@+id/appCompatImageView" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/takePictureLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:gravity="center_vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/takePictureIV"
+            android:layout_width="@dimen/dialog_item_image_size"
+            android:layout_height="@dimen/dialog_item_image_size"
+            android:layout_marginEnd="@dimen/dialog_image_margin_left"
+            android:theme="@style/DialogItemsImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_photo" />
+
+        <TextView
+            android:id="@+id/takePictureTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/take_picture"
+            android:theme="@style/DialogItemsText"
+            app:layout_constraintStart_toEndOf="@+id/appCompatImageView" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/deletePictureLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/deletePictureIV"
+            android:layout_width="@dimen/dialog_item_image_size"
+            android:layout_height="@dimen/dialog_item_image_size"
+            android:layout_marginEnd="@dimen/dialog_image_margin_left"
+            android:theme="@style/DialogItemsImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_delete" />
+
+        <TextView
+            android:id="@+id/deletePictureTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_picture"
+            android:theme="@style/DialogItemsText"
+            app:layout_constraintStart_toEndOf="@+id/appCompatImageView" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

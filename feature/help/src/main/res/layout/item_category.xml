@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/category_layout_margin"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingVertical="@dimen/category_paddingVertical"
+    android:theme="@style/CategoryItemLayout">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/categoryNameIV"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/category_image_size"
+        android:layout_marginBottom="@dimen/category_image_margin_bottom"
+        android:scaleType="centerInside"
+        tools:src="@drawable/category_children" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/categoryNameTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/CategoryItemTextView"
+        tools:ignore="TextContrastCheck"
+        tools:text="Взрослые" />
+</androidx.appcompat.widget.LinearLayoutCompat>

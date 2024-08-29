@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
+    <style name="ToolbarTitle">
+        <item name="android:textSize">@dimen/toolbar_text_size</item>
+        <item name="android:fontFamily">@font/officinasansextraboldscc</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="LayoutText">
+        <item name="android:fontFamily">@font/roboto</item>
+    </style>
+
+    <style name="ScreenH1TextView" parent="LayoutText">
+        <item name="android:textSize">@dimen/screen_h1_text_size</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="ProfileAttributeHeaderTextView" parent="LayoutText">
+        <item name="android:textSize">@dimen/attribute_header_text_size</item>
+        <item name="android:textColor">?attr/helperText</item>
+    </style>
+
+    <style name="ProfileAttributeValueTextView" parent="LayoutText">
+        <item name="android:textSize">@dimen/attribute_value_text_size</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="ScreenH2TextView" parent="LayoutText">
+        <item name="android:textSize">@dimen/screen_h2_text_size</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="Switch" parent="ProfileAttributeValueTextView">
+        <item name="colorControlActivated">?attr/colorPrimary</item>
+    </style>
+
+    <style name="FriendCardImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="SectionDivider">
+        <item name="android:background">?attr/dividerColor</item>
+    </style>
+
+    <style name="DialogItemsText" parent="LayoutText">
+        <item name="android:textSize">@dimen/dialog_item_text_size</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="DialogItemsImage" parent="LayoutText">
+        <item name="android:tint">?attr/colorPrimary</item>
+    </style>
+
+    <style name="CategoryItemLayout">
+        <item name="android:background">?attr/colorSecondary</item>
+    </style>
+
+    <style name="CategoryItemTextView">
+        <item name="android:fontFamily">@font/officinasansextraboldscc</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">@dimen/category_text_size</item>
+    </style>
+
+    <style name="SearchResultItemTextView" parent="ScreenH2TextView">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="EventDetailsTitle">
+        <item name="android:fontFamily">@font/officinasansextraboldscc</item>
+        <item name="android:lineSpacingExtra">10sp</item>
+        <item name="android:textColor">@color/blue_grey</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+
+    <style name="AdditionalText">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textSize">@dimen/event_details_additional_text_size</item>
+    </style>
+
+    <style name="EventDetailsDateTextView" parent="AdditionalText">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="OrganizerNameTextView" parent="AdditionalText">
+        <item name="android:textColor">@color/black60</item>
+    </style>
+
+    <style name="EventDescription">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/black70</item>
+        <item name="android:textSize">@dimen/event_description_text_size</item>
+    </style>
+
+    <style name="EventClickableText">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">@dimen/event_description_text_size</item>
+    </style>
+
+    <style name="CircularProgressIndicator">
+        <item name="android:layout_width">@dimen/progressIndicatorSize</item>
+        <item name="android:layout_height">@dimen/progressIndicatorSize</item>
+        <item name="android:indeterminate">true</item>
+    </style>
+
+    <style name="ButtonStyle">
+        <item name="android:background">@color/selector_button_color</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="IconLabel">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/black40</item>
+        <item name="android:textSize">@dimen/icon_label_text_size</item>
+    </style>
+</resources>

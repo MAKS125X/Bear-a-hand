@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="news">News</string>
+    <string name="search">Search</string>
+    <string name="help">Help</string>
+    <string name="history">History</string>
+    <string name="profile">Profile</string>
+    <string name="filter">Filter</string>
+
+    <string name="adults">Adult</string>
+    <string name="children">Children</string>
+    <string name="animals">Animals</string>
+    <string name="events">Events</string>
+    <string name="old">Old</string>
+
+    <string name="select_help_category">Select the help category:</string>
+    <string name="nothing_was_found_based_on_filters">Nothing was found based on your filters</string>
+
+    <string name="request_notification_permission">The application needs permission to send notifications to inform about a successful donation</string>
+</resources>

@@ -1,0 +1,32 @@
+{
+  "children": {
+    "id": "1",
+    "name_en": "children",
+    "name": "дети",
+    "image": "https://i.imgur.com/UWOZP5z.png"
+  },
+  "adults": {
+    "id": "2",
+    "name_en": "adults",
+    "name": "взрослые",
+    "image": "https://i.imgur.com/LMh9wYR.png"
+  },
+  "elders": {
+    "id": "3",
+    "name_en": "elders",
+    "name": "пожилые",
+    "image": "https://i.imgur.com/eQgcsUj.png"
+  },
+  "animals": {
+    "id": "4",
+    "name_en": "animals",
+    "name": "животные",
+    "image": "https://i.imgur.com/rryUlik.png"
+  },
+  "events": {
+    "id": "5",
+    "name_en": "events",
+    "name": "мероприятия",
+    "image": "https://i.imgur.com/1MxWB96.png"
+  }
+}

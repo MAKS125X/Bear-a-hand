@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="forget_password"><u>Forget password?</u></string>
+    <string name="registration"><u>Registration</u></string>
+    <string name="authorization">Authorization</string>
+    <string name="email">E-mail</string>
+    <string name="enter_email">Enter e-mail</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Enter password</string>
+    <string name="login">Login</string>
+    <string name="login_via_socials">To participate in events, log in to the app via social media</string>
+    <string name="login_through_app">Log in through the app</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+</resources>

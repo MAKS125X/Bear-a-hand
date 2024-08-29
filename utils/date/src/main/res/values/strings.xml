@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_already_ended">The event has already ended</string>
+    <string name="will_start_soon">It will start in %1$s days (%2$s – %3$s)</string>
+    <string name="days_left">Left %1$s days (%2$s – %3$s)</string>
+</resources>

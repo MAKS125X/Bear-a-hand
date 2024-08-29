@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/ScreenH1TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="21dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:text="@string/thanks_for_deciding_to_help" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/ScreenH2TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/choose_donation_size"
+        android:textAlignment="center"
+        android:textColor="?attr/colorOnSurface" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/donationAmountLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/background_button_layout_stroke"
+        android:padding="1dp">
+
+        <android.widget.Button
+            android:id="@+id/donate100Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_donation_button_background"
+            android:minWidth="65dp"
+            android:minHeight="36dp"
+            android:text="@string/rubles_100"
+            android:textColor="@drawable/selector_donation_button_text_color" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="?attr/colorPrimary" />
+
+        <android.widget.Button
+            android:id="@+id/donate500Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_donation_button_background"
+            android:minWidth="65dp"
+            android:minHeight="36dp"
+            android:padding="1dp"
+            android:text="@string/rubles_500"
+            android:textColor="@drawable/selector_donation_button_text_color" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="?attr/colorPrimary" />
+
+        <android.widget.Button
+            android:id="@+id/donate1000Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_donation_button_background"
+            android:minWidth="65dp"
+            android:minHeight="36dp"
+            android:padding="1dp"
+            android:text="@string/rubles_1000"
+            android:textColor="@drawable/selector_donation_button_text_color" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="?attr/colorPrimary" />
+
+        <android.widget.Button
+            android:id="@+id/donate2000Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_donation_button_background"
+            android:minWidth="65dp"
+            android:minHeight="36dp"
+            android:padding="1dp"
+            android:text="@string/rubles_2000"
+            android:textColor="@drawable/selector_donation_button_text_color" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/ScreenH2TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/or_enter_required_amount"
+        android:textColor="?attr/colorOnSurface" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/donateEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="@string/enter_amount"
+        android:inputType="number" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

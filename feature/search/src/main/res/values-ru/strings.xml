@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="empty_category_list_error">Произошла ошибка получения категорий. Настройте интересующие вас категории.</string>
+    <string name="search_result_events_size">Результаты поиска: %1$s мероприятий</string>
+    <string name="search_result_organizations_size">Результаты поиска: %1$s организаций</string>
+    <string name="try_search_events">Напишите в строке поиска название \nмероприятия или ключевые слова.</string>
+    <string name="try_search_organization">Напишите в строке поиска название \nорганизации или ключевые слова.</string>
+    <string name="empty_search_result">По данному запросу ничего не найдено</string>
+</resources>
